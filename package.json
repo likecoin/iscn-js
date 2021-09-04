@@ -15,7 +15,17 @@
     "url": "https://github.com/likecoin/iscn-js.git"
   },
   "license": "GPL-3.0-or-later",
+  "peerDependencies": {
+    "@cosmjs/stargate": "^0.26.0"
+  },
   "devDependencies": {
+    "@cosmjs/stargate": "^0.26.0",
     "typescript": "^4.4.2"
+  },
+  "dependencies": {
+    "@likecoin/iscn-message-types": "^0.0.1",
+    "bignumber.js": "^9.0.1",
+    "buffer": "^6.0.3",
+    "fast-json-stable-stringify": "^2.1.0"
   }
 }

@@ -1,14 +1,14 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
-import { QueryClient, setupBankExtension, BankExtension } from "@cosmjs/stargate";
-import { Coin } from "@cosmjs/stargate";
-import { QueryResponseRecord } from "@likecoin/iscn-message-types/dist/iscn/query";
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import {
+  QueryClient, setupBankExtension, BankExtension, Coin,
+} from '@cosmjs/stargate';
+import { QueryResponseRecord } from '@likecoin/iscn-message-types/dist/iscn/query';
 import BigNumber from 'bignumber.js';
 
-import { setupISCNExtension, ISCNExtension } from "./ISCNQueryExtension";
-import { ISCNRecord } from "./types";
-import { DEFAULT_RPC_ENDPOINT } from "./constant";
-
+import { setupISCNExtension, ISCNExtension } from './ISCNQueryExtension';
+import { ISCNRecord } from './types';
+import { DEFAULT_RPC_ENDPOINT } from './constant';
 
 function parseISCNTxRecordFromQuery(records: QueryResponseRecord[]) {
   return records.map((r): ISCNRecord => {
@@ -17,14 +17,15 @@ function parseISCNTxRecordFromQuery(records: QueryResponseRecord[]) {
     return {
       ipld,
       data: parsedData,
-    }
+    };
   });
 }
 
 export class ISCNQueryClient {
   queryClient: QueryClient & ISCNExtension & BankExtension | null = null;
 
-  async connect(rpcURL = DEFAULT_RPC_ENDPOINT) {
+  async connect(rpcURL = DEFAULT_RPC_ENDPOINT)
+  : Promise<QueryClient & ISCNExtension & BankExtension> {
     const tendermintClient = await Tendermint34Client.connect(rpcURL);
     this.queryClient = QueryClient.withExtensions(
       tendermintClient,
@@ -34,8 +35,8 @@ export class ISCNQueryClient {
     return this.queryClient;
   }
 
-  async getQueryClient() {
-    let queryClient = this.queryClient;
+  async getQueryClient(): Promise<QueryClient & ISCNExtension & BankExtension> {
+    let { queryClient } = this;
     if (!queryClient) queryClient = await this.connect();
     return queryClient;
   }
@@ -79,7 +80,7 @@ export class ISCNQueryClient {
     return null;
   }
 
-  async queryFeePerByte() {
+  async queryFeePerByte(): Promise<Coin | null> {
     const queryClient = await this.getQueryClient();
     const res = await queryClient.iscn.params();
     if (res && res.params && res.params.feePerByte) {
@@ -92,7 +93,7 @@ export class ISCNQueryClient {
         amount: new BigNumber(amount).shiftedBy(-18).toFixed(),
       } as Coin;
     }
-    return 0;
+    return null;
   }
 }
 

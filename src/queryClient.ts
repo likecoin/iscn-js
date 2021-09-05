@@ -7,6 +7,7 @@ import BigNumber from 'bignumber.js';
 
 import { setupISCNExtension, ISCNExtension } from "./ISCNQueryExtension";
 import { ISCNRecord } from "./types";
+import { DEFAULT_RPC_ENDPOINT } from "./constant";
 
 
 function parseISCNTxRecordFromQuery(records: QueryResponseRecord[]) {
@@ -23,7 +24,7 @@ function parseISCNTxRecordFromQuery(records: QueryResponseRecord[]) {
 export class ISCNQueryClient {
   queryClient: QueryClient & ISCNExtension & BankExtension | null = null;
 
-  async connect({ rpcURL = '' }: { rpcURL?: string} = {}) {
+  async connect(rpcURL = DEFAULT_RPC_ENDPOINT) {
     const tendermintClient = await Tendermint34Client.connect(rpcURL);
     this.queryClient = QueryClient.withExtensions(
       tendermintClient,

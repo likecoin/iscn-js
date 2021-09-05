@@ -1,5 +1,7 @@
-import Long from "long";
-import { createProtobufRpcClient, QueryClient } from "@cosmjs/stargate";
+/* eslint-disable max-len */
+// eslint-disable-next-line import/no-extraneous-dependencies
+import Long from 'long';
+import { createProtobufRpcClient, QueryClient } from '@cosmjs/stargate';
 import {
   QueryClientImpl,
   QueryRecordsByIdResponse,
@@ -9,7 +11,7 @@ import {
   QueryGetCidResponse,
   QueryHasCidResponse,
   QueryGetCidSizeResponse,
-} from "@likecoin/iscn-message-types/dist/iscn/query";
+} from '@likecoin/iscn-message-types/dist/iscn/query';
 
 export interface ISCNExtension {
   readonly iscn: {
@@ -29,11 +31,11 @@ export function setupISCNExtension(base: QueryClient): ISCNExtension {
   return {
     iscn: {
       recordsById: (iscnId, fromVersion = 0, toVersion = 0) => queryService.RecordsById({
-          iscnId,
-          fromVersion: Long.fromNumber(fromVersion, true),
-          toVersion: Long.fromNumber(toVersion, true),
-        }),
-      recordsByFingerprint: (fingerprint, fromSequence = 0) =>  queryService.RecordsByFingerprint({
+        iscnId,
+        fromVersion: Long.fromNumber(fromVersion, true),
+        toVersion: Long.fromNumber(toVersion, true),
+      }),
+      recordsByFingerprint: (fingerprint, fromSequence = 0) => queryService.RecordsByFingerprint({
         fingerprint,
         fromSequence: Long.fromNumber(fromSequence, true),
       }),
@@ -44,6 +46,6 @@ export function setupISCNExtension(base: QueryClient): ISCNExtension {
       getCid: (cid) => queryService.GetCid({ cid }),
       hasCid: (cid) => queryService.HasCid({ cid }),
       getCidSize: (cid) => queryService.GetCidSize({ cid }),
-    }
+    },
   };
 }

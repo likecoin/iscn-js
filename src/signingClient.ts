@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { OfflineSigner, Registry } from '@cosmjs/proto-signing';
 import {
   defaultRegistryTypes,
@@ -9,8 +10,8 @@ import {
   MsgCreateIscnRecord,
   MsgUpdateIscnRecord,
   MsgChangeIscnRecordOwnership,
-} from '@likecoin/iscn-message-types/dist/iscn/tx'
-import jsonStringify from 'fast-json-stable-stringify'
+} from '@likecoin/iscn-message-types/dist/iscn/tx';
+import jsonStringify from 'fast-json-stable-stringify';
 
 import {
   ISCN_REGISTRY_NAME,
@@ -30,7 +31,7 @@ const registry = new Registry([
   ['/likechain.iscn.MsgCreateIscnRecord', MsgCreateIscnRecord],
   ['/likechain.iscn.MsgUpdateIscnRecord', MsgUpdateIscnRecord],
   ['/likechain.iscn.MsgChangeIscnRecordOwnership', MsgChangeIscnRecordOwnership],
-])
+]);
 
 export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
   const {
@@ -43,13 +44,12 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
     type,
     usageInfo,
     recordNotes,
-  } = payload
+  } = payload;
 
-  const stakeholders = inputStakeHolders.map((s: Stakeholder) =>
-    Buffer.from(
-      JSON.stringify(s),
-      'utf8',
-    ),);
+  const stakeholders = inputStakeHolders.map((s: Stakeholder) => Buffer.from(
+    JSON.stringify(s),
+    'utf8',
+  ));
   const contentMetadata = {
     '@context': 'http://schema.org/',
     '@type': type,
@@ -59,13 +59,13 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
     url,
     keywords: keywords.join(','),
     usageInfo,
-  }
+  };
   return {
     recordNotes,
     contentFingerprints,
     stakeholders,
     contentMetadata: Buffer.from(JSON.stringify(contentMetadata), 'utf8'),
-  }
+  };
 }
 
 export async function estimateISCNTxGas(tx: ISCNSignPayload) {
@@ -81,8 +81,8 @@ export async function estimateISCNTxGas(tx: ISCNSignPayload) {
     msg: [msg],
     fee: {
       amount: [{
-          denom: 'nanolike',
-          amount: '200000', // temp number here for estimation
+        denom: 'nanolike',
+        amount: '200000', // temp number here for estimation
       }],
       gas: '200000', // temp number here for estimation
     },
@@ -97,14 +97,18 @@ export async function estimateISCNTxGas(tx: ISCNSignPayload) {
   const gasUsedEstimation = byteSize.multipliedBy(GAS_ESTIMATOR_SLOP).plus(interceptWithBuffer);
   return {
     fee: {
-      amount: [{ amount: gasUsedEstimation.multipliedBy(DEFAULT_GAS_PRICE_NUMBER).toFixed(0,0), denom: COSMOS_DENOM }],
-      gas: gasUsedEstimation.toFixed(0,0),
+      amount: [{
+        amount: gasUsedEstimation.multipliedBy(DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+        denom: COSMOS_DENOM,
+      }],
+      gas: gasUsedEstimation.toFixed(0, 0),
     },
-  }
+  };
 }
 
 export class ISCNSigningClient {
   signingClient: SigningStargateClient | null = null;
+
   queryClient: ISCNQueryClient;
 
   constructor() {
@@ -124,16 +128,16 @@ export class ISCNSigningClient {
     tx: ISCNSignPayload,
     { version = 1 } = {},
   ) {
-    const record = formatISCNPayload(tx)
-    const feePerByte = await this.queryClient.queryFeePerByte()
-    const feePerByteAmount = feePerByte ? parseInt(feePerByte.amount, 10) : 1
+    const record = formatISCNPayload(tx);
+    const feePerByte = await this.queryClient.queryFeePerByte();
+    const feePerByteAmount = feePerByte ? parseInt(feePerByte.amount, 10) : 1;
     const {
       recordNotes,
       contentFingerprints,
       stakeholders,
       contentMetadata,
-    } = record
-    const now = new Date()
+    } = record;
+    const now = new Date();
     const obj = {
       '@context': {
         '@vocab': 'http://iscn.io/',
@@ -160,18 +164,17 @@ export class ISCNSigningClient {
       recordNotes,
       contentFingerprints,
       recordParentIPLD: {},
-    }
+    };
     if (version > 1) {
       obj.recordParentIPLD = {
         '/': 'bahuaierav3bfvm4ytx7gvn4yqeu4piiocuvtvdpyyb5f6moxniwemae4tjyq',
-      }
+      };
     }
-    const byteSize =
-      Buffer.from(jsonStringify(obj), 'utf-8').length +
-      stakeholders.reduce((acc, s) => acc + s.length, 0) +
-      contentMetadata.length
-    const feeAmount = byteSize * feePerByteAmount
-    return feeAmount
+    const byteSize = Buffer.from(jsonStringify(obj), 'utf-8').length
+      + stakeholders.reduce((acc, s) => acc + s.length, 0)
+      + contentMetadata.length;
+    const feeAmount = byteSize * feePerByteAmount;
+    return feeAmount;
   }
 
   async createISCNRecord(
@@ -181,18 +184,18 @@ export class ISCNSigningClient {
   ) {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const record = formatISCNPayload(payload)
+    const record = formatISCNPayload(payload);
     const message = {
       typeUrl: '/likechain.iscn.MsgCreateIscnRecord',
       value: {
         from: senderAddress,
         record,
       },
-    }
-    const { fee } = await estimateISCNTxGas(payload)
-    const response = await client.signAndBroadcast(senderAddress, [message], fee, memo)
-    assertIsBroadcastTxSuccess(response)
-    return response
+    };
+    const { fee } = await estimateISCNTxGas(payload);
+    const response = await client.signAndBroadcast(senderAddress, [message], fee, memo);
+    assertIsBroadcastTxSuccess(response);
+    return response;
   }
 
   async updateISCNRecord(
@@ -203,7 +206,7 @@ export class ISCNSigningClient {
   ) {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const record = formatISCNPayload(payload)
+    const record = formatISCNPayload(payload);
     const message = {
       typeUrl: '/likechain.iscn.MsgUpdateIscnRecord',
       value: {
@@ -211,11 +214,11 @@ export class ISCNSigningClient {
         iscnId,
         record,
       },
-    }
-    const { fee } = await estimateISCNTxGas(payload)
-    const response = await client.signAndBroadcast(senderAddress, [message], fee, memo)
-    assertIsBroadcastTxSuccess(response)
-    return response
+    };
+    const { fee } = await estimateISCNTxGas(payload);
+    const response = await client.signAndBroadcast(senderAddress, [message], fee, memo);
+    assertIsBroadcastTxSuccess(response);
+    return response;
   }
 
   async changeISCNOwnership(
@@ -233,16 +236,17 @@ export class ISCNSigningClient {
         iscnId,
         newOwner: newOwnerAddress,
       },
-    }
+    };
     const fee = {
       amount: [{
-        amount: new BigNumber(ISCN_CHANGE_OWNER_GAS).multipliedBy(DEFAULT_GAS_PRICE_NUMBER).toFixed(0,0),
+        amount: new BigNumber(ISCN_CHANGE_OWNER_GAS)
+          .multipliedBy(DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
         denom: COSMOS_DENOM,
       }],
       gas: ISCN_CHANGE_OWNER_GAS.toString(),
     };
-    const response = await client.signAndBroadcast(senderAddress, [message], fee, memo)
-    assertIsBroadcastTxSuccess(response)
-    return response
+    const response = await client.signAndBroadcast(senderAddress, [message], fee, memo);
+    assertIsBroadcastTxSuccess(response);
+    return response;
   }
 }

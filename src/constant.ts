@@ -1,4 +1,3 @@
-
 export const COSMOS_DENOM = 'nanolike';
 
 export const DEFAULT_GAS_PRICE = [{ amount: 1000, denom: COSMOS_DENOM }];

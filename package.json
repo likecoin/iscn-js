@@ -10,6 +10,9 @@
     "generate": "",
     "test": "jest --coverage"
   },
+  "files": [
+    "dist/"
+  ],
   "keywords": [],
   "repository": {
     "type": "git",

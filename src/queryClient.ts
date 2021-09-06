@@ -1,44 +1,74 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import {
-  QueryClient, setupBankExtension, BankExtension, Coin,
+  QueryClient, setupBankExtension, BankExtension, Coin, StargateClient,
 } from '@cosmjs/stargate';
-import { QueryResponseRecord } from '@likecoin/iscn-message-types/dist/iscn/query';
 import BigNumber from 'bignumber.js';
 
 import { setupISCNExtension, ISCNExtension } from './ISCNQueryExtension';
+import { parseISCNTxInfoFromIndexedTx, parseISCNTxRecordFromQuery } from './parsing';
 import { ISCNRecord } from './types';
 import { DEFAULT_RPC_ENDPOINT } from './constant';
-
-function parseISCNTxRecordFromQuery(records: QueryResponseRecord[]) {
-  return records.map((r): ISCNRecord => {
-    const { data, ipld } = r;
-    const parsedData = JSON.parse(Buffer.from(data).toString('utf-8'));
-    return {
-      ipld,
-      data: parsedData,
-    };
-  });
-}
 
 export class ISCNQueryClient {
   queryClient: QueryClient & ISCNExtension & BankExtension | null = null;
 
+  stargateClient: StargateClient | null = null;
+
   async connect(rpcURL = DEFAULT_RPC_ENDPOINT)
-  : Promise<QueryClient & ISCNExtension & BankExtension> {
-    const tendermintClient = await Tendermint34Client.connect(rpcURL);
-    this.queryClient = QueryClient.withExtensions(
+  // eslint-disable-next-line max-len
+  : Promise<{ queryClient: QueryClient & ISCNExtension & BankExtension; stargateClient: StargateClient; }> {
+    const [tendermintClient, stargateClient] = await Promise.all([
+      Tendermint34Client.connect(rpcURL),
+      StargateClient.connect(rpcURL),
+    ]);
+    const queryClient = QueryClient.withExtensions(
       tendermintClient,
       setupISCNExtension,
       setupBankExtension,
     );
-    return this.queryClient;
+    this.queryClient = queryClient;
+    this.stargateClient = stargateClient;
+    return {
+      queryClient,
+      stargateClient,
+    };
   }
 
   async getQueryClient(): Promise<QueryClient & ISCNExtension & BankExtension> {
     let { queryClient } = this;
-    if (!queryClient) queryClient = await this.connect();
+    if (!queryClient) ({ queryClient } = await this.connect());
     return queryClient;
+  }
+
+  async getStargateClient(): Promise<StargateClient> {
+    let { stargateClient } = this;
+    if (!stargateClient) ({ stargateClient } = await this.connect());
+    return stargateClient;
+  }
+
+  async queryISCNIdsByTx(txId: string): Promise<string[]> {
+    const stargateClient = await this.getStargateClient();
+    const res = await stargateClient.getTx(txId);
+    if (res) {
+      const parsed = parseISCNTxInfoFromIndexedTx(res);
+      const records: string[] = [];
+      parsed.tx.body.messages.forEach((m, index) => {
+        if (!m || !m.typeUrl.includes('/likechain.iscn')) return;
+        const log = parsed.logs[index];
+        const event = log.events.find((e: any) => e.type === 'iscn_record');
+        if (!event) return;
+        const { attributes } = event;
+        const ipldAttr = attributes.find((a: any) => a.key === 'ipld');
+        const ipld = ipldAttr && ipldAttr.value;
+        const iscnIdAttr = attributes.find((a: any) => a.key === 'iscn_id');
+        const iscnId = iscnIdAttr && iscnIdAttr.value;
+        if (!ipld || !iscnId) return;
+        records.push(iscnId);
+      });
+      return records;
+    }
+    return [];
   }
 
   async queryRecordsById(iscnId: string, fromVersion?: number, toVersion?: number) {

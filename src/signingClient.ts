@@ -5,6 +5,7 @@ import {
   defaultRegistryTypes,
   assertIsBroadcastTxSuccess,
   SigningStargateClient,
+  Coin,
 } from '@cosmjs/stargate';
 import {
   MsgCreateIscnRecord,
@@ -69,8 +70,8 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
   };
 }
 
-export async function estimateISCNTxGas(tx: ISCNSignPayload) {
-  const record = await formatISCNPayload(tx);
+export async function estimateISCNTxGas(payload: ISCNSignPayload) {
+  const record = await formatISCNPayload(payload);
   const msg = {
     type: Buffer.from('likecoin-chain/MsgCreateIscnRecord', 'utf-8'),
     value: {
@@ -125,11 +126,22 @@ export class ISCNSigningClient {
     await this.queryClient.connect(rpcURL);
   }
 
+  async esimateISCNTxGasAndFee(payload: ISCNSignPayload,) {
+    const [gas, iscnFee] = await Promise.all([
+      estimateISCNTxGas(payload),
+      this.estimateISCNTxFee(payload),
+    ]);
+    return {
+      gas,
+      iscnFee,
+    };
+  }
+
   async estimateISCNTxFee(
-    tx: ISCNSignPayload,
+    payload: ISCNSignPayload,
     { version = 1 } = {},
   ) {
-    const record = formatISCNPayload(tx);
+    const record = formatISCNPayload(payload);
     const feePerByte = await this.queryClient.queryFeePerByte();
     const feePerByteAmount = feePerByte ? parseInt(feePerByte.amount, 10) : 1;
     const {
@@ -174,8 +186,11 @@ export class ISCNSigningClient {
     const byteSize = Buffer.from(jsonStringify(obj), 'utf-8').length
       + stakeholders.reduce((acc, s) => acc + s.length, 0)
       + contentMetadata.length;
-    const feeAmount = byteSize * feePerByteAmount;
-    return feeAmount;
+    const feeAmount = new BigNumber(byteSize).multipliedBy(feePerByteAmount);
+    return {
+      amount: feeAmount.toFixed(0, 0),
+      denom: feePerByte?.denom,
+    } as Coin;
   }
 
   async createISCNRecord(

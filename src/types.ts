@@ -17,19 +17,19 @@ export interface Entity {
 }
 
 export interface Stakeholder {
-  entity: Entity,
-  rewardProportion: number,
-  contributionType: string
+  entity?: Entity & {[key:string]: unknown},
+  rewardProportion?: number,
+  contributionType?: string
 }
 
 export interface ISCNSignPayload {
   name: string;
-  description: string;
-  keywords: string[];
-  url: string;
+  description?: string;
+  keywords?: string[];
+  url?: string;
   contentFingerprints: string[];
-  stakeholders: Stakeholder[];
-  type: string;
-  usageInfo: string;
-  recordNotes: string;
+  stakeholders: (Stakeholder & unknown)[];
+  type?: string;
+  usageInfo?: string;
+  recordNotes?: string;
 }

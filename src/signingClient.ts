@@ -34,13 +34,14 @@ const registry = new Registry([
 ]);
 
 export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
+  if (!payload) throw new Error('INVALID_ISCN_PAYLOAD');
   const {
     name,
     description,
-    keywords,
+    keywords = [],
     url,
     contentFingerprints,
-    stakeholders: inputStakeHolders,
+    stakeholders: inputStakeHolders = [],
     type,
     usageInfo,
     recordNotes,

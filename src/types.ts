@@ -7,7 +7,7 @@ export interface ISCNRecordData {
 
 export interface ISCNRecord {
   ipld: string;
-  data: ISCNRecordData;
+  data: ISCNRecordData & {[key:string]: unknown};
 }
 
 export interface Entity {

@@ -126,7 +126,7 @@ export class ISCNSigningClient {
     await this.queryClient.connect(rpcURL);
   }
 
-  async esimateISCNTxGasAndFee(payload: ISCNSignPayload,) {
+  async esimateISCNTxGasAndFee(payload: ISCNSignPayload) {
     const [gas, iscnFee] = await Promise.all([
       estimateISCNTxGas(payload),
       this.estimateISCNTxFee(payload),

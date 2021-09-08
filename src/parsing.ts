@@ -32,34 +32,26 @@ export function parseISCNTxInfoFromIndexedTx(tx: IndexedTx) {
   const { tx: txBytes, rawLog } = tx;
   const decodedTx = decodeTxRaw(txBytes);
   const messages = decodedTx.body.messages.map((m) => {
+    let msg;
     if (m.typeUrl === '/likechain.iscn.MsgCreateIscnRecord') {
-      const msg = MsgCreateIscnRecord.decode(m.value);
+      msg = MsgCreateIscnRecord.decode(m.value);
       if (msg.record) {
         msg.record = parseISCNRecordFields(msg.record);
       }
-      return {
-        ...m,
-        value: msg,
-      };
     }
     if (m.typeUrl === '/likechain.iscn.MsgUpdateIscnRecord') {
-      const msg = MsgUpdateIscnRecord.decode(m.value);
+      msg = MsgUpdateIscnRecord.decode(m.value);
       if (msg.record) {
         msg.record = parseISCNRecordFields(msg.record);
       }
-      return {
-        ...m,
-        value: msg,
-      };
     }
     if (m.typeUrl === '/likechain.iscn.MsgChangeIscnRecordOwnership') {
-      const msg = MsgChangeIscnRecordOwnership.decode(m.value);
-      return {
-        ...m,
-        value: msg,
-      };
+      msg = MsgChangeIscnRecordOwnership.decode(m.value);
     }
-    return null;
+    return msg ? {
+      ...m,
+      value: msg,
+    } : null;
   });
   return {
     ...tx,

@@ -19,6 +19,7 @@ import {
   GAS_ESTIMATOR_INTERCEPT,
   GAS_ESTIMATOR_BUFFER,
   GAS_ESTIMATOR_SLOP,
+  DEFAULT_RPC_ENDPOINT,
   DEFAULT_GAS_PRICE_NUMBER,
   COSMOS_DENOM,
   STUB_WALLET,
@@ -113,17 +114,28 @@ export class ISCNSigningClient {
 
   queryClient: ISCNQueryClient;
 
+  rpcURL = DEFAULT_RPC_ENDPOINT;
+
   constructor() {
     this.queryClient = new ISCNQueryClient();
   }
 
-  async connectWithSigner(rpcURL: string, signer: OfflineSigner) {
+  async connect(rpcURL: string): Promise<void> {
+    await this.queryClient.connect(rpcURL);
+    this.rpcURL = rpcURL;
+  }
+
+  async setSigner(signer: OfflineSigner): Promise<void> {
     this.signingClient = await SigningStargateClient.connectWithSigner(
-      rpcURL,
+      this.rpcURL,
       signer,
       { registry },
     );
-    await this.queryClient.connect(rpcURL);
+  }
+
+  async connectWithSigner(rpcURL: string, signer: OfflineSigner): Promise<void> {
+    await this.connect(rpcURL);
+    await this.setSigner(signer);
   }
 
   async esimateISCNTxGasAndFee(payload: ISCNSignPayload) {

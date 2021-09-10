@@ -7,18 +7,8 @@ import BigNumber from 'bignumber.js';
 
 import { setupISCNExtension, ISCNExtension } from './ISCNQueryExtension';
 import { parseISCNTxInfoFromIndexedTx, parseISCNTxRecordFromQuery } from './parsing';
+import { ISCNRecord } from './types';
 import { DEFAULT_RPC_ENDPOINT } from './constant';
-
-function parseISCNTxRecordQueryResponse(res) {
-  if (res && res.records) {
-    const records = parseISCNTxRecordFromQuery(res.records);
-    return {
-      ...res,
-      records,
-    };
-  }
-  return null;
-}
 
 export class ISCNQueryClient {
   queryClient: QueryClient & ISCNExtension & BankExtension | null = null;
@@ -84,19 +74,40 @@ export class ISCNQueryClient {
   async queryRecordsById(iscnId: string, fromVersion?: number, toVersion?: number) {
     const queryClient = await this.getQueryClient();
     const res = await queryClient.iscn.recordsById(iscnId, fromVersion, toVersion);
-    return parseISCNTxRecordQueryResponse(res);
+    if (res && res.records) {
+      const records = parseISCNTxRecordFromQuery(res.records);
+      return {
+        ...res,
+        records,
+      };
+    }
+    return null;
   }
 
   async queryRecordsByFingerprint(fingerprint: string, fromSequence?: number) {
     const queryClient = await this.getQueryClient();
     const res = await queryClient.iscn.recordsByFingerprint(fingerprint, fromSequence);
-    return parseISCNTxRecordQueryResponse(res);
+    if (res && res.records) {
+      const records = parseISCNTxRecordFromQuery(res.records);
+      return {
+        ...res,
+        records,
+      };
+    }
+    return null;
   }
 
   async queryRecordsByOwner(owner: string, fromSequence?: number) {
     const queryClient = await this.getQueryClient();
     const res = await queryClient.iscn.recordsByOwner(owner, fromSequence);
-    return parseISCNTxRecordQueryResponse(res);
+    if (res && res.records) {
+      const records = parseISCNTxRecordFromQuery(res.records);
+      return {
+        ...res,
+        records,
+      };
+    }
+    return null;
   }
 
   async queryFeePerByte(): Promise<Coin | null> {

@@ -7,7 +7,6 @@ import BigNumber from 'bignumber.js';
 
 import { setupISCNExtension, ISCNExtension } from './ISCNQueryExtension';
 import { parseISCNTxInfoFromIndexedTx, parseISCNTxRecordFromQuery } from './parsing';
-import { ISCNRecord } from './types';
 import { DEFAULT_RPC_ENDPOINT } from './constant';
 
 export class ISCNQueryClient {

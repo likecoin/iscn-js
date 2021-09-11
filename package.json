@@ -12,7 +12,8 @@
   },
   "files": [
     "dist/",
-    "!*.spec.*"
+    "!*.spec.*",
+    "!**/tests/*"
   ],
   "keywords": [],
   "repository": {

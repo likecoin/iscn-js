@@ -40,7 +40,7 @@ const [wallet] = await signer.getAccounts();
 
 const client = new ISCNQueryClient();
 const signingClient = new ISCNSigningClient();
-await signingClient.connectWithSigner('https://mainnet-node.like.co/rpc/', wallet);
+await signingClient.connectWithSigner('https://mainnet-node.like.co/rpc/', signer);
 
 const res = await signingClient.createISCNRecord(wallet.address, {,
   'contentFingerprints': [

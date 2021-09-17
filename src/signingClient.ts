@@ -1,11 +1,13 @@
 import BigNumber from 'bignumber.js';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { OfflineSigner, Registry } from '@cosmjs/proto-signing';
+import { EncodeObject, OfflineSigner, Registry } from '@cosmjs/proto-signing';
 import {
   defaultRegistryTypes,
   assertIsBroadcastTxSuccess,
   SigningStargateClient,
   Coin,
+  SignerData,
+  StdFee,
 } from '@cosmjs/stargate';
 import {
   MsgCreateIscnRecord,
@@ -26,7 +28,7 @@ import {
   ISCN_CHANGE_OWNER_GAS,
 } from './constant';
 import { ISCNQueryClient } from './queryClient';
-import { ISCNSignPayload, Stakeholder } from './types';
+import { ISCNSignOptions, ISCNSignPayload, Stakeholder } from './types';
 
 const registry = new Registry([
   ...defaultRegistryTypes,
@@ -224,10 +226,47 @@ export class ISCNSigningClient {
     };
   }
 
+  private async signOrBroadcast(
+    senderAddress: string,
+    message: EncodeObject,
+    fee: StdFee,
+    {
+      memo = '',
+      broadcast = true,
+      accountNumber,
+      sequence,
+      chainId,
+    }: ISCNSignOptions = {},
+  ) {
+    if (broadcast && (accountNumber || sequence || chainId)) {
+      throw new Error('CANNOT_DEFINE_SIGNING_PARAM_WITH_BROADCAST');
+    }
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    if (!broadcast) {
+      let signData: SignerData | undefined;
+      if ((accountNumber || sequence || chainId)) {
+        if (!(accountNumber && sequence && chainId)) {
+          throw new Error('CANNOT_DEFINE_SIGNING_PARAM_WITH_BROADCAST');
+        }
+        signData = {
+          accountNumber,
+          sequence,
+          chainId,
+        };
+      }
+      const response = await client.sign(senderAddress, [message], fee, memo, signData);
+      return response;
+    }
+    const response = await client.signAndBroadcast(senderAddress, [message], fee, memo);
+    assertIsBroadcastTxSuccess(response);
+    return response;
+  }
+
   async createISCNRecord(
     senderAddress: string,
     payload: ISCNSignPayload,
-    { memo = '', broadcast = true }: { memo?: string, broadcast?: boolean} = {},
+    signOptions: ISCNSignOptions,
   ) {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
@@ -240,12 +279,7 @@ export class ISCNSigningClient {
       },
     };
     const { fee } = await this.estimateISCNTxGas(payload);
-    if (!broadcast) {
-      const response = await client.sign(senderAddress, [message], fee, memo);
-      return response;
-    }
-    const response = await client.signAndBroadcast(senderAddress, [message], fee, memo);
-    assertIsBroadcastTxSuccess(response);
+    const response = await this.signOrBroadcast(senderAddress, message, fee, signOptions);
     return response;
   }
 
@@ -253,7 +287,7 @@ export class ISCNSigningClient {
     senderAddress: string,
     iscnId: string,
     payload: ISCNSignPayload,
-    { memo = '', broadcast = true }: { memo?: string, broadcast?: boolean} = {},
+    { fee: inputFee, ...signOptions }: ISCNSignOptions,
   ) {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
@@ -266,13 +300,9 @@ export class ISCNSigningClient {
         record,
       },
     };
-    const { fee } = await this.estimateISCNTxGas(payload);
-    if (!broadcast) {
-      const response = await client.sign(senderAddress, [message], fee, memo);
-      return response;
-    }
-    const response = await client.signAndBroadcast(senderAddress, [message], fee, memo);
-    assertIsBroadcastTxSuccess(response);
+    let fee = inputFee;
+    if (!fee) ({ fee } = await this.estimateISCNTxGas(payload));
+    const response = await this.signOrBroadcast(senderAddress, message, fee, signOptions);
     return response;
   }
 
@@ -280,7 +310,7 @@ export class ISCNSigningClient {
     senderAddress: string,
     newOwnerAddress: string,
     iscnId: string,
-    { memo = '', broadcast = true }: { memo?: string, broadcast?: boolean} = {},
+    { fee: inputFee, ...signOptions }: ISCNSignOptions,
   ) {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
@@ -292,20 +322,18 @@ export class ISCNSigningClient {
         newOwner: newOwnerAddress,
       },
     };
-    const fee = {
-      amount: [{
-        amount: new BigNumber(ISCN_CHANGE_OWNER_GAS)
-          .multipliedBy(DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-        denom: this.denom,
-      }],
-      gas: ISCN_CHANGE_OWNER_GAS.toString(),
-    };
-    if (!broadcast) {
-      const response = await client.sign(senderAddress, [message], fee, memo);
-      return response;
+    let fee = inputFee;
+    if (!fee) {
+      fee = {
+        amount: [{
+          amount: new BigNumber(ISCN_CHANGE_OWNER_GAS)
+            .multipliedBy(DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          denom: this.denom,
+        }],
+        gas: ISCN_CHANGE_OWNER_GAS.toString(),
+      };
     }
-    const response = await client.signAndBroadcast(senderAddress, [message], fee, memo);
-    assertIsBroadcastTxSuccess(response);
+    const response = await this.signOrBroadcast(senderAddress, message, fee, signOptions);
     return response;
   }
 }

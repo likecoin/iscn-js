@@ -1,3 +1,5 @@
+import { StdFee } from '@cosmjs/stargate';
+
 export interface ISCNRecordData {
   stakeholders: any[];
   contentMetadata: any;
@@ -33,4 +35,13 @@ export interface ISCNSignPayload {
   type?: string;
   usageInfo?: string;
   recordNotes?: string;
+}
+
+export interface ISCNSignOptions {
+  memo?: string,
+  broadcast?: boolean,
+  accountNumber?: number,
+  sequence?: number,
+  chainId?: string,
+  fee?: StdFee,
 }

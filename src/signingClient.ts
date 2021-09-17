@@ -17,8 +17,8 @@ import jsonStringify from 'fast-json-stable-stringify';
 import {
   ISCN_REGISTRY_NAME,
   GAS_ESTIMATOR_INTERCEPT,
-  GAS_ESTIMATOR_BUFFER,
   GAS_ESTIMATOR_SLOP,
+  GAS_ESTIMATOR_BUFFER_RATIO,
   DEFAULT_RPC_ENDPOINT,
   DEFAULT_GAS_PRICE_NUMBER,
   COSMOS_DENOM,
@@ -94,10 +94,13 @@ export async function estimateISCNTxGas(payload: ISCNSignPayload) {
     type: 'cosmos-sdk/StdTx',
     value: Buffer.from(jsonStringify(value), 'utf-8'),
   };
-  const interceptWithBuffer = new BigNumber(GAS_ESTIMATOR_INTERCEPT).plus(GAS_ESTIMATOR_BUFFER);
   const txBytes = Buffer.from(jsonStringify(obj), 'utf-8');
   const byteSize = new BigNumber(txBytes.length);
-  const gasUsedEstimation = byteSize.multipliedBy(GAS_ESTIMATOR_SLOP).plus(interceptWithBuffer);
+  const gasUsedEstimationBeforeBuffer = byteSize
+    .multipliedBy(GAS_ESTIMATOR_SLOP)
+    .plus(GAS_ESTIMATOR_INTERCEPT);
+  const buffer = gasUsedEstimationBeforeBuffer.multipliedBy(GAS_ESTIMATOR_BUFFER_RATIO);
+  const gasUsedEstimation = gasUsedEstimationBeforeBuffer.plus(buffer);
   return {
     fee: {
       amount: [{

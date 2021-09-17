@@ -10,9 +10,9 @@ import { parseISCNTxInfoFromIndexedTx, parseISCNTxRecordFromQuery } from './pars
 import { DEFAULT_RPC_ENDPOINT } from './constant';
 
 export class ISCNQueryClient {
-  queryClient: QueryClient & ISCNExtension & BankExtension | null = null;
+  private queryClient: QueryClient & ISCNExtension & BankExtension | null = null;
 
-  stargateClient: StargateClient | null = null;
+  private stargateClient: StargateClient | null = null;
 
   async connect(rpcURL = DEFAULT_RPC_ENDPOINT)
   // eslint-disable-next-line max-len

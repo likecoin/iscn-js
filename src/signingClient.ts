@@ -72,16 +72,24 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
 }
 
 export class ISCNSigningClient {
-  signingClient: SigningStargateClient | null = null;
+  private signingClient: SigningStargateClient | null = null;
 
-  queryClient: ISCNQueryClient;
+  private queryClient: ISCNQueryClient;
 
-  rpcURL = DEFAULT_RPC_ENDPOINT;
+  private rpcURL = DEFAULT_RPC_ENDPOINT;
 
-  denom = COSMOS_DENOM;
+  private denom = COSMOS_DENOM;
 
   constructor() {
     this.queryClient = new ISCNQueryClient();
+  }
+
+  getSigningStargateClient(): SigningStargateClient | null {
+    return this.signingClient;
+  }
+
+  getISCNQueryClient(): ISCNQueryClient {
+    return this.queryClient;
   }
 
   async connect(rpcURL: string): Promise<void> {

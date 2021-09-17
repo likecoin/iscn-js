@@ -71,53 +71,14 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
   };
 }
 
-export async function estimateISCNTxGas(payload: ISCNSignPayload) {
-  const record = await formatISCNPayload(payload);
-  const msg = {
-    type: Buffer.from('likecoin-chain/MsgCreateIscnRecord', 'utf-8'),
-    value: {
-      from: Buffer.from(STUB_WALLET, 'utf-8'),
-      record,
-    },
-  };
-  const value = {
-    msg: [msg],
-    fee: {
-      amount: [{
-        denom: 'nanolike',
-        amount: '200000', // temp number here for estimation
-      }],
-      gas: '200000', // temp number here for estimation
-    },
-  };
-  const obj = {
-    type: 'cosmos-sdk/StdTx',
-    value: Buffer.from(jsonStringify(value), 'utf-8'),
-  };
-  const txBytes = Buffer.from(jsonStringify(obj), 'utf-8');
-  const byteSize = new BigNumber(txBytes.length);
-  const gasUsedEstimationBeforeBuffer = byteSize
-    .multipliedBy(GAS_ESTIMATOR_SLOP)
-    .plus(GAS_ESTIMATOR_INTERCEPT);
-  const buffer = gasUsedEstimationBeforeBuffer.multipliedBy(GAS_ESTIMATOR_BUFFER_RATIO);
-  const gasUsedEstimation = gasUsedEstimationBeforeBuffer.plus(buffer);
-  return {
-    fee: {
-      amount: [{
-        amount: gasUsedEstimation.multipliedBy(DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-        denom: COSMOS_DENOM,
-      }],
-      gas: gasUsedEstimation.toFixed(0, 0),
-    },
-  };
-}
-
 export class ISCNSigningClient {
   signingClient: SigningStargateClient | null = null;
 
   queryClient: ISCNQueryClient;
 
   rpcURL = DEFAULT_RPC_ENDPOINT;
+
+  denom = COSMOS_DENOM;
 
   constructor() {
     this.queryClient = new ISCNQueryClient();
@@ -126,6 +87,7 @@ export class ISCNSigningClient {
   async connect(rpcURL: string): Promise<void> {
     await this.queryClient.connect(rpcURL);
     this.rpcURL = rpcURL;
+    await this.fetchISCNFeeDenom();
   }
 
   async setSigner(signer: OfflineSigner): Promise<void> {
@@ -141,9 +103,14 @@ export class ISCNSigningClient {
     await this.setSigner(signer);
   }
 
+  async fetchISCNFeeDenom() {
+    const feePerByte = await this.queryClient.queryFeePerByte();
+    if (feePerByte?.denom) this.denom = feePerByte.denom;
+  }
+
   async esimateISCNTxGasAndFee(payload: ISCNSignPayload) {
     const [gas, iscnFee] = await Promise.all([
-      estimateISCNTxGas(payload),
+      this.estimateISCNTxGas(payload),
       this.estimateISCNTxFee(payload),
     ]);
     return {
@@ -204,8 +171,49 @@ export class ISCNSigningClient {
     const feeAmount = new BigNumber(byteSize).multipliedBy(feePerByteAmount);
     return {
       amount: feeAmount.toFixed(0, 0),
-      denom: feePerByte?.denom,
+      denom: feePerByte?.denom || this.denom,
     } as Coin;
+  }
+
+  async estimateISCNTxGas(payload: ISCNSignPayload, denom = this.denom) {
+    const record = await formatISCNPayload(payload);
+    const msg = {
+      type: Buffer.from('likecoin-chain/MsgCreateIscnRecord', 'utf-8'),
+      value: {
+        from: Buffer.from(STUB_WALLET, 'utf-8'),
+        record,
+      },
+    };
+    const value = {
+      msg: [msg],
+      fee: {
+        amount: [{
+          denom: 'nanolike',
+          amount: '200000', // temp number here for estimation
+        }],
+        gas: '200000', // temp number here for estimation
+      },
+    };
+    const obj = {
+      type: 'cosmos-sdk/StdTx',
+      value: Buffer.from(jsonStringify(value), 'utf-8'),
+    };
+    const txBytes = Buffer.from(jsonStringify(obj), 'utf-8');
+    const byteSize = new BigNumber(txBytes.length);
+    const gasUsedEstimationBeforeBuffer = byteSize
+      .multipliedBy(GAS_ESTIMATOR_SLOP)
+      .plus(GAS_ESTIMATOR_INTERCEPT);
+    const buffer = gasUsedEstimationBeforeBuffer.multipliedBy(GAS_ESTIMATOR_BUFFER_RATIO);
+    const gasUsedEstimation = gasUsedEstimationBeforeBuffer.plus(buffer);
+    return {
+      fee: {
+        amount: [{
+          amount: gasUsedEstimation.multipliedBy(DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          denom,
+        }],
+        gas: gasUsedEstimation.toFixed(0, 0),
+      },
+    };
   }
 
   async createISCNRecord(
@@ -223,7 +231,7 @@ export class ISCNSigningClient {
         record,
       },
     };
-    const { fee } = await estimateISCNTxGas(payload);
+    const { fee } = await this.estimateISCNTxGas(payload);
     if (!broadcast) {
       const response = await client.sign(senderAddress, [message], fee, memo);
       return response;
@@ -250,7 +258,7 @@ export class ISCNSigningClient {
         record,
       },
     };
-    const { fee } = await estimateISCNTxGas(payload);
+    const { fee } = await this.estimateISCNTxGas(payload);
     if (!broadcast) {
       const response = await client.sign(senderAddress, [message], fee, memo);
       return response;
@@ -280,7 +288,7 @@ export class ISCNSigningClient {
       amount: [{
         amount: new BigNumber(ISCN_CHANGE_OWNER_GAS)
           .multipliedBy(DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-        denom: COSMOS_DENOM,
+        denom: this.denom,
       }],
       gas: ISCN_CHANGE_OWNER_GAS.toString(),
     };

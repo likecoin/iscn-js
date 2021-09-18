@@ -1,0 +1,15 @@
+{
+  "recordNotes": "",
+  "contentFingerprints": [
+  ],
+  "stakeholders": [
+  ],
+  "type": "Article",
+  "name": "Decentralized Publishing",
+  "description": "LikeCoin is a Decentralized Publishing Infrastructure to empower content ownership, authenticity, and provenance. LikeCoin works as a repository for immutable digital content metadata. Content creators can records the data and guarantees its integrity using LikeCoin's content registry protocol, ISCN (International Standard Content Number). The ISCN functions like an ISBN (International Standard Book Number) for digital content; this unique, immutable content identifier contains metadata including timestamp, author, title, publisher, licensing, and versions. At its core, content metadata will be registered in the LikeCoin public blockchain and link to decentrazlied storage solution like the IPFS or Arweave for storing and serving ISCN-linked content. LikeCoin provides publication related SDK/ plugins that can integrate with publication platforms like news outlet, social media and blogging websites.  Some media empowered by LikeCoin include Matters, Standnews, InMedia, HKCNews and other 1,300+ websites. LikeCoin can also be utilized on WordPress, Medium, Vocus, Blogspot ( Blogger.com ), Pixnet and other content platforms. LikeCoin also provides LikeCoin button to let Media be rewarded by clapping by readers. The core component of LikeCoin is LikeCoin chain, a public blockchain itailor-made for content publishing, supporting the Republic of Liker Land.",
+  "datePublished": "2019-04-19",
+  "version": 1,
+  "url": "https://docs.like.co/",
+  "usageInfo": "https://creativecommons.org/licenses/by/4.0",
+  "keywords": ["LikeCoin is a Decentralized Publishing Infrastructure to empower content ownership, authenticity, and provenance. LikeCoin works as a repository for immutable digital content metadata. Content creators can records the data and guarantees its integrity using LikeCoin's content registry protocol, ISCN (International Standard Content Number).", "The ISCN functions like an ISBN (International Standard Book Number) for digital content; this unique, immutable content identifier contains metadata including timestamp, author, title, publisher, licensing, and versions. At its core, content metadata will be registered in the LikeCoin public blockchain and link to decentrazlied storage solution like the IPFS or Arweave for storing and serving ISCN-linked content."]
+}

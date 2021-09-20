@@ -43,5 +43,6 @@ export interface ISCNSignOptions {
   accountNumber?: number,
   sequence?: number,
   chainId?: string,
+  gasPrice?: number,
   fee?: StdFee,
 }

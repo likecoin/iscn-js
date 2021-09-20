@@ -118,9 +118,9 @@ export class ISCNSigningClient {
     if (feePerByte?.denom) this.denom = feePerByte.denom;
   }
 
-  async esimateISCNTxGasAndFee(payload: ISCNSignPayload) {
+  async esimateISCNTxGasAndFee(payload: ISCNSignPayload, { gasPrice }: { gasPrice?: number } = {}) {
     const [gas, iscnFee] = await Promise.all([
-      this.estimateISCNTxGas(payload),
+      this.estimateISCNTxGas(payload, { gasPrice }),
       this.estimateISCNTxFee(payload),
     ]);
     return {
@@ -185,7 +185,10 @@ export class ISCNSigningClient {
     } as Coin;
   }
 
-  async estimateISCNTxGas(payload: ISCNSignPayload, denom = this.denom) {
+  async estimateISCNTxGas(payload: ISCNSignPayload, {
+    denom = this.denom,
+    gasPrice = DEFAULT_GAS_PRICE_NUMBER,
+  } = {}) {
     const record = await formatISCNPayload(payload);
     const msg = {
       type: Buffer.from('likecoin-chain/MsgCreateIscnRecord', 'utf-8'),
@@ -198,7 +201,7 @@ export class ISCNSigningClient {
       msg: [msg],
       fee: {
         amount: [{
-          denom: 'nanolike',
+          denom: this.denom,
           amount: '200000', // temp number here for estimation
         }],
         gas: '200000', // temp number here for estimation
@@ -218,7 +221,8 @@ export class ISCNSigningClient {
     return {
       fee: {
         amount: [{
-          amount: gasUsedEstimation.multipliedBy(DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          amount: gasUsedEstimation
+            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
           denom,
         }],
         gas: gasUsedEstimation.toFixed(0, 0),
@@ -266,7 +270,7 @@ export class ISCNSigningClient {
   async createISCNRecord(
     senderAddress: string,
     payload: ISCNSignPayload,
-    signOptions: ISCNSignOptions,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions,
   ) {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
@@ -278,7 +282,12 @@ export class ISCNSigningClient {
         record,
       },
     };
-    const { fee } = await this.estimateISCNTxGas(payload);
+    let fee = inputFee;
+    if (!fee) {
+      ({ fee } = await this.estimateISCNTxGas(payload, { gasPrice }));
+    } else if (gasPrice) {
+      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    }
     const response = await this.signOrBroadcast(senderAddress, message, fee, signOptions);
     return response;
   }
@@ -287,7 +296,7 @@ export class ISCNSigningClient {
     senderAddress: string,
     iscnId: string,
     payload: ISCNSignPayload,
-    { fee: inputFee, ...signOptions }: ISCNSignOptions,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions,
   ) {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
@@ -301,7 +310,11 @@ export class ISCNSigningClient {
       },
     };
     let fee = inputFee;
-    if (!fee) ({ fee } = await this.estimateISCNTxGas(payload));
+    if (!fee) {
+      ({ fee } = await this.estimateISCNTxGas(payload, { gasPrice }));
+    } else if (gasPrice) {
+      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    }
     const response = await this.signOrBroadcast(senderAddress, message, fee, signOptions);
     return response;
   }
@@ -310,7 +323,7 @@ export class ISCNSigningClient {
     senderAddress: string,
     newOwnerAddress: string,
     iscnId: string,
-    { fee: inputFee, ...signOptions }: ISCNSignOptions,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions,
   ) {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
@@ -327,12 +340,12 @@ export class ISCNSigningClient {
       fee = {
         amount: [{
           amount: new BigNumber(ISCN_CHANGE_OWNER_GAS)
-            .multipliedBy(DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
           denom: this.denom,
         }],
         gas: ISCN_CHANGE_OWNER_GAS.toString(),
       };
-    }
+    } else if (gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     const response = await this.signOrBroadcast(senderAddress, message, fee, signOptions);
     return response;
   }

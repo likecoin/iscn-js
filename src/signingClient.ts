@@ -218,14 +218,15 @@ export class ISCNSigningClient {
       .plus(GAS_ESTIMATOR_INTERCEPT);
     const buffer = gasUsedEstimationBeforeBuffer.multipliedBy(GAS_ESTIMATOR_BUFFER_RATIO);
     const gasUsedEstimation = gasUsedEstimationBeforeBuffer.plus(buffer);
+    const gas = gasUsedEstimation.toFixed(0, 0);
     return {
       fee: {
         amount: [{
-          amount: gasUsedEstimation
+          amount: new BigNumber(gas)
             .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
           denom,
         }],
-        gas: gasUsedEstimation.toFixed(0, 0),
+        gas,
       },
     };
   }

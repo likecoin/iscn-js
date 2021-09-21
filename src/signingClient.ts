@@ -250,9 +250,9 @@ export class ISCNSigningClient {
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
     if (!broadcast) {
       let signData: SignerData | undefined;
-      if ((accountNumber || sequence || chainId)) {
-        if (!(accountNumber && sequence && chainId)) {
-          throw new Error('CANNOT_DEFINE_SIGNING_PARAM_WITH_BROADCAST');
+      if ((accountNumber !== undefined || sequence !== undefined || chainId !== undefined)) {
+        if (!(accountNumber !== undefined && sequence !== undefined && chainId !== undefined)) {
+          throw new Error('MUST_DEFINE_ALL_SIGNING_PARAM');
         }
         signData = {
           accountNumber,

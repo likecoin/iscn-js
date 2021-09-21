@@ -36,24 +36,3 @@ Thumbs.db
 
 # Ignore built ts files
 dist/**/*
-
-# ignore yarn.lock
-yarn.lock
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-
-cosmos
-dist
-src/iscn/
-src/cosmos/
-src/google/

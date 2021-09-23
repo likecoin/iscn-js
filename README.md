@@ -35,9 +35,19 @@ import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { assertIsBroadcastTxSuccess, SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 
+// Use mnemonic
 const mnemonic = 'surround miss nominee dream gap cross assault thank captain prosper drop duty group candy wealth weather scale put';
 const signer = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic);
 const [wallet] = await signer.getAccounts();
+
+/* For Keplr, use suggestChain API and config found in
+   https://github.com/likecoin/mainnet/ or
+   https://github.com/likecoin/testnets/ */
+
+// await window.keplr.experimentalSuggestChain(config);
+// await window.keplr.enable('likecoin-mainnet-2');
+// const signer = window.getOfflineSigner('likecoin-mainnet-2');
+// const [wallet] = await signer.getAccounts();
 
 const client = new ISCNQueryClient();
 const signingClient = new ISCNSigningClient();

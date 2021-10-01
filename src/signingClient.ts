@@ -14,6 +14,7 @@ import {
   MsgUpdateIscnRecord,
   MsgChangeIscnRecordOwnership,
 } from '@likecoin/iscn-message-types/dist/iscn/tx';
+import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import jsonStringify from 'fast-json-stable-stringify';
 
 import {
@@ -243,27 +244,25 @@ export class ISCNSigningClient {
       chainId,
     }: ISCNSignOptions = {},
   ) {
-    if (broadcast && (accountNumber || sequence || chainId)) {
-      throw new Error('CANNOT_DEFINE_SIGNING_PARAM_WITH_BROADCAST');
-    }
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    if (!broadcast) {
-      let signData: SignerData | undefined;
-      if ((accountNumber !== undefined || sequence !== undefined || chainId !== undefined)) {
-        if (!(accountNumber !== undefined && sequence !== undefined && chainId !== undefined)) {
-          throw new Error('MUST_DEFINE_ALL_SIGNING_PARAM');
-        }
-        signData = {
-          accountNumber,
-          sequence,
-          chainId,
-        };
+    let signData: SignerData | undefined;
+    if ((accountNumber !== undefined || sequence !== undefined || chainId !== undefined)) {
+      if (!(accountNumber !== undefined && sequence !== undefined && chainId !== undefined)) {
+        throw new Error('MUST_DEFINE_ALL_SIGNING_PARAM');
       }
-      const response = await client.sign(senderAddress, [message], fee, memo, signData);
-      return response;
+      signData = {
+        accountNumber,
+        sequence,
+        chainId,
+      };
     }
-    const response = await client.signAndBroadcast(senderAddress, [message], fee, memo);
+    const txRaw = await client.sign(senderAddress, [message], fee, memo, signData);
+    if (!broadcast) {
+      return txRaw;
+    }
+    const txBytes = TxRaw.encode(txRaw).finish();
+    const response = await client.broadcastTx(txBytes);
     assertIsBroadcastTxSuccess(response);
     return response;
   }
@@ -271,7 +270,7 @@ export class ISCNSigningClient {
   async createISCNRecord(
     senderAddress: string,
     payload: ISCNSignPayload,
-    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ) {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');

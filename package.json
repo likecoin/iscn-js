@@ -1,13 +1,14 @@
 {
   "name": "@likecoin/iscn-js",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "",
   "main": "./dist/index.js",
   "module": "./dist/esm/index.js",
   "scripts": {
     "build": "rm -rf dist && tsc && tsc --project tsconfig.es6.json",
     "lint": "eslint src --ext .ts",
-    "generate": "",
+    "generate": "npm run build",
+    "publish": "npm run build && npm publish --access public",
     "test": "jest --coverage"
   },
   "files": [

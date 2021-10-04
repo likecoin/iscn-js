@@ -1,6 +1,10 @@
 # Changelog
 ## [Unreleased]
 
+## [0.0.6] - 2021-10-05
+### Fixed
+- Proper release of 0.0.5
+
 ## [0.0.5] - 2021-10-05
 ### Changed
 - Allow broadcast = true and signing params to be defined at the same time

@@ -14,9 +14,11 @@ export class ISCNQueryClient {
 
   private stargateClient: StargateClient | null = null;
 
+  private feePerByte: Coin | null = null;
+
   async connect(rpcURL = DEFAULT_RPC_ENDPOINT)
-  // eslint-disable-next-line max-len
-  : Promise<{ queryClient: QueryClient & ISCNExtension & BankExtension; stargateClient: StargateClient; }> {
+    // eslint-disable-next-line max-len
+    : Promise<{ queryClient: QueryClient & ISCNExtension & BankExtension; stargateClient: StargateClient; }> {
     const [tendermintClient, stargateClient] = await Promise.all([
       Tendermint34Client.connect(rpcURL),
       StargateClient.connect(rpcURL),
@@ -110,6 +112,7 @@ export class ISCNQueryClient {
   }
 
   async queryFeePerByte(): Promise<Coin | null> {
+    if (this.feePerByte) return this.feePerByte;
     const queryClient = await this.getQueryClient();
     const res = await queryClient.iscn.params();
     if (res && res.params && res.params.feePerByte) {
@@ -117,10 +120,11 @@ export class ISCNQueryClient {
         denom,
         amount,
       } = res.params.feePerByte;
-      return {
+      this.feePerByte = {
         denom,
         amount: new BigNumber(amount).shiftedBy(-18).toFixed(),
       } as Coin;
+      return this.feePerByte;
     }
     return null;
   }

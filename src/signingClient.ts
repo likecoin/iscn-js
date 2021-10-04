@@ -49,6 +49,7 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
     type,
     usageInfo,
     recordNotes,
+    ...data
   } = payload;
 
   const stakeholders = inputStakeHolders.map((s: Stakeholder) => Buffer.from(
@@ -64,6 +65,7 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
     url,
     keywords: keywords.join(','),
     usageInfo,
+    ...data,
   };
   return {
     recordNotes,

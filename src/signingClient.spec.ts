@@ -31,14 +31,14 @@ describe('queryClient', () => {
       expect.objectContaining({
         gas: expect.objectContaining({
           fee: expect.objectContaining({
-            gas: '169847',
-            amount: expect.arrayContaining([expect.objectContaining({ amount: '169847000' })]),
+            gas: '172949',
+            amount: expect.arrayContaining([expect.objectContaining({ amount: '172949000' })]),
           }),
         }),
       }),
     );
     expect(res).toEqual(
-      expect.objectContaining({ iscnFee: expect.objectContaining({ amount: '2744000' }) }),
+      expect.objectContaining({ iscnFee: expect.objectContaining({ amount: '2876000' }) }),
     );
   });
 
@@ -46,10 +46,10 @@ describe('queryClient', () => {
     const { client } = await getSigner();
     const res = await client.esimateISCNTxGasAndFee(testData2);
     expect(res).toEqual(
-      expect.objectContaining({ gas: expect.objectContaining({ fee: expect.objectContaining({ gas: '248124' }) }) }),
+      expect.objectContaining({ gas: expect.objectContaining({ fee: expect.objectContaining({ gas: '249426' }) }) }),
     );
     expect(res).toEqual(
-      expect.objectContaining({ iscnFee: expect.objectContaining({ amount: '5848000' }) }),
+      expect.objectContaining({ iscnFee: expect.objectContaining({ amount: '5906000' }) }),
     );
   });
 
@@ -60,14 +60,14 @@ describe('queryClient', () => {
       expect.objectContaining({
         gas: expect.objectContaining({
           fee: expect.objectContaining({
-            gas: '169847',
-            amount: expect.arrayContaining([expect.objectContaining({ amount: '169847' })]),
+            gas: '172949',
+            amount: expect.arrayContaining([expect.objectContaining({ amount: '172949' })]),
           }),
         }),
       }),
     );
     expect(res).toEqual(
-      expect.objectContaining({ iscnFee: expect.objectContaining({ amount: '2744000' }) }),
+      expect.objectContaining({ iscnFee: expect.objectContaining({ amount: '2876000' }) }),
     );
   });
 
@@ -79,13 +79,13 @@ describe('queryClient', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('A8D6C7CAC38DA365DBB0FF89991023BB228FD2E765948F7A4CE3635F2A94380C');
+    expect(hash).toEqual('4C0335F6725C71FA473BE6231206DDE835905FDEDA8B6381CE40EFB45DA4D8CD');
     const signedTxRaw2 = await client.createISCNRecord(
       wallet.address, testData1, {
         broadcast: false, sequence: 2, accountNumber: 0, chainId: 'likecoin-mainnet-2',
       },
     );
     const hash2 = await computeTransactionHash(signedTxRaw2 as TxRaw);
-    expect(hash2).toEqual('92849D1263EE386896AB21B389BD7CD76D6D67F750BA6CC18FEDE31919C92039');
+    expect(hash2).toEqual('962A94E112748717BF33D2866F0596308A7240358100FBB926512611D8D54E9F');
   });
 });

@@ -298,7 +298,7 @@ export class ISCNSigningClient {
     senderAddress: string,
     iscnId: string,
     payload: ISCNSignPayload,
-    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ) {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
@@ -325,7 +325,7 @@ export class ISCNSigningClient {
     senderAddress: string,
     newOwnerAddress: string,
     iscnId: string,
-    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ) {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');

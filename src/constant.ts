@@ -5,8 +5,8 @@ export const DEFAULT_GAS_PRICE = [{ amount: 1000, denom: COSMOS_DENOM }];
 export const DEFAULT_GAS_PRICE_NUMBER = DEFAULT_GAS_PRICE[0].amount;
 
 export const GAS_ESTIMATOR_BUFFER_RATIO = 0.25;
-export const GAS_ESTIMATOR_SLOP = 3.58;
-export const GAS_ESTIMATOR_INTERCEPT = 99443.87;
+export const GAS_ESTIMATOR_SLOPE = 10.3;
+export const GAS_ESTIMATOR_INTERCEPT = 110533;
 
 export const ISCN_CHANGE_OWNER_GAS = 200000;
 

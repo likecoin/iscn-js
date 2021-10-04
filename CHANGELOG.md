@@ -1,6 +1,13 @@
 # Changelog
 ## [Unreleased]
 
+## [0.0.5] - 2021-10-05
+### Changed
+- Allow broadcast = true and signing params to be defined at the same time
+- Allow arbitrary keys in payload to be formatted into contentMetadata
+### Fixed
+- Fix signing params was not optional in signing client
+
 ## [0.0.4] - 2021-09-23
 ### Added
 - Support defining custom gas price when signing

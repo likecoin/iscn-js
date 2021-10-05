@@ -1,6 +1,10 @@
 # Changelog
 ## [Unreleased]
 
+## [0.0.7] - 2021-10-05
+### Changed
+- Improve accuracy of ISCN fee and gas estimation for large payload
+
 ## [0.0.6] - 2021-10-05
 ### Fixed
 - Proper release of 0.0.5

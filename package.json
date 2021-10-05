@@ -8,7 +8,7 @@
     "build": "rm -rf dist && tsc && tsc --project tsconfig.es6.json",
     "lint": "eslint src --ext .ts",
     "generate": "npm run build",
-    "publish": "npm run build && npm publish --access public",
+    "prepublish": "npm run build",
     "test": "jest --coverage"
   },
   "files": [

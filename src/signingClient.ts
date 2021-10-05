@@ -179,7 +179,9 @@ export class ISCNSigningClient {
       };
     }
     const byteSize = Buffer.from(jsonStringify(obj), 'utf-8').length
+      + Buffer.from(jsonStringify({ stakeholders: [], contentMetadata: {} }), 'utf-8').length
       + stakeholders.reduce((acc, s) => acc + s.length, 0)
+      + stakeholders.length
       + contentMetadata.length;
     const feeAmount = new BigNumber(byteSize).multipliedBy(feePerByteAmount);
     return {

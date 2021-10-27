@@ -122,7 +122,7 @@ export class ISCNQueryClient {
       } = res.params.feePerByte;
       this.feePerByte = {
         denom,
-        amount: new BigNumber(amount).shiftedBy(-18).toFixed(),
+        amount: new BigNumber(amount).shiftedBy(-9).toFixed(),
       } as Coin;
       return this.feePerByte;
     }

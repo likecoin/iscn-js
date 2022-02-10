@@ -1,5 +1,7 @@
 const { Router } = require('express');
 const {
+  COSMOS_CHAIN_ID,
+  getAccountInfo,
   getISCNSigningClient,
   getISCNQueryClient,
   getISCNSigningAddressInfo,
@@ -55,10 +57,17 @@ router.post(
         datePublished,
         url,
       };
-      const { address } = await getISCNSigningAddressInfo();
+      const { address, accountNumber } = await getISCNSigningAddressInfo();
+      /* code 32 might be thrown if more than 1 transaction is sent in each block
+        Switch to a local/redis/database increasing counter of sequence to mitigate this issue */
+      const { sequence } = await getAccountInfo(address);
       const iscnRes = await signingClient.createISCNRecord(
         address,
-        ISCNPayload,
+        ISCNPayload,{
+          accountNumber,
+          sequence,
+          chainId: COSMOS_CHAIN_ID,
+        }
       );
       const { transactionHash: iscnTxHash } = iscnRes;
       console.log(`txHash: ${iscnTxHash}`);

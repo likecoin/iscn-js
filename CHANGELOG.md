@@ -1,6 +1,10 @@
 # Changelog
 ## [Unreleased]
 
+## [0.1.0] - 2022-03-08
+### Changed
+- Update breaking change from @cosmjs/stargate 0.27.1
+
 ## [0.0.7] - 2021-10-05
 ### Changed
 - Improve accuracy of ISCN fee and gas estimation for large payload

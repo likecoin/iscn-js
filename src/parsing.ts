@@ -8,7 +8,7 @@ import {
   MsgUpdateIscnRecord,
   MsgChangeIscnRecordOwnership,
 } from '@likecoin/iscn-message-types/dist/iscn/tx';
-import { ISCNRecord, ISCNRecordData } from './types';
+import { ISCNRecord, ISCNRecordData, ParsedISCNTx } from './types';
 
 export function parseISCNRecordFields(record: IscnRecord): ISCNRecordData {
   const {
@@ -28,7 +28,7 @@ export function parseISCNRecordFields(record: IscnRecord): ISCNRecordData {
   };
 }
 
-export function parseISCNTxInfoFromIndexedTx(tx: IndexedTx) {
+export function parseISCNTxInfoFromIndexedTx(tx: IndexedTx): ParsedISCNTx {
   const { tx: txBytes, rawLog } = tx;
   const decodedTx = decodeTxRaw(txBytes);
   const messages = decodedTx.body.messages.map((m) => {
@@ -51,7 +51,7 @@ export function parseISCNTxInfoFromIndexedTx(tx: IndexedTx) {
     return msg ? {
       ...m,
       value: msg,
-    } : null;
+    } : m;
   });
   return {
     ...tx,

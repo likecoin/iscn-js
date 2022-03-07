@@ -32,7 +32,7 @@ Signing
 ```typescript
 import { ISCNQueryClient, ISCNSigningClient } from '@likecoin/iscn-js';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { assertIsBroadcastTxSuccess, SigningStargateClient, StargateClient } from '@cosmjs/stargate';
+import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 
 (async() => {

@@ -3,11 +3,12 @@ import BigNumber from 'bignumber.js';
 import { EncodeObject, OfflineSigner, Registry } from '@cosmjs/proto-signing';
 import {
   defaultRegistryTypes,
-  assertIsBroadcastTxSuccess,
+  assertIsDeliverTxSuccess,
   SigningStargateClient,
   Coin,
   SignerData,
   StdFee,
+  DeliverTxResponse,
 } from '@cosmjs/stargate';
 import {
   MsgCreateIscnRecord,
@@ -267,7 +268,7 @@ export class ISCNSigningClient {
     }
     const txBytes = TxRaw.encode(txRaw).finish();
     const response = await client.broadcastTx(txBytes);
-    assertIsBroadcastTxSuccess(response);
+    assertIsDeliverTxSuccess(response);
     return response;
   }
 
@@ -275,7 +276,7 @@ export class ISCNSigningClient {
     senderAddress: string,
     payload: ISCNSignPayload,
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
-  ) {
+  ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
     const record = formatISCNPayload(payload);
@@ -301,7 +302,7 @@ export class ISCNSigningClient {
     iscnId: string,
     payload: ISCNSignPayload,
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
-  ) {
+  ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
     const record = formatISCNPayload(payload);
@@ -328,7 +329,7 @@ export class ISCNSigningClient {
     newOwnerAddress: string,
     iscnId: string,
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
-  ) {
+  ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
     const message = {

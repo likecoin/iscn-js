@@ -30,6 +30,7 @@ export class ISCNQueryClient {
     );
     this.queryClient = queryClient;
     this.stargateClient = stargateClient;
+    this.feePerByte = null;
     return {
       queryClient,
       stargateClient,

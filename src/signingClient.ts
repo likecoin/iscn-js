@@ -122,6 +122,10 @@ export class ISCNSigningClient {
     if (feePerByte?.denom) this.denom = feePerByte.denom;
   }
 
+  setDenom(denom: string): void {
+    this.denom = denom;
+  }
+
   async esimateISCNTxGasAndFee(payload: ISCNSignPayload, { gasPrice }: { gasPrice?: number } = {}) {
     const [gas, iscnFee] = await Promise.all([
       this.estimateISCNTxGas(payload, { gasPrice }),
@@ -207,7 +211,7 @@ export class ISCNSigningClient {
       msg: [msg],
       fee: {
         amount: [{
-          denom: this.denom,
+          denom,
           amount: '200000', // temp number here for estimation
         }],
         gas: '200000', // temp number here for estimation

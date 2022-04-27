@@ -126,9 +126,12 @@ export class ISCNSigningClient {
     this.denom = denom;
   }
 
-  async esimateISCNTxGasAndFee(payload: ISCNSignPayload, { gasPrice }: { gasPrice?: number } = {}) {
+  async esimateISCNTxGasAndFee(
+    payload: ISCNSignPayload,
+    { gasPrice, memo }: { gasPrice?: number, memo?: string } = {},
+  ) {
     const [gas, iscnFee] = await Promise.all([
-      this.estimateISCNTxGas(payload, { gasPrice }),
+      this.estimateISCNTxGas(payload, { gasPrice, memo }),
       this.estimateISCNTxFee(payload),
     ]);
     return {
@@ -198,6 +201,11 @@ export class ISCNSigningClient {
   async estimateISCNTxGas(payload: ISCNSignPayload, {
     denom = this.denom,
     gasPrice = DEFAULT_GAS_PRICE_NUMBER,
+    memo,
+  }: {
+    denom?: string,
+    gasPrice?: number,
+    memo?: string,
   } = {}) {
     const record = await formatISCNPayload(payload);
     const msg = {
@@ -220,6 +228,7 @@ export class ISCNSigningClient {
     const obj = {
       type: 'cosmos-sdk/StdTx',
       value,
+      memo, // directly append memo to object if exists, since we only need its length
     };
     const txBytes = Buffer.from(jsonStringify(obj), 'utf-8');
     const byteSize = new BigNumber(txBytes.length);
@@ -293,7 +302,8 @@ export class ISCNSigningClient {
     };
     let fee = inputFee;
     if (!fee) {
-      ({ fee } = await this.estimateISCNTxGas(payload, { gasPrice }));
+      const { memo } = signOptions;
+      ({ fee } = await this.estimateISCNTxGas(payload, { gasPrice, memo }));
     } else if (gasPrice) {
       throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     }
@@ -320,7 +330,8 @@ export class ISCNSigningClient {
     };
     let fee = inputFee;
     if (!fee) {
-      ({ fee } = await this.estimateISCNTxGas(payload, { gasPrice }));
+      const { memo } = signOptions;
+      ({ fee } = await this.estimateISCNTxGas(payload, { gasPrice, memo }));
     } else if (gasPrice) {
       throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     }

@@ -42,6 +42,24 @@ describe('queryClient', () => {
     );
   });
 
+  test('Estimate ISCN gas and fee with memo', async () => {
+    const { client } = await getSigner();
+    const res = await client.esimateISCNTxGasAndFee(testData1, { memo: 'testing' });
+    expect(res).toEqual(
+      expect.objectContaining({
+        gas: expect.objectContaining({
+          fee: expect.objectContaining({
+            gas: '181118',
+            amount: expect.arrayContaining([expect.objectContaining({ amount: '181118000' })]),
+          }),
+        }),
+      }),
+    );
+    expect(res).toEqual(
+      expect.objectContaining({ iscnFee: expect.objectContaining({ amount: '2960000' }) }),
+    );
+  });
+
   test('Estimate large ISCN gas and fee', async () => {
     const { client } = await getSigner();
     const res = await client.esimateISCNTxGasAndFee(testData2);

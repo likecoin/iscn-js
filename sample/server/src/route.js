@@ -23,6 +23,7 @@ router.post(
         keywords = [],
         datePublished,
         url,
+        ...otherFields
       } = metadata;
       if (!type) {
         res.status(400).send('TYPE_SHOULD_BE_DEFINED');
@@ -46,6 +47,7 @@ router.post(
       ]);
       const recordNotes = ''; // add iscn record remarks on chain
       const ISCNPayload = {
+        ...otherFields,
         contentFingerprints,
         stakeholders,
         type,

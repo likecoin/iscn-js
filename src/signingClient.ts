@@ -15,6 +15,15 @@ import {
   MsgUpdateIscnRecord,
   MsgChangeIscnRecordOwnership,
 } from '@likecoin/iscn-message-types/dist/iscn/tx';
+import {
+  MsgNewClass,
+  MsgUpdateClass,
+  MsgMintNFT,
+  MsgBurnNFT,
+  MsgCreateMintableNFT,
+  MsgUpdateMintableNFT,
+  MsgDeleteMintableNFT,
+} from '@likecoin/iscn-message-types/dist/likenft/tx';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import jsonStringify from 'fast-json-stable-stringify';
 
@@ -28,6 +37,8 @@ import {
   COSMOS_DENOM,
   STUB_WALLET,
   ISCN_CHANGE_OWNER_GAS,
+  LIKENFT_MINT_NFT_GAS,
+  LIKENFT_CREATE_CLASS_GAS,
 } from './constant';
 import { ISCNQueryClient } from './queryClient';
 import { ISCNSignOptions, ISCNSignPayload, Stakeholder } from './types';
@@ -37,6 +48,13 @@ const registry = new Registry([
   ['/likechain.iscn.MsgCreateIscnRecord', MsgCreateIscnRecord],
   ['/likechain.iscn.MsgUpdateIscnRecord', MsgUpdateIscnRecord],
   ['/likechain.iscn.MsgChangeIscnRecordOwnership', MsgChangeIscnRecordOwnership],
+  ['/likechain.likenft.MsgNewClass', MsgNewClass],
+  ['/likechain.likenft.MsgUpdateClass', MsgUpdateClass],
+  ['/likechain.likenft.MsgMintNFT', MsgMintNFT],
+  ['/likechain.likenft.MsgBurnNFT', MsgBurnNFT],
+  ['/likechain.likenft.MsgCreateMintableNFT', MsgCreateMintableNFT],
+  ['/likechain.likenft.MsgUpdateMintableNFT', MsgUpdateMintableNFT],
+  ['/likechain.likenft.MsgDeleteMintableNFT', MsgDeleteMintableNFT],
 ]);
 
 export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
@@ -252,7 +270,7 @@ export class ISCNSigningClient {
 
   private async signOrBroadcast(
     senderAddress: string,
-    message: EncodeObject,
+    messages: EncodeObject[],
     fee: StdFee,
     {
       memo = '',
@@ -275,7 +293,7 @@ export class ISCNSigningClient {
         chainId,
       };
     }
-    const txRaw = await client.sign(senderAddress, [message], fee, memo, signData);
+    const txRaw = await client.sign(senderAddress, messages, fee, memo, signData);
     if (!broadcast) {
       return txRaw;
     }
@@ -307,7 +325,7 @@ export class ISCNSigningClient {
     } else if (gasPrice) {
       throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     }
-    const response = await this.signOrBroadcast(senderAddress, message, fee, signOptions);
+    const response = await this.signOrBroadcast(senderAddress, [message], fee, signOptions);
     return response;
   }
 
@@ -335,7 +353,7 @@ export class ISCNSigningClient {
     } else if (gasPrice) {
       throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     }
-    const response = await this.signOrBroadcast(senderAddress, message, fee, signOptions);
+    const response = await this.signOrBroadcast(senderAddress, [message], fee, signOptions);
     return response;
   }
 
@@ -366,7 +384,105 @@ export class ISCNSigningClient {
         gas: ISCN_CHANGE_OWNER_GAS.toString(),
       };
     } else if (gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    const response = await this.signOrBroadcast(senderAddress, message, fee, signOptions);
+    const response = await this.signOrBroadcast(senderAddress, [message], fee, signOptions);
+    return response;
+  }
+
+  async createNewNFTClass(
+    senderAddress: string,
+    iscnIdPrefix: string,
+    className: string,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const res = await this.queryClient.queryRecordsById(iscnIdPrefix);
+    if (!res) throw new Error('');
+    const { records: [record] } = res;
+    const { data: { contentMetadata } } = record;
+    const message = {
+      typeUrl: '/likechain.likenft.MsgNewClass',
+      value: {
+        creator: senderAddress,
+        parent: {
+          type: 1, // ISCN
+          iscnIdPrefix,
+        },
+        input: {
+          name: className || contentMetadata.name,
+          symbol: undefined,
+          description: contentMetadata.description,
+          uri: `https://mainnet-node.like.co/iscn/records/id?iscn_id=${encodeURIComponent(iscnIdPrefix)}`,
+          uriHash: '',
+          metadata: {
+            ...contentMetadata,
+          },
+          config: {
+            burnable: false,
+          },
+        },
+      },
+    };
+    let fee = inputFee;
+    if (!fee) {
+      fee = {
+        amount: [{
+          amount: new BigNumber(LIKENFT_CREATE_CLASS_GAS)
+            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          denom: this.denom,
+        }],
+        gas: LIKENFT_CREATE_CLASS_GAS.toString(),
+      };
+    } else if (gasPrice) {
+      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    }
+    const response = await this.signOrBroadcast(senderAddress, [message], fee, signOptions);
+    return response;
+  }
+
+  async mintNFT(
+    senderAddress: string,
+    classId: string,
+    nftDatas: [],
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const query = await this.queryClient.getQueryClient();
+    const res = await query.nft.class(classId);
+    if (!res || !res.class) throw new Error('Class not found');
+    const classData = res.class;
+    const messages = nftDatas.map((n, i) => ({
+      typeUrl: '/likechain.likenft.MsgMintNFT',
+      value: {
+        creator: senderAddress,
+        classId,
+        id: `${classId}-${i}`,
+        input: {
+          uri: `https://api.like.co/nft?classId=${encodeURIComponent(classId)}&id=${i}`,
+          uriHash: '',
+          metadata: {
+            name: classData.name,
+            description: classData.description,
+            ...classData.data,
+          },
+        },
+      },
+    }));
+    let fee = inputFee;
+    if (!fee) {
+      fee = {
+        amount: [{
+          amount: new BigNumber(LIKENFT_MINT_NFT_GAS)
+            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          denom: this.denom,
+        }],
+        gas: LIKENFT_MINT_NFT_GAS.toString(),
+      };
+    } else if (gasPrice) {
+      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    }
+    const response = await this.signOrBroadcast(senderAddress, messages, fee, signOptions);
     return response;
   }
 }

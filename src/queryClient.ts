@@ -5,12 +5,15 @@ import {
 } from '@cosmjs/stargate';
 import BigNumber from 'bignumber.js';
 
-import { setupISCNExtension, ISCNExtension } from './ISCNQueryExtension';
+import { setupISCNExtension, ISCNExtension } from './iscn/ISCNQueryExtension';
+import { setupNFTExtension, NFTExtension } from './likenft/NFTQueryExtension';
+import { setupLikeNFTExtension, LikeNFTExtension } from './likenft/LikeNFTQueryExtension';
 import { parseISCNTxInfoFromIndexedTx, parseISCNTxRecordFromQuery } from './parsing';
 import { DEFAULT_RPC_ENDPOINT } from './constant';
 
 export class ISCNQueryClient {
-  private queryClient: QueryClient & ISCNExtension & BankExtension | null = null;
+  private queryClient: QueryClient
+    & ISCNExtension & BankExtension & NFTExtension & LikeNFTExtension | null = null;
 
   private stargateClient: StargateClient | null = null;
 
@@ -18,7 +21,9 @@ export class ISCNQueryClient {
 
   async connect(rpcURL = DEFAULT_RPC_ENDPOINT)
     // eslint-disable-next-line max-len
-    : Promise<{ queryClient: QueryClient & ISCNExtension & BankExtension; stargateClient: StargateClient; }> {
+    : Promise<{ queryClient: QueryClient
+      & ISCNExtension & BankExtension & NFTExtension & LikeNFTExtension;
+      stargateClient: StargateClient; }> {
     const [tendermintClient, stargateClient] = await Promise.all([
       Tendermint34Client.connect(rpcURL),
       StargateClient.connect(rpcURL),
@@ -26,6 +31,8 @@ export class ISCNQueryClient {
     const queryClient = QueryClient.withExtensions(
       tendermintClient,
       setupISCNExtension,
+      setupNFTExtension,
+      setupLikeNFTExtension,
       setupBankExtension,
     );
     this.queryClient = queryClient;
@@ -37,7 +44,8 @@ export class ISCNQueryClient {
     };
   }
 
-  async getQueryClient(): Promise<QueryClient & ISCNExtension & BankExtension> {
+  async getQueryClient(): Promise<QueryClient
+    & ISCNExtension & BankExtension & NFTExtension & LikeNFTExtension> {
     let { queryClient } = this;
     if (!queryClient) ({ queryClient } = await this.connect());
     return queryClient;

@@ -40,6 +40,8 @@ import {
   ISCN_CHANGE_OWNER_GAS,
   LIKENFT_MINT_NFT_GAS,
   LIKENFT_CREATE_CLASS_GAS,
+  LIKENFT_BURN_NFT_GAS,
+  LIKENFT_UPDATE_CLASS_GAS,
 } from './constant';
 import { ISCNQueryClient } from './queryClient';
 import { ISCNSignOptions, ISCNSignPayload, MintNFTData, NewNFTClassData, Stakeholder } from './types';
@@ -444,6 +446,45 @@ export class ISCNSigningClient {
     return response;
   }
 
+  async updateNFTClass(
+    senderAddress: string,
+    classId: string,
+    nftClassData: NewNFTClassData,
+    classConfig?: ClassConfig,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const message = {
+      typeUrl: '/likechain.likenft.MsgUpdateClass',
+      value: {
+        creator: senderAddress,
+        classId,
+        input: {
+          ...nftClassData,
+          config: classConfig || {
+            burnable: false,
+          },
+        },
+      },
+    };
+    let fee = inputFee;
+    if (!fee) {
+      fee = {
+        amount: [{
+          amount: new BigNumber(LIKENFT_UPDATE_CLASS_GAS)
+            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          denom: this.denom,
+        }],
+        gas: LIKENFT_UPDATE_CLASS_GAS.toString(),
+      };
+    } else if (gasPrice) {
+      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    }
+    const response = await this.signOrBroadcast(senderAddress, [message], fee, signOptions);
+    return response;
+  }
+
   async mintNFT(
     senderAddress: string,
     classId: string,
@@ -484,6 +525,39 @@ export class ISCNSigningClient {
           denom: this.denom,
         }],
         gas: (LIKENFT_MINT_NFT_GAS * nftDatas.length).toString(),
+      };
+    } else if (gasPrice) {
+      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    }
+    const response = await this.signOrBroadcast(senderAddress, messages, fee, signOptions);
+    return response;
+  }
+
+  async burnNFT(
+    senderAddress: string,
+    classId: string,
+    nftId: string,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [{
+      typeUrl: '/likechain.likenft.MsgBurnNFT',
+      value: {
+        creator: senderAddress,
+        classId,
+        nftId,
+      },
+    }];
+    let fee = inputFee;
+    if (!fee) {
+      fee = {
+        amount: [{
+          amount: new BigNumber(LIKENFT_BURN_NFT_GAS)
+            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          denom: this.denom,
+        }],
+        gas: LIKENFT_BURN_NFT_GAS.toString(),
       };
     } else if (gasPrice) {
       throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');

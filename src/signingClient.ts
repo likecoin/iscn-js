@@ -390,7 +390,7 @@ export class ISCNSigningClient {
     return response;
   }
 
-  async createNewNFTClass(
+  async createNFTClass(
     senderAddress: string,
     iscnIdPrefix: string,
     nftClassData: NewNFTClassData,
@@ -400,7 +400,7 @@ export class ISCNSigningClient {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
     const res = await this.queryClient.queryRecordsById(iscnIdPrefix);
-    if (!res) throw new Error('');
+    if (!res) throw new Error('ISCN_NOT_FOUND');
     const { records: [record] } = res;
     const { data: { contentMetadata } } = record;
     const message = {
@@ -479,10 +479,11 @@ export class ISCNSigningClient {
       fee = {
         amount: [{
           amount: new BigNumber(LIKENFT_MINT_NFT_GAS)
+            .multipliedBy(nftDatas.length)
             .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
           denom: this.denom,
         }],
-        gas: LIKENFT_MINT_NFT_GAS.toString(),
+        gas: (LIKENFT_MINT_NFT_GAS * nftDatas.length).toString(),
       };
     } else if (gasPrice) {
       throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');

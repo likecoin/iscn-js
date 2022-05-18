@@ -650,10 +650,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@likecoin/iscn-message-types@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@likecoin/iscn-message-types/-/iscn-message-types-0.0.1.tgz#190a7d4920e2e80a38c05cba96ec14bf4f99d8bc"
-  integrity sha512-tNAgwQ/kynXu5k2upFiytOBDrNoixa0SvW/OxaJx91+PQYaGodAL+BQZbZs6VamT2q3JqO0SEZplNqgfxwxTfw==
+"@likecoin/iscn-message-types@0.0.3-alpha.0":
+  version "0.0.3-alpha.0"
+  resolved "https://registry.yarnpkg.com/@likecoin/iscn-message-types/-/iscn-message-types-0.0.3-alpha.0.tgz#a51689eb5c7e61064c18ad7e40303e148758275f"
+  integrity sha512-t4OZUZCgziueXGW7F4F7GhpQAo65GYls1e2bLUSR90yRW3bFlmsFTJVZwl0VqJxl/vuAcFZVWekexVH8tD1xTA==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"

@@ -1,5 +1,5 @@
-import { StdFee } from '@cosmjs/stargate';
-import { AuthInfo, TxBody } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
+import { StdFee } from "@cosmjs/stargate";
+import { AuthInfo, TxBody } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 export interface ISCNRecordData {
   stakeholders: any[];
@@ -10,7 +10,7 @@ export interface ISCNRecordData {
 
 export interface ISCNRecord {
   ipld: string;
-  data: ISCNRecordData & {[key:string]: unknown};
+  data: ISCNRecordData & { [key: string]: unknown };
 }
 
 export interface Entity {
@@ -20,13 +20,13 @@ export interface Entity {
 }
 
 export interface Stakeholder {
-  entity?: Entity & {[key:string]: unknown},
-  rewardProportion?: number,
-  contributionType?: string
+  entity?: Entity & { [key: string]: unknown };
+  rewardProportion?: number;
+  contributionType?: string;
 }
 
 export interface ISCNSignPayload {
-  [key: string]: unknown,
+  [key: string]: unknown;
   name: string;
   description?: string;
   keywords?: string[];
@@ -39,13 +39,13 @@ export interface ISCNSignPayload {
 }
 
 export interface ISCNSignOptions {
-  memo?: string,
-  broadcast?: boolean,
-  accountNumber?: number,
-  sequence?: number,
-  chainId?: string,
-  gasPrice?: number,
-  fee?: StdFee,
+  memo?: string;
+  broadcast?: boolean;
+  accountNumber?: number;
+  sequence?: number;
+  chainId?: string;
+  gasPrice?: number;
+  fee?: StdFee;
 }
 export interface ParsedISCNTx {
   readonly height: number;
@@ -74,4 +74,20 @@ export interface ParsedISCNTx {
   }[];
   readonly gasUsed: number;
   readonly gasWanted: number;
+}
+
+export interface NewNFTClassData {
+  name?: string;
+  symbol?: string;
+  description?: string;
+  uri?: string;
+  uriHash?: string;
+  metadata?: { [key: string]: string };
+}
+
+export interface MintNFTData {
+  id: string;
+  uri: string;
+  uriHash?: string;
+  metadata?: { [key: string]: string };
 }

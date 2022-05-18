@@ -24,6 +24,7 @@ import {
   MsgUpdateMintableNFT,
   MsgDeleteMintableNFT,
 } from '@likecoin/iscn-message-types/dist/likenft/tx';
+import { ClassConfig } from '@likecoin/iscn-message-types/dist/likenft/class_data';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import jsonStringify from 'fast-json-stable-stringify';
 
@@ -41,7 +42,8 @@ import {
   LIKENFT_CREATE_CLASS_GAS,
 } from './constant';
 import { ISCNQueryClient } from './queryClient';
-import { ISCNSignOptions, ISCNSignPayload, Stakeholder } from './types';
+import { ISCNSignOptions, ISCNSignPayload, MintNFTData, NewNFTClassData, Stakeholder } from './types';
+
 
 const registry = new Registry([
   ...defaultRegistryTypes,
@@ -391,7 +393,8 @@ export class ISCNSigningClient {
   async createNewNFTClass(
     senderAddress: string,
     iscnIdPrefix: string,
-    className: string,
+    nftClassData: NewNFTClassData,
+    classConfig?: ClassConfig,
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
@@ -409,15 +412,16 @@ export class ISCNSigningClient {
           iscnIdPrefix,
         },
         input: {
-          name: className || contentMetadata.name,
-          symbol: undefined,
-          description: contentMetadata.description,
-          uri: `https://mainnet-node.like.co/iscn/records/id?iscn_id=${encodeURIComponent(iscnIdPrefix)}`,
-          uriHash: '',
+          name: nftClassData.name || contentMetadata.name,
+          symbol: nftClassData.symbol,
+          description: nftClassData.description || contentMetadata.description,
+          uri: nftClassData.uri,
+          uriHash: nftClassData.uriHash,
           metadata: {
-            ...contentMetadata,
+            ...(contentMetadata || {}),
+            ...(nftClassData.metadata || {}),
           },
-          config: {
+          config: classConfig || {
             burnable: false,
           },
         },
@@ -443,7 +447,7 @@ export class ISCNSigningClient {
   async mintNFT(
     senderAddress: string,
     classId: string,
-    nftDatas: [],
+    nftDatas: MintNFTData[],
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
@@ -452,19 +456,20 @@ export class ISCNSigningClient {
     const res = await query.nft.class(classId);
     if (!res || !res.class) throw new Error('Class not found');
     const classData = res.class;
-    const messages = nftDatas.map((n, i) => ({
+    const messages = nftDatas.map((n) => ({
       typeUrl: '/likechain.likenft.MsgMintNFT',
       value: {
         creator: senderAddress,
         classId,
-        id: `${classId}-${i}`,
+        id: n.id,
         input: {
-          uri: `https://api.like.co/nft?classId=${encodeURIComponent(classId)}&id=${i}`,
-          uriHash: '',
+          uri: n.uri,
+          uriHash: n.uriHash,
           metadata: {
             name: classData.name,
             description: classData.description,
-            ...classData.data,
+            ...(classData.data || {}),
+            ...(n.metadata || {}),
           },
         },
       },

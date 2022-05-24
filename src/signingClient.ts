@@ -24,6 +24,7 @@ import {
   MsgUpdateMintableNFT,
   MsgDeleteMintableNFT,
 } from '@likecoin/iscn-message-types/dist/likenft/tx';
+import { MsgSend as MsgSendNFT } from '@likecoin/iscn-message-types/dist/nft/tx';
 import { ClassConfig } from '@likecoin/iscn-message-types/dist/likenft/class_data';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import jsonStringify from 'fast-json-stable-stringify';
@@ -52,6 +53,7 @@ const registry = new Registry([
   ['/likechain.iscn.MsgCreateIscnRecord', MsgCreateIscnRecord],
   ['/likechain.iscn.MsgUpdateIscnRecord', MsgUpdateIscnRecord],
   ['/likechain.iscn.MsgChangeIscnRecordOwnership', MsgChangeIscnRecordOwnership],
+  ['/cosmos.nft.v1beta1.MsgSend', MsgSendNFT],
   ['/likechain.likenft.MsgNewClass', MsgNewClass],
   ['/likechain.likenft.MsgUpdateClass', MsgUpdateClass],
   ['/likechain.likenft.MsgMintNFT', MsgMintNFT],
@@ -530,6 +532,39 @@ export class ISCNSigningClient {
       throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     }
     const response = await this.signOrBroadcast(senderAddress, messages, fee, signOptions);
+    return response;
+  }
+
+  async sendNFT(
+    senderAddress: string,
+    receiverAddress: string,
+    classId: string,
+    id: string,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const message = {
+      typeUrl: '/cosmos.nft.v1beta1.MsgSend',
+      value: {
+        sender: senderAddress,
+        receiver: receiverAddress,
+        classId,
+        id,
+      },
+    };
+    let fee = inputFee;
+    if (!fee) {
+      fee = {
+        amount: [{
+          amount: new BigNumber(ISCN_CHANGE_OWNER_GAS)
+            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          denom: this.denom,
+        }],
+        gas: ISCN_CHANGE_OWNER_GAS.toString(),
+      };
+    } else if (gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    const response = await this.signOrBroadcast(senderAddress, [message], fee, signOptions);
     return response;
   }
 

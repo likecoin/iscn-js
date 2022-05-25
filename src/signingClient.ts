@@ -393,10 +393,10 @@ export class ISCNSigningClient {
           description: nftClassData.description || contentMetadata.description,
           uri: nftClassData.uri,
           uriHash: nftClassData.uriHash,
-          metadata: {
+          metadata: Buffer.from(JSON.stringify({
             ...(contentMetadata || {}),
             ...(nftClassData.metadata || {}),
-          },
+          }), 'utf8'),
           config: classConfig || {
             burnable: false,
           },
@@ -470,7 +470,6 @@ export class ISCNSigningClient {
     const query = await this.queryClient.getQueryClient();
     const res = await query.nft.class(classId);
     if (!res || !res.class) throw new Error('Class not found');
-    const classData = res.class;
     const messages = nftDatas.map((n) => ({
       typeUrl: '/likechain.likenft.MsgMintNFT',
       value: {
@@ -480,12 +479,9 @@ export class ISCNSigningClient {
         input: {
           uri: n.uri,
           uriHash: n.uriHash,
-          metadata: {
-            name: classData.name,
-            description: classData.description,
-            ...(classData.data || {}),
+          metadata: Buffer.from(JSON.stringify({
             ...(n.metadata || {}),
-          },
+          }), 'utf8'),
         },
       },
     }));

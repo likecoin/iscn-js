@@ -8,8 +8,11 @@ import {
   MsgUpdateIscnRecord,
   MsgChangeIscnRecordOwnership,
 } from '@likecoin/iscn-message-types/dist/iscn/tx';
+import { Class, NFT } from '@likecoin/iscn-message-types/dist/nft/nft';
+import { NFTData } from '@likecoin/iscn-message-types/dist/likenft/nft_data';
 import { ISCNRecord, ISCNRecordData, ParsedISCNTx } from './types';
 import { messageRegistryMap } from './messageRegistry';
+import { ClassData } from '@likecoin/iscn-message-types/dist/likenft/class_data';
 
 export function parseISCNRecordFields(record: IscnRecord): ISCNRecordData {
   const {
@@ -27,6 +30,42 @@ export function parseISCNRecordFields(record: IscnRecord): ISCNRecordData {
     }),
     contentMetadata: JSON.parse(Buffer.from(contentMetadata).toString('utf-8')),
   };
+}
+
+export function parseNFTClassDataFields(record: Class) {
+  let data;
+  if (record.data && record.data.typeUrl === '/likechain.likenft.ClassData') {
+    data = ClassData.decode(record.data.value);
+    if (data.metadata) {
+      const metadataString = Buffer.from(data.metadata).toString('utf-8');
+      if (metadataString) {
+        data.metadata = JSON.parse(metadataString);
+      }
+    }
+    return data ? {
+      ...record,
+      data,
+    } : record;
+  }
+  return record;
+}
+
+export function parseNFTDataFields(record: NFT) {
+  let data;
+  if (record.data && record.data.typeUrl === '/likechain.likenft.NFTData') {
+    data = NFTData.decode(record.data.value);
+    if (data.metadata) {
+      const metadataString = Buffer.from(data.metadata).toString('utf-8');
+      if (metadataString) {
+        data.metadata = JSON.parse(metadataString);
+      }
+    }
+    return data ? {
+      ...record,
+      data,
+    } : record;
+  }
+  return record;
 }
 
 export function parseTxInfoFromIndexedTx(tx: IndexedTx): ParsedISCNTx {

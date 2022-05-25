@@ -1,8 +1,7 @@
 import BigNumber from 'bignumber.js';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { EncodeObject, OfflineSigner, Registry } from '@cosmjs/proto-signing';
+import { EncodeObject, OfflineSigner } from '@cosmjs/proto-signing';
 import {
-  defaultRegistryTypes,
   assertIsDeliverTxSuccess,
   SigningStargateClient,
   Coin,
@@ -10,21 +9,6 @@ import {
   StdFee,
   DeliverTxResponse,
 } from '@cosmjs/stargate';
-import {
-  MsgCreateIscnRecord,
-  MsgUpdateIscnRecord,
-  MsgChangeIscnRecordOwnership,
-} from '@likecoin/iscn-message-types/dist/iscn/tx';
-import {
-  MsgNewClass,
-  MsgUpdateClass,
-  MsgMintNFT,
-  MsgBurnNFT,
-  MsgCreateMintableNFT,
-  MsgUpdateMintableNFT,
-  MsgDeleteMintableNFT,
-} from '@likecoin/iscn-message-types/dist/likenft/tx';
-import { MsgSend as MsgSendNFT } from '@likecoin/iscn-message-types/dist/nft/tx';
 import { ClassConfig } from '@likecoin/iscn-message-types/dist/likenft/class_data';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import jsonStringify from 'fast-json-stable-stringify';
@@ -46,23 +30,10 @@ import {
   LIKENFT_UPDATE_CLASS_GAS,
 } from './constant';
 import { ISCNQueryClient } from './queryClient';
-import { ISCNSignOptions, ISCNSignPayload, MintNFTData, NewNFTClassData, Stakeholder } from './types';
-
-
-const registry = new Registry([
-  ...defaultRegistryTypes,
-  ['/likechain.iscn.MsgCreateIscnRecord', MsgCreateIscnRecord],
-  ['/likechain.iscn.MsgUpdateIscnRecord', MsgUpdateIscnRecord],
-  ['/likechain.iscn.MsgChangeIscnRecordOwnership', MsgChangeIscnRecordOwnership],
-  ['/cosmos.nft.v1beta1.MsgSend', MsgSendNFT],
-  ['/likechain.likenft.MsgNewClass', MsgNewClass],
-  ['/likechain.likenft.MsgUpdateClass', MsgUpdateClass],
-  ['/likechain.likenft.MsgMintNFT', MsgMintNFT],
-  ['/likechain.likenft.MsgBurnNFT', MsgBurnNFT],
-  ['/likechain.likenft.MsgCreateMintableNFT', MsgCreateMintableNFT],
-  ['/likechain.likenft.MsgUpdateMintableNFT', MsgUpdateMintableNFT],
-  ['/likechain.likenft.MsgDeleteMintableNFT', MsgDeleteMintableNFT],
-]);
+import { messageRegistry as registry } from './messageRegistry';
+import {
+  ISCNSignOptions, ISCNSignPayload, MintNFTData, NewNFTClassData, Stakeholder,
+} from './types';
 
 export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
   if (!payload) throw new Error('INVALID_ISCN_PAYLOAD');

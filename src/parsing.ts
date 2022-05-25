@@ -9,6 +9,7 @@ import {
   MsgChangeIscnRecordOwnership,
 } from '@likecoin/iscn-message-types/dist/iscn/tx';
 import { ISCNRecord, ISCNRecordData, ParsedISCNTx } from './types';
+import { messageRegistryMap } from './messageRegistry';
 
 export function parseISCNRecordFields(record: IscnRecord): ISCNRecordData {
   const {
@@ -28,25 +29,35 @@ export function parseISCNRecordFields(record: IscnRecord): ISCNRecordData {
   };
 }
 
-export function parseISCNTxInfoFromIndexedTx(tx: IndexedTx): ParsedISCNTx {
+export function parseTxInfoFromIndexedTx(tx: IndexedTx): ParsedISCNTx {
   const { tx: txBytes, rawLog } = tx;
   const decodedTx = decodeTxRaw(txBytes);
   const messages = decodedTx.body.messages.map((m) => {
     let msg;
-    if (m.typeUrl === '/likechain.iscn.MsgCreateIscnRecord') {
-      msg = MsgCreateIscnRecord.decode(m.value);
-      if (msg.record) {
-        msg.record = parseISCNRecordFields(msg.record);
+    switch (m.typeUrl) {
+      case '/likechain.iscn.MsgCreateIscnRecord': {
+        msg = MsgCreateIscnRecord.decode(m.value);
+        if (msg.record) {
+          msg.record = parseISCNRecordFields(msg.record);
+        }
+        break;
       }
-    }
-    if (m.typeUrl === '/likechain.iscn.MsgUpdateIscnRecord') {
-      msg = MsgUpdateIscnRecord.decode(m.value);
-      if (msg.record) {
-        msg.record = parseISCNRecordFields(msg.record);
+      case '/likechain.iscn.MsgUpdateIscnRecord': {
+        msg = MsgUpdateIscnRecord.decode(m.value);
+        if (msg.record) {
+          msg.record = parseISCNRecordFields(msg.record);
+        }
+        break;
       }
-    }
-    if (m.typeUrl === '/likechain.iscn.MsgChangeIscnRecordOwnership') {
-      msg = MsgChangeIscnRecordOwnership.decode(m.value);
+      case '/likechain.iscn.MsgChangeIscnRecordOwnership': {
+        msg = MsgChangeIscnRecordOwnership.decode(m.value);
+        break;
+      }
+      default: {
+        if (messageRegistryMap[m.typeUrl]) {
+          msg = messageRegistryMap[m.typeUrl].decode(m.value);
+        }
+      }
     }
     return msg ? {
       ...m,

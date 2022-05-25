@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 import { setupISCNExtension, ISCNExtension } from './iscn/ISCNQueryExtension';
 import { setupNFTExtension, NFTExtension } from './likenft/NFTQueryExtension';
 import { setupLikeNFTExtension, LikeNFTExtension } from './likenft/LikeNFTQueryExtension';
-import { parseISCNTxInfoFromIndexedTx, parseISCNTxRecordFromQuery } from './parsing';
+import { parseTxInfoFromIndexedTx, parseISCNTxRecordFromQuery } from './parsing';
 import { DEFAULT_RPC_ENDPOINT } from './constant';
 
 export class ISCNQueryClient {
@@ -61,7 +61,7 @@ export class ISCNQueryClient {
     const stargateClient = await this.getStargateClient();
     const res = await stargateClient.getTx(txId);
     if (res) {
-      const parsed = parseISCNTxInfoFromIndexedTx(res);
+      const parsed = parseTxInfoFromIndexedTx(res);
       const records: string[] = [];
       parsed.tx.body.messages.forEach((m, index) => {
         if (!m || !m.typeUrl.includes('/likechain.iscn')) return;

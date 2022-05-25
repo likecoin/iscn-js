@@ -39,6 +39,7 @@ import {
   COSMOS_DENOM,
   STUB_WALLET,
   ISCN_CHANGE_OWNER_GAS,
+  SEND_NFT_GAS,
   LIKENFT_MINT_NFT_GAS,
   LIKENFT_CREATE_CLASS_GAS,
   LIKENFT_BURN_NFT_GAS,
@@ -539,12 +540,12 @@ export class ISCNSigningClient {
     senderAddress: string,
     receiverAddress: string,
     classId: string,
-    id: string,
+    nftIds: string[],
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const message = {
+    const messages = nftIds.map((id) => ({
       typeUrl: '/cosmos.nft.v1beta1.MsgSend',
       value: {
         sender: senderAddress,
@@ -552,47 +553,49 @@ export class ISCNSigningClient {
         classId,
         id,
       },
-    };
+    }));
     let fee = inputFee;
     if (!fee) {
       fee = {
         amount: [{
-          amount: new BigNumber(ISCN_CHANGE_OWNER_GAS)
+          amount: new BigNumber(SEND_NFT_GAS)
+            .multipliedBy(nftIds.length)
             .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
           denom: this.denom,
         }],
-        gas: ISCN_CHANGE_OWNER_GAS.toString(),
+        gas: (SEND_NFT_GAS * nftIds.length).toString(),
       };
     } else if (gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    const response = await this.signOrBroadcast(senderAddress, [message], fee, signOptions);
+    const response = await this.signOrBroadcast(senderAddress, messages, fee, signOptions);
     return response;
   }
 
   async burnNFT(
     senderAddress: string,
     classId: string,
-    nftId: string,
+    nftIds: string[],
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const messages = [{
+    const messages = nftIds.map((nftId) => ({
       typeUrl: '/likechain.likenft.MsgBurnNFT',
       value: {
         creator: senderAddress,
         classId,
         nftId,
       },
-    }];
+    }));
     let fee = inputFee;
     if (!fee) {
       fee = {
         amount: [{
           amount: new BigNumber(LIKENFT_BURN_NFT_GAS)
+            .multipliedBy(nftIds.length)
             .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
           denom: this.denom,
         }],
-        gas: LIKENFT_BURN_NFT_GAS.toString(),
+        gas: (LIKENFT_BURN_NFT_GAS * nftIds.length).toString(),
       };
     } else if (gasPrice) {
       throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');

@@ -10,9 +10,9 @@ import {
 } from '@likecoin/iscn-message-types/dist/iscn/tx';
 import { Class, NFT } from '@likecoin/iscn-message-types/dist/nft/nft';
 import { NFTData } from '@likecoin/iscn-message-types/dist/likenft/nft_data';
+import { ClassData } from '@likecoin/iscn-message-types/dist/likenft/class_data';
 import { ISCNRecord, ISCNRecordData, ParsedISCNTx } from './types';
 import { messageRegistryMap } from './messageRegistry';
-import { ClassData } from '@likecoin/iscn-message-types/dist/likenft/class_data';
 
 export function parseISCNRecordFields(record: IscnRecord): ISCNRecordData {
   const {

@@ -15,6 +15,7 @@ import {
   MsgDeleteMintableNFT,
 } from '@likecoin/iscn-message-types/dist/likenft/tx';
 import { MsgSend as MsgSendNFT } from '@likecoin/iscn-message-types/dist/nft/tx';
+import { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { defaultRegistryTypes } from '@cosmjs/stargate';
 
 const registryTypes: ReadonlyArray<[string, GeneratedType]> = [
@@ -40,3 +41,29 @@ export const messageRegistryMap = registryTypes
   }, {});
 
 export const messageRegistry = new Registry(registryTypes);
+
+export function formatGrantMsg(
+  granter: string,
+  grantee: string,
+  type: string,
+  value: Uint8Array,
+  expirationInMs: number,
+) {
+  return {
+    typeUrl: '/cosmos.authz.v1beta1.MsgGrant',
+    value: {
+      granter,
+      grantee,
+      grant: {
+        authorization: {
+          typeUrl: type,
+          value,
+        },
+        expiration: Timestamp.fromPartial({
+          seconds: Math.floor(expirationInMs / 1000),
+          nanos: 0,
+        }),
+      },
+    },
+  };
+}

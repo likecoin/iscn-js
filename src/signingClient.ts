@@ -11,6 +11,8 @@ import {
 } from '@cosmjs/stargate';
 import { ClassConfig } from '@likecoin/iscn-message-types/dist/likenft/class_data';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
+import { SendAuthorization } from 'cosmjs-types/cosmos/bank/v1beta1/authz';
+import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx';
 import jsonStringify from 'fast-json-stable-stringify';
 
 import {
@@ -28,9 +30,12 @@ import {
   LIKENFT_CREATE_CLASS_GAS,
   LIKENFT_BURN_NFT_GAS,
   LIKENFT_UPDATE_CLASS_GAS,
+  GRANT_SEND_AUTH_GAS,
+  EXEC_SEND_AUTH_GAS,
+  REVOKE_SEND_AUTH_GAS,
 } from './constant';
 import { ISCNQueryClient } from './queryClient';
-import { messageRegistry as registry } from './messageRegistry';
+import { formatGrantMsg, messageRegistry as registry } from './messageRegistry';
 import {
   ISCNSignOptions, ISCNSignPayload, MintNFTData, NewNFTClassData, Stakeholder,
 } from './types';
@@ -563,6 +568,115 @@ export class ISCNSigningClient {
           denom: this.denom,
         }],
         gas: (LIKENFT_BURN_NFT_GAS * nftIds.length).toString(),
+      };
+    } else if (gasPrice) {
+      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    }
+    const response = await this.signOrBroadcast(senderAddress, messages, fee, signOptions);
+    return response;
+  }
+
+  async createSendGrant(
+    senderAddress: string,
+    granteeAddress: string,
+    spendLimit: Coin[],
+    expirationInMs: number,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [
+      formatGrantMsg(
+        senderAddress,
+        granteeAddress,
+        '/cosmos.bank.v1beta1.SendAuthorization',
+        SendAuthorization.encode(SendAuthorization.fromPartial({
+          spendLimit,
+        })).finish(),
+        expirationInMs,
+      ),
+    ];
+    let fee = inputFee;
+    if (!fee) {
+      fee = {
+        amount: [{
+          amount: new BigNumber(GRANT_SEND_AUTH_GAS)
+            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          denom: this.denom,
+        }],
+        gas: GRANT_SEND_AUTH_GAS.toString(),
+      };
+    } else if (gasPrice) {
+      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    }
+    const response = await this.signOrBroadcast(senderAddress, messages, fee, signOptions);
+    return response;
+  }
+
+  async executeSendGrant(
+    execAddress: string,
+    granterAddress: string,
+    toAddress: string,
+    amounts: Coin[],
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [{
+      typeUrl: '/cosmos.authz.v1beta1.MsgExec',
+      value: {
+        grantee: execAddress,
+        msgs: [{
+          typeUrl: '/cosmos.bank.v1beta1.MsgSend',
+          value: MsgSend.encode(MsgSend.fromPartial({
+            fromAddress: granterAddress,
+            toAddress,
+            amount: amounts,
+          })).finish(),
+        }],
+      },
+    }];
+    let fee = inputFee;
+    if (!fee) {
+      fee = {
+        amount: [{
+          amount: new BigNumber(EXEC_SEND_AUTH_GAS)
+            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          denom: this.denom,
+        }],
+        gas: EXEC_SEND_AUTH_GAS.toString(),
+      };
+    } else if (gasPrice) {
+      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    }
+    const response = await this.signOrBroadcast(execAddress, messages, fee, signOptions);
+    return response;
+  }
+
+  async revokeSendGrant(
+    senderAddress: string,
+    granteeAddress: string,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [{
+      typeUrl: '/cosmos.authz.v1beta1.MsgRevoke',
+      value: {
+        granter: senderAddress,
+        grantee: granteeAddress,
+        msgTypeUrl: '/cosmos.bank.v1beta1.MsgSend',
+      },
+    }];
+    let fee = inputFee;
+    if (!fee) {
+      fee = {
+        amount: [{
+          amount: new BigNumber(REVOKE_SEND_AUTH_GAS)
+            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          denom: this.denom,
+        }],
+        gas: REVOKE_SEND_AUTH_GAS.toString(),
       };
     } else if (gasPrice) {
       throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');

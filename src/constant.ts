@@ -17,6 +17,10 @@ export const LIKENFT_UPDATE_CLASS_GAS = 200000;
 export const LIKENFT_MINT_NFT_GAS = 200000;
 export const LIKENFT_BURN_NFT_GAS = 200000;
 
+export const GRANT_SEND_AUTH_GAS = 200000;
+export const EXEC_SEND_AUTH_GAS = 200000;
+export const REVOKE_SEND_AUTH_GAS = 200000;
+
 export const DEFAULT_RPC_ENDPOINT = 'https://mainnet-node.like.co/rpc/';
 export const ISCN_REGISTRY_NAME = 'likecoin-chain';
 

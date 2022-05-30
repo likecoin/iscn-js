@@ -1,5 +1,5 @@
-import { StdFee } from "@cosmjs/stargate";
-import { AuthInfo, TxBody } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { StdFee } from '@cosmjs/stargate';
+import { AuthInfo } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 
 export interface ISCNRecordData {
   stakeholders: any[];

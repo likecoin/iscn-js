@@ -3,6 +3,7 @@ import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import {
   QueryClient, setupBankExtension, BankExtension, Coin, StargateClient,
 } from '@cosmjs/stargate';
+import { setupAuthzExtension, AuthzExtension } from '@cosmjs/stargate/build/modules/authz/queries';
 import BigNumber from 'bignumber.js';
 
 import { setupISCNExtension, ISCNExtension } from './iscn/ISCNQueryExtension';
@@ -13,7 +14,9 @@ import { DEFAULT_RPC_ENDPOINT } from './constant';
 
 export class ISCNQueryClient {
   private queryClient: QueryClient
-    & ISCNExtension & BankExtension & NFTExtension & LikeNFTExtension | null = null;
+    & ISCNExtension
+    & BankExtension & AuthzExtension
+    & NFTExtension & LikeNFTExtension | null = null;
 
   private stargateClient: StargateClient | null = null;
 
@@ -22,7 +25,8 @@ export class ISCNQueryClient {
   async connect(rpcURL = DEFAULT_RPC_ENDPOINT)
     // eslint-disable-next-line max-len
     : Promise<{ queryClient: QueryClient
-      & ISCNExtension & BankExtension & NFTExtension & LikeNFTExtension;
+      & ISCNExtension & BankExtension & AuthzExtension
+      & NFTExtension & LikeNFTExtension;
       stargateClient: StargateClient; }> {
     const [tendermintClient, stargateClient] = await Promise.all([
       Tendermint34Client.connect(rpcURL),
@@ -30,6 +34,7 @@ export class ISCNQueryClient {
     ]);
     const queryClient = QueryClient.withExtensions(
       tendermintClient,
+      setupAuthzExtension,
       setupISCNExtension,
       setupNFTExtension,
       setupLikeNFTExtension,

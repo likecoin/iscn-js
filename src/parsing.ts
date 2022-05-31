@@ -11,6 +11,10 @@ import {
 import { Class, NFT } from '@likecoin/iscn-message-types/dist/nft/nft';
 import { NFTData } from '@likecoin/iscn-message-types/dist/likenft/nft_data';
 import { ClassData } from '@likecoin/iscn-message-types/dist/likenft/class_data';
+import { MsgGrant } from 'cosmjs-types/cosmos/authz/v1beta1/tx';
+import { GenericAuthorization, Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz';
+import { SendAuthorization } from 'cosmjs-types/cosmos/bank/v1beta1/authz';
+import { StakeAuthorization } from 'cosmjs-types/cosmos/staking/v1beta1/authz';
 import { ISCNRecord, ISCNRecordData, ParsedISCNTx } from './types';
 import { messageRegistryMap } from './messageRegistry';
 
@@ -68,6 +72,34 @@ export function parseNFTDataFields(record: NFT) {
   return record;
 }
 
+export function parseAuthzGrant(grant: Grant) {
+  const { authorization } = grant;
+  if (!authorization) return grant;
+  let authorizationValue;
+  switch (authorization.typeUrl) {
+    case '/cosmos.bank.v1beta1.SendAuthorization': {
+      authorizationValue = SendAuthorization.decode(authorization.value);
+      break;
+    }
+    case '/cosmos.staking.v1beta1.StakeAuthorization': {
+      authorizationValue = StakeAuthorization.decode(authorization.value);
+      break;
+    }
+    case '/cosmos.authz.v1beta1.GenericAuthorization': {
+      authorizationValue = GenericAuthorization.decode(authorization.value);
+      break;
+    }
+    default:
+  }
+  return {
+    ...grant,
+    authorization: {
+      typeUrl: authorization.typeUrl,
+      value: authorizationValue,
+    },
+  };
+}
+
 export function parseTxInfoFromIndexedTx(tx: IndexedTx): ParsedISCNTx {
   const { tx: txBytes, rawLog } = tx;
   const decodedTx = decodeTxRaw(txBytes);
@@ -90,6 +122,17 @@ export function parseTxInfoFromIndexedTx(tx: IndexedTx): ParsedISCNTx {
       }
       case '/likechain.iscn.MsgChangeIscnRecordOwnership': {
         msg = MsgChangeIscnRecordOwnership.decode(m.value);
+        break;
+      }
+      case '/cosmos.authz.v1beta1.MsgGrant': {
+        msg = MsgGrant.decode(m.value);
+        if (msg.grant) {
+          const grant = parseAuthzGrant(msg.grant);
+          msg = {
+            ...msg,
+            grant,
+          };
+        }
         break;
       }
       default: {

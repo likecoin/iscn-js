@@ -15,8 +15,8 @@ import { MsgGrant } from 'cosmjs-types/cosmos/authz/v1beta1/tx';
 import { GenericAuthorization, Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz';
 import { SendAuthorization } from 'cosmjs-types/cosmos/bank/v1beta1/authz';
 import { StakeAuthorization } from 'cosmjs-types/cosmos/staking/v1beta1/authz';
-import { ISCNRecord, ISCNRecordData, ParsedISCNTx } from './types';
-import { messageRegistryMap } from './messageRegistry';
+import { ISCNRecord, ISCNRecordData, ParsedISCNTx } from '../types';
+import { messageRegistryMap } from './registry';
 
 export function parseISCNRecordFields(record: IscnRecord): ISCNRecordData {
   const {

@@ -1,7 +1,5 @@
-export * from './iscn/ISCNQueryExtension';
-export * from './likenft/LikeNFTQueryExtension';
-export * from './likenft/NFTQueryExtension';
 export * from './queryClient';
 export * from './signingClient';
-export * from './parsing';
+export * as queryExtension from './queryExtensions';
+export * as message from './messages';
 export * from './types';

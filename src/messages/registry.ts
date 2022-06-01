@@ -15,14 +15,14 @@ import {
   MsgDeleteMintableNFT,
 } from '@likecoin/iscn-message-types/dist/likenft/tx';
 import { MsgSend as MsgSendNFT } from '@likecoin/iscn-message-types/dist/nft/tx';
-import { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { defaultRegistryTypes } from '@cosmjs/stargate';
 
-const registryTypes: ReadonlyArray<[string, GeneratedType]> = [
-  ...defaultRegistryTypes,
+export const ISCNRegistryTypes: ReadonlyArray<[string, GeneratedType]> = [
   ['/likechain.iscn.MsgCreateIscnRecord', MsgCreateIscnRecord],
   ['/likechain.iscn.MsgUpdateIscnRecord', MsgUpdateIscnRecord],
   ['/likechain.iscn.MsgChangeIscnRecordOwnership', MsgChangeIscnRecordOwnership],
+];
+export const LikeNFTRegistryTypes: ReadonlyArray<[string, GeneratedType]> = [
   ['/cosmos.nft.v1beta1.MsgSend', MsgSendNFT],
   ['/likechain.likenft.MsgNewClass', MsgNewClass],
   ['/likechain.likenft.MsgUpdateClass', MsgUpdateClass],
@@ -33,6 +33,12 @@ const registryTypes: ReadonlyArray<[string, GeneratedType]> = [
   ['/likechain.likenft.MsgDeleteMintableNFT', MsgDeleteMintableNFT],
 ];
 
+const registryTypes: ReadonlyArray<[string, GeneratedType]> = [
+  ...defaultRegistryTypes,
+  ...ISCNRegistryTypes,
+  ...LikeNFTRegistryTypes,
+];
+
 export const messageRegistryMap = registryTypes
   .reduce((acc: { [key: string]: GeneratedType }, cur) => {
     const [key, value] = cur;
@@ -41,29 +47,3 @@ export const messageRegistryMap = registryTypes
   }, {});
 
 export const messageRegistry = new Registry(registryTypes);
-
-export function formatGrantMsg(
-  granter: string,
-  grantee: string,
-  type: string,
-  value: Uint8Array,
-  expirationInMs: number,
-) {
-  return {
-    typeUrl: '/cosmos.authz.v1beta1.MsgGrant',
-    value: {
-      granter,
-      grantee,
-      grant: {
-        authorization: {
-          typeUrl: type,
-          value,
-        },
-        expiration: Timestamp.fromPartial({
-          seconds: Math.floor(expirationInMs / 1000),
-          nanos: 0,
-        }),
-      },
-    },
-  };
-}

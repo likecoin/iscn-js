@@ -6,10 +6,10 @@ import {
 import { setupAuthzExtension, AuthzExtension } from '@cosmjs/stargate/build/modules/authz/queries';
 import BigNumber from 'bignumber.js';
 
-import { setupISCNExtension, ISCNExtension } from './iscn/ISCNQueryExtension';
-import { setupNFTExtension, NFTExtension } from './likenft/NFTQueryExtension';
-import { setupLikeNFTExtension, LikeNFTExtension } from './likenft/LikeNFTQueryExtension';
-import { parseTxInfoFromIndexedTx, parseISCNTxRecordFromQuery } from './parsing';
+import { setupISCNExtension, ISCNExtension } from './queryExtensions/ISCNQueryExtension';
+import { setupNFTExtension, NFTExtension } from './queryExtensions/NFTQueryExtension';
+import { setupLikeNFTExtension, LikeNFTExtension } from './queryExtensions/LikeNFTQueryExtension';
+import { parseTxInfoFromIndexedTx, parseISCNTxRecordFromQuery } from './messages/parsing';
 import { DEFAULT_RPC_ENDPOINT } from './constant';
 
 export class ISCNQueryClient {

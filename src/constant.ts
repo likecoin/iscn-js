@@ -8,6 +8,8 @@ export const GAS_ESTIMATOR_BUFFER_RATIO = 0.25;
 export const GAS_ESTIMATOR_SLOPE = 10.3;
 export const GAS_ESTIMATOR_INTERCEPT = 110533;
 
+export const DEFAULT_MESSAGE_GAS = 200000;
+
 export const ISCN_CHANGE_OWNER_GAS = 200000;
 
 export const SEND_NFT_GAS = 200000;

@@ -91,3 +91,8 @@ export interface MintNFTData {
   uriHash?: string;
   metadata?: { [key: string]: string };
 }
+
+export type TransactionMessage = {
+  typeUrl: string;
+  value: unknown;
+}

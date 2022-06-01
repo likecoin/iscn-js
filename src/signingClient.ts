@@ -33,50 +33,31 @@ import {
   GRANT_SEND_AUTH_GAS,
   EXEC_SEND_AUTH_GAS,
   REVOKE_SEND_AUTH_GAS,
+  DEFAULT_MESSAGE_GAS,
 } from './constant';
 import { ISCNQueryClient } from './queryClient';
-import { formatGrantMsg, messageRegistry as registry } from './messageRegistry';
+import { messageRegistry as registry } from './messages/registry';
 import {
-  ISCNSignOptions, ISCNSignPayload, MintNFTData, NewNFTClassData, Stakeholder,
+  ISCNSignOptions, ISCNSignPayload, MintNFTData, NewNFTClassData,
 } from './types';
-
-export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
-  if (!payload) throw new Error('INVALID_ISCN_PAYLOAD');
-  const {
-    name,
-    description,
-    keywords = [],
-    url,
-    contentFingerprints,
-    stakeholders: inputStakeHolders = [],
-    type,
-    usageInfo,
-    recordNotes,
-    ...data
-  } = payload;
-
-  const stakeholders = inputStakeHolders.map((s: Stakeholder) => Buffer.from(
-    JSON.stringify(s),
-    'utf8',
-  ));
-  const contentMetadata = {
-    '@context': 'http://schema.org/',
-    '@type': type,
-    name,
-    description,
-    version,
-    url,
-    keywords: keywords.join(','),
-    usageInfo,
-    ...data,
-  };
-  return {
-    recordNotes,
-    contentFingerprints,
-    stakeholders,
-    contentMetadata: Buffer.from(JSON.stringify(contentMetadata), 'utf8'),
-  };
-}
+import {
+  formatISCNPayload,
+  formatMsgChangeIscnRecordOwnership,
+  formatMsgCreateIscnRecord,
+  formatMsgUpdateIscnRecord,
+} from './messages/iscn';
+import {
+  formatMsgBurnNFT,
+  formatMsgMintNFT,
+  formatMsgNewClass,
+  formatMsgSend,
+  formatMsgUpdateClass,
+} from './messages/likenft';
+import {
+  formatSendAuthorizationMsgExec,
+  formatSendAuthorizationMsgGrant,
+  formatSendAuthorizationMsgRevoke,
+} from './messages/authz';
 
 export class ISCNSigningClient {
   private signingClient: SigningStargateClient | null = null;
@@ -208,14 +189,7 @@ export class ISCNSigningClient {
     gasPrice?: number,
     memo?: string,
   } = {}) {
-    const record = await formatISCNPayload(payload);
-    const msg = {
-      type: 'likecoin-chain/MsgCreateIscnRecord',
-      value: {
-        from: STUB_WALLET,
-        record,
-      },
-    };
+    const msg = formatMsgCreateIscnRecord(STUB_WALLET, payload);
     const value = {
       msg: [msg],
       fee: {
@@ -286,6 +260,29 @@ export class ISCNSigningClient {
     return response;
   }
 
+  async sendMessages(
+    senderAddress: string,
+    messages :EncodeObject[],
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    let fee = inputFee;
+    if (!fee) {
+      fee = {
+        amount: [{
+          amount: new BigNumber(DEFAULT_MESSAGE_GAS)
+            .multipliedBy(messages.length)
+            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          denom: this.denom,
+        }],
+        gas: (DEFAULT_MESSAGE_GAS * messages.length).toString(),
+      };
+    } else if (gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    const response = await this.signOrBroadcast(senderAddress, messages, fee, signOptions);
+    return response;
+  }
+
   async createISCNRecord(
     senderAddress: string,
     payload: ISCNSignPayload,
@@ -293,14 +290,7 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const record = formatISCNPayload(payload);
-    const message = {
-      typeUrl: '/likechain.iscn.MsgCreateIscnRecord',
-      value: {
-        from: senderAddress,
-        record,
-      },
-    };
+    const message = formatMsgCreateIscnRecord(senderAddress, payload);
     let fee = inputFee;
     if (!fee) {
       const { memo } = signOptions;
@@ -320,15 +310,7 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const record = formatISCNPayload(payload);
-    const message = {
-      typeUrl: '/likechain.iscn.MsgUpdateIscnRecord',
-      value: {
-        from: senderAddress,
-        iscnId,
-        record,
-      },
-    };
+    const message = formatMsgUpdateIscnRecord(senderAddress, iscnId, payload);
     let fee = inputFee;
     if (!fee) {
       const { memo } = signOptions;
@@ -348,14 +330,7 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const message = {
-      typeUrl: '/likechain.iscn.MsgChangeIscnRecordOwnership',
-      value: {
-        from: senderAddress,
-        iscnId,
-        newOwner: newOwnerAddress,
-      },
-    };
+    const message = formatMsgChangeIscnRecordOwnership(senderAddress, iscnId, newOwnerAddress);
     let fee = inputFee;
     if (!fee) {
       fee = {
@@ -384,30 +359,23 @@ export class ISCNSigningClient {
     if (!res) throw new Error('ISCN_NOT_FOUND');
     const { records: [record] } = res;
     const { data: { contentMetadata } } = record;
-    const message = {
-      typeUrl: '/likechain.likenft.MsgNewClass',
-      value: {
-        creator: senderAddress,
-        parent: {
-          type: 1, // ISCN
-          iscnIdPrefix,
-        },
-        input: {
-          name: nftClassData.name || contentMetadata.name,
-          symbol: nftClassData.symbol,
-          description: nftClassData.description || contentMetadata.description,
-          uri: nftClassData.uri,
-          uriHash: nftClassData.uriHash,
-          metadata: Buffer.from(JSON.stringify({
-            ...(contentMetadata || {}),
-            ...(nftClassData.metadata || {}),
-          }), 'utf8'),
-          config: classConfig || {
-            burnable: false,
-          },
-        },
+    const combinedClassData = {
+      name: nftClassData.name || contentMetadata.name,
+      symbol: nftClassData.symbol,
+      description: nftClassData.description || contentMetadata.description,
+      uri: nftClassData.uri,
+      uriHash: nftClassData.uriHash,
+      metadata: {
+        ...(contentMetadata || {}),
+        ...(nftClassData.metadata || {}),
       },
     };
+    const message = formatMsgNewClass(
+      senderAddress,
+      iscnIdPrefix,
+      combinedClassData,
+      classConfig,
+    );
     let fee = inputFee;
     if (!fee) {
       fee = {
@@ -434,19 +402,12 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const message = {
-      typeUrl: '/likechain.likenft.MsgUpdateClass',
-      value: {
-        creator: senderAddress,
-        classId,
-        input: {
-          ...nftClassData,
-          config: classConfig || {
-            burnable: false,
-          },
-        },
-      },
-    };
+    const message = formatMsgUpdateClass(
+      senderAddress,
+      classId,
+      nftClassData,
+      classConfig,
+    );
     let fee = inputFee;
     if (!fee) {
       fee = {
@@ -464,7 +425,7 @@ export class ISCNSigningClient {
     return response;
   }
 
-  async mintNFT(
+  async mintNFTs(
     senderAddress: string,
     classId: string,
     nftDatas: MintNFTData[],
@@ -475,21 +436,7 @@ export class ISCNSigningClient {
     const query = await this.queryClient.getQueryClient();
     const res = await query.nft.class(classId);
     if (!res || !res.class) throw new Error('Class not found');
-    const messages = nftDatas.map((n) => ({
-      typeUrl: '/likechain.likenft.MsgMintNFT',
-      value: {
-        creator: senderAddress,
-        classId,
-        id: n.id,
-        input: {
-          uri: n.uri,
-          uriHash: n.uriHash,
-          metadata: Buffer.from(JSON.stringify({
-            ...(n.metadata || {}),
-          }), 'utf8'),
-        },
-      },
-    }));
+    const messages = nftDatas.map((n) => formatMsgMintNFT(senderAddress, classId, n));
     let fee = inputFee;
     if (!fee) {
       fee = {
@@ -508,7 +455,7 @@ export class ISCNSigningClient {
     return response;
   }
 
-  async sendNFT(
+  async sendNFTs(
     senderAddress: string,
     receiverAddress: string,
     classId: string,
@@ -517,15 +464,7 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const messages = nftIds.map((id) => ({
-      typeUrl: '/cosmos.nft.v1beta1.MsgSend',
-      value: {
-        sender: senderAddress,
-        receiver: receiverAddress,
-        classId,
-        id,
-      },
-    }));
+    const messages = nftIds.map((id) => formatMsgSend(senderAddress, receiverAddress, classId, id));
     let fee = inputFee;
     if (!fee) {
       fee = {
@@ -550,14 +489,7 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const messages = nftIds.map((nftId) => ({
-      typeUrl: '/likechain.likenft.MsgBurnNFT',
-      value: {
-        creator: senderAddress,
-        classId,
-        nftId,
-      },
-    }));
+    const messages = nftIds.map((nftId) => formatMsgBurnNFT(senderAddress, classId, nftId));
     let fee = inputFee;
     if (!fee) {
       fee = {
@@ -585,17 +517,12 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const messages = [
-      formatGrantMsg(
-        senderAddress,
-        granteeAddress,
-        '/cosmos.bank.v1beta1.SendAuthorization',
-        SendAuthorization.encode(SendAuthorization.fromPartial({
-          spendLimit,
-        })).finish(),
-        expirationInMs,
-      ),
-    ];
+    const messages = [formatSendAuthorizationMsgGrant(
+      senderAddress,
+      granteeAddress,
+      spendLimit,
+      expirationInMs,
+    )];
     let fee = inputFee;
     if (!fee) {
       fee = {
@@ -622,20 +549,12 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const messages = [{
-      typeUrl: '/cosmos.authz.v1beta1.MsgExec',
-      value: {
-        grantee: execAddress,
-        msgs: [{
-          typeUrl: '/cosmos.bank.v1beta1.MsgSend',
-          value: MsgSend.encode(MsgSend.fromPartial({
-            fromAddress: granterAddress,
-            toAddress,
-            amount: amounts,
-          })).finish(),
-        }],
-      },
-    }];
+    const messages = [formatSendAuthorizationMsgExec(
+      execAddress,
+      granterAddress,
+      toAddress,
+      amounts,
+    )];
     let fee = inputFee;
     if (!fee) {
       fee = {
@@ -660,14 +579,7 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const messages = [{
-      typeUrl: '/cosmos.authz.v1beta1.MsgRevoke',
-      value: {
-        granter: senderAddress,
-        grantee: granteeAddress,
-        msgTypeUrl: '/cosmos.bank.v1beta1.MsgSend',
-      },
-    }];
+    const messages = [formatSendAuthorizationMsgRevoke(senderAddress, granteeAddress)];
     let fee = inputFee;
     if (!fee) {
       fee = {
@@ -685,3 +597,5 @@ export class ISCNSigningClient {
     return response;
   }
 }
+
+export default ISCNSigningClient;

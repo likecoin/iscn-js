@@ -11,8 +11,6 @@ import {
 } from '@cosmjs/stargate';
 import { ClassConfig } from '@likecoin/iscn-message-types/dist/likenft/class_data';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
-import { SendAuthorization } from 'cosmjs-types/cosmos/bank/v1beta1/authz';
-import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx';
 import jsonStringify from 'fast-json-stable-stringify';
 
 import {
@@ -59,6 +57,29 @@ import {
   formatSendAuthorizationMsgRevoke,
 } from './messages/authz';
 
+function formatGasFee({
+  gas = DEFAULT_MESSAGE_GAS,
+  gasPrice = DEFAULT_GAS_PRICE_NUMBER,
+  gasMultiplier = 1,
+  denom,
+}: {
+  gas?: number | string,
+  gasPrice?: number | string,
+  gasMultiplier?: number | string,
+  denom: string,
+}): StdFee {
+  const fee = {
+    amount: [{
+      amount: new BigNumber(gas)
+        .multipliedBy(gasPrice)
+        .multipliedBy(gasMultiplier)
+        .toFixed(0, 0),
+      denom,
+    }],
+    gas: new BigNumber(gas).multipliedBy(gasMultiplier).toFixed(0, 0),
+  };
+  return fee;
+}
 export class ISCNSigningClient {
   private signingClient: SigningStargateClient | null = null;
 
@@ -112,12 +133,12 @@ export class ISCNSigningClient {
     payload: ISCNSignPayload,
     { gasPrice, memo }: { gasPrice?: number, memo?: string } = {},
   ) {
-    const [gas, iscnFee] = await Promise.all([
+    const [fee, iscnFee] = await Promise.all([
       this.estimateISCNTxGas(payload, { gasPrice, memo }),
       this.estimateISCNTxFee(payload),
     ]);
     return {
-      gas,
+      gas: { fee },
       iscnFee,
     };
   }
@@ -192,13 +213,8 @@ export class ISCNSigningClient {
     const msg = formatMsgCreateIscnRecord(STUB_WALLET, payload);
     const value = {
       msg: [msg],
-      fee: {
-        amount: [{
-          denom,
-          amount: '200000', // temp number here for estimation
-        }],
-        gas: '200000', // temp number here for estimation
-      },
+      // temp number here for estimation
+      fee: formatGasFee({ gas: '200000', gasPrice: '1', denom }),
     };
     const obj = {
       type: 'cosmos-sdk/StdTx',
@@ -213,16 +229,7 @@ export class ISCNSigningClient {
     const buffer = gasUsedEstimationBeforeBuffer.multipliedBy(GAS_ESTIMATOR_BUFFER_RATIO);
     const gasUsedEstimation = gasUsedEstimationBeforeBuffer.plus(buffer);
     const gas = gasUsedEstimation.toFixed(0, 0);
-    return {
-      fee: {
-        amount: [{
-          amount: new BigNumber(gas)
-            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-          denom,
-        }],
-        gas,
-      },
-    };
+    return formatGasFee({ gas, gasPrice, denom });
   }
 
   private async signOrBroadcast(
@@ -267,18 +274,13 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    let fee = inputFee;
-    if (!fee) {
-      fee = {
-        amount: [{
-          amount: new BigNumber(DEFAULT_MESSAGE_GAS)
-            .multipliedBy(messages.length)
-            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-          denom: this.denom,
-        }],
-        gas: (DEFAULT_MESSAGE_GAS * messages.length).toString(),
-      };
-    } else if (gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    const fee = inputFee || formatGasFee({
+      gas: DEFAULT_MESSAGE_GAS,
+      gasPrice,
+      gasMultiplier: messages.length,
+      denom: this.denom,
+    });
     const response = await this.signOrBroadcast(senderAddress, messages, fee, signOptions);
     return response;
   }
@@ -292,11 +294,10 @@ export class ISCNSigningClient {
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
     const message = formatMsgCreateIscnRecord(senderAddress, payload);
     let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     if (!fee) {
       const { memo } = signOptions;
-      ({ fee } = await this.estimateISCNTxGas(payload, { gasPrice, memo }));
-    } else if (gasPrice) {
-      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+      fee = await this.estimateISCNTxGas(payload, { gasPrice, memo });
     }
     const response = await this.signOrBroadcast(senderAddress, [message], fee, signOptions);
     return response;
@@ -312,11 +313,10 @@ export class ISCNSigningClient {
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
     const message = formatMsgUpdateIscnRecord(senderAddress, iscnId, payload);
     let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     if (!fee) {
       const { memo } = signOptions;
-      ({ fee } = await this.estimateISCNTxGas(payload, { gasPrice, memo }));
-    } else if (gasPrice) {
-      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+      fee = await this.estimateISCNTxGas(payload, { gasPrice, memo });
     }
     const response = await this.signOrBroadcast(senderAddress, [message], fee, signOptions);
     return response;
@@ -331,17 +331,12 @@ export class ISCNSigningClient {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
     const message = formatMsgChangeIscnRecordOwnership(senderAddress, iscnId, newOwnerAddress);
-    let fee = inputFee;
-    if (!fee) {
-      fee = {
-        amount: [{
-          amount: new BigNumber(ISCN_CHANGE_OWNER_GAS)
-            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-          denom: this.denom,
-        }],
-        gas: ISCN_CHANGE_OWNER_GAS.toString(),
-      };
-    } else if (gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    const fee = inputFee || formatGasFee({
+      gas: ISCN_CHANGE_OWNER_GAS,
+      gasPrice,
+      denom: this.denom,
+    });
     const response = await this.signOrBroadcast(senderAddress, [message], fee, signOptions);
     return response;
   }
@@ -376,19 +371,12 @@ export class ISCNSigningClient {
       combinedClassData,
       classConfig,
     );
-    let fee = inputFee;
-    if (!fee) {
-      fee = {
-        amount: [{
-          amount: new BigNumber(LIKENFT_CREATE_CLASS_GAS)
-            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-          denom: this.denom,
-        }],
-        gas: LIKENFT_CREATE_CLASS_GAS.toString(),
-      };
-    } else if (gasPrice) {
-      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    }
+    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    const fee = inputFee || formatGasFee({
+      gas: LIKENFT_CREATE_CLASS_GAS,
+      gasPrice,
+      denom: this.denom,
+    });
     const response = await this.signOrBroadcast(senderAddress, [message], fee, signOptions);
     return response;
   }
@@ -408,19 +396,12 @@ export class ISCNSigningClient {
       nftClassData,
       classConfig,
     );
-    let fee = inputFee;
-    if (!fee) {
-      fee = {
-        amount: [{
-          amount: new BigNumber(LIKENFT_UPDATE_CLASS_GAS)
-            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-          denom: this.denom,
-        }],
-        gas: LIKENFT_UPDATE_CLASS_GAS.toString(),
-      };
-    } else if (gasPrice) {
-      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    }
+    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    const fee = inputFee || formatGasFee({
+      gas: LIKENFT_UPDATE_CLASS_GAS,
+      gasPrice,
+      denom: this.denom,
+    });
     const response = await this.signOrBroadcast(senderAddress, [message], fee, signOptions);
     return response;
   }
@@ -437,20 +418,13 @@ export class ISCNSigningClient {
     const res = await query.nft.class(classId);
     if (!res || !res.class) throw new Error('Class not found');
     const messages = nftDatas.map((n) => formatMsgMintNFT(senderAddress, classId, n));
-    let fee = inputFee;
-    if (!fee) {
-      fee = {
-        amount: [{
-          amount: new BigNumber(LIKENFT_MINT_NFT_GAS)
-            .multipliedBy(nftDatas.length)
-            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-          denom: this.denom,
-        }],
-        gas: (LIKENFT_MINT_NFT_GAS * nftDatas.length).toString(),
-      };
-    } else if (gasPrice) {
-      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    }
+    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    const fee = inputFee || formatGasFee({
+      gas: LIKENFT_MINT_NFT_GAS,
+      gasPrice,
+      gasMultiplier: nftDatas.length,
+      denom: this.denom,
+    });
     const response = await this.signOrBroadcast(senderAddress, messages, fee, signOptions);
     return response;
   }
@@ -465,18 +439,13 @@ export class ISCNSigningClient {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
     const messages = nftIds.map((id) => formatMsgSend(senderAddress, receiverAddress, classId, id));
-    let fee = inputFee;
-    if (!fee) {
-      fee = {
-        amount: [{
-          amount: new BigNumber(SEND_NFT_GAS)
-            .multipliedBy(nftIds.length)
-            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-          denom: this.denom,
-        }],
-        gas: (SEND_NFT_GAS * nftIds.length).toString(),
-      };
-    } else if (gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    const fee = inputFee || formatGasFee({
+      gas: SEND_NFT_GAS,
+      gasPrice,
+      gasMultiplier: nftIds.length,
+      denom: this.denom,
+    });
     const response = await this.signOrBroadcast(senderAddress, messages, fee, signOptions);
     return response;
   }
@@ -490,20 +459,13 @@ export class ISCNSigningClient {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
     const messages = nftIds.map((nftId) => formatMsgBurnNFT(senderAddress, classId, nftId));
-    let fee = inputFee;
-    if (!fee) {
-      fee = {
-        amount: [{
-          amount: new BigNumber(LIKENFT_BURN_NFT_GAS)
-            .multipliedBy(nftIds.length)
-            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-          denom: this.denom,
-        }],
-        gas: (LIKENFT_BURN_NFT_GAS * nftIds.length).toString(),
-      };
-    } else if (gasPrice) {
-      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    }
+    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    const fee = inputFee || formatGasFee({
+      gas: LIKENFT_BURN_NFT_GAS,
+      gasPrice,
+      gasMultiplier: nftIds.length,
+      denom: this.denom,
+    });
     const response = await this.signOrBroadcast(senderAddress, messages, fee, signOptions);
     return response;
   }
@@ -555,19 +517,12 @@ export class ISCNSigningClient {
       toAddress,
       amounts,
     )];
-    let fee = inputFee;
-    if (!fee) {
-      fee = {
-        amount: [{
-          amount: new BigNumber(EXEC_SEND_AUTH_GAS)
-            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-          denom: this.denom,
-        }],
-        gas: EXEC_SEND_AUTH_GAS.toString(),
-      };
-    } else if (gasPrice) {
-      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    }
+    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    const fee = inputFee || formatGasFee({
+      gas: EXEC_SEND_AUTH_GAS,
+      gasPrice,
+      denom: this.denom,
+    });
     const response = await this.signOrBroadcast(execAddress, messages, fee, signOptions);
     return response;
   }
@@ -580,19 +535,12 @@ export class ISCNSigningClient {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
     const messages = [formatSendAuthorizationMsgRevoke(senderAddress, granteeAddress)];
-    let fee = inputFee;
-    if (!fee) {
-      fee = {
-        amount: [{
-          amount: new BigNumber(REVOKE_SEND_AUTH_GAS)
-            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
-          denom: this.denom,
-        }],
-        gas: REVOKE_SEND_AUTH_GAS.toString(),
-      };
-    } else if (gasPrice) {
-      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    }
+    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    const fee = inputFee || formatGasFee({
+      gas: REVOKE_SEND_AUTH_GAS,
+      gasPrice,
+      denom: this.denom,
+    });
     const response = await this.signOrBroadcast(senderAddress, messages, fee, signOptions);
     return response;
   }

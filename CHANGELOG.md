@@ -1,6 +1,22 @@
 # Changelog
 ## [Unreleased]
 
+## [0.2.0-alpha.0] - 2022-06-02
+### Added
+- Add x/likenft NFT Class creation and minting based on ISCN
+- Add x/nft send NFT Token
+- Add x/authz spend limit grant, execute and revoke
+- Add query and transaction message parsing of x/nft, x/likenft and x/authz
+- Improved tranasction message parsing to support all meesage types included in this library
+- Refactor message creation functions, which can now be used indivdually
+- Add `sendMessages()` which can send a combinations of messages
+
+### Changed
+- Lower default gas price to 10
+- Refactor code structure
+- Update @cosmjs/stargate 0.28.4
+- Update @likecoin/iscn-message-types
+
 ## [0.1.0] - 2022-03-08
 ### Changed
 - Update breaking change from @cosmjs/stargate 0.27.1

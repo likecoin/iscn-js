@@ -159,7 +159,7 @@ export function parseTxInfoFromIndexedTx(tx: IndexedTx): ParsedISCNTx {
   };
 }
 
-export function parseISCNTxRecordFromQuery(records: QueryResponseRecord[]) {
+export function parseISCNTxRecordFromQuery(records: QueryResponseRecord[]): ISCNRecord[] {
   return records.map((r): ISCNRecord => {
     const { data, ipld } = r;
     const parsedData = JSON.parse(Buffer.from(data).toString('utf-8'));

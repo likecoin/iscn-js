@@ -2,8 +2,12 @@
 import { EncodeObject } from '@cosmjs/proto-signing';
 import { ISCNSignPayload, Stakeholder } from '../types';
 
-export function formatISCNPayload(payload: ISCNSignPayload, version = 1) {
-  if (!payload) throw new Error('INVALID_ISCN_PAYLOAD');
+export function formatISCNPayload(payload: ISCNSignPayload, version = 1): {
+    recordNotes?: string;
+    contentFingerprints: string[];
+    stakeholders: Uint8Array[];
+    contentMetadata: Uint8Array;
+  } {
   const {
     name,
     description,

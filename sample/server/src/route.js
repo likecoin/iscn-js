@@ -13,7 +13,7 @@ router.post(
   '/new',
   async (req, res, next) => {
     try {
-      let { metadata = {} } = req.body;
+      const { metadata = {} } = req.body;
       const {
         contentFingerprints = [],
         stakeholders = [],
@@ -66,11 +66,11 @@ router.post(
       const { sequence } = await getAccountInfo(address);
       const iscnRes = await signingClient.createISCNRecord(
         address,
-        ISCNPayload,{
+        ISCNPayload, {
           accountNumber,
           sequence,
           chainId: COSMOS_CHAIN_ID,
-        }
+        },
       );
       const { transactionHash: iscnTxHash } = iscnRes;
       console.log(`txHash: ${iscnTxHash}`);

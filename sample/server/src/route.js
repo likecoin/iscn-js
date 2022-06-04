@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { sleep } = require('util');
 const {
   COSMOS_CHAIN_ID,
   getAccountInfo,
@@ -73,7 +74,16 @@ router.post(
       );
       const { transactionHash: iscnTxHash } = iscnRes;
       console.log(`txHash: ${iscnTxHash}`);
-      const [iscnId] = await queryClient.queryISCNIdsByTx(iscnTxHash);
+      let iscnId;
+      const QUERY_RETRY_LIMIT = 6;
+      let tryCount = 0;
+      while (!iscnId && tryCount < QUERY_RETRY_LIMIT) {
+        /* eslint-disable no-await-in-loop */
+        ([iscnId] = await queryClient.queryISCNIdsByTx(iscnTxHash));
+        if (!iscnId) await sleep(2000);
+        tryCount += 1;
+        /* eslint-enable no-await-in-loop */
+      }
       console.log(`ISCN ID: ${iscnId}`);
 
       res.json({

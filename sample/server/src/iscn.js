@@ -23,19 +23,19 @@ let cosmosQueryClient = null;
 async function getQueryClient() {
   if (!cosmosQueryClient) {
     const tendermint34Client = await Tendermint34Client.connect(COSMOS_RPC_ENDPOINT);
-    const queryClient = QueryClient.withExtensions(
+    const client = QueryClient.withExtensions(
       tendermint34Client,
       setupAuthExtension,
       setupBankExtension,
     );
-    cosmosQueryClient = queryClient;
+    cosmosQueryClient = client;
   }
   return cosmosQueryClient;
 }
 
 async function getAccountInfo(address) {
-  const queryClient = await getQueryClient();
-  const { value } = await queryClient.auth.account(address);
+  const client = await getQueryClient();
+  const { value } = await client.auth.account(address);
   const accountInfo = BaseAccount.decode(value);
   return accountInfo;
 }

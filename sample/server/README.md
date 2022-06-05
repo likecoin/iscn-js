@@ -2,6 +2,13 @@
 
 A server that wraps `iscn-js` in an HTTP API.
 
+Sample env configuration:
+```
+COSMOS_CHAIN_ID='likecoin-mainnet-2'
+COSMOS_RPC_ENDPOINT='https://mainnet-node.like.co/rpc/'
+MNEMONIC_SEED_WORD='surround miss nominee dream gap cross assault thank captain prosper drop duty group candy wealth weather scale put'
+```
+
 To run:
 ```
 $ node src/index.js

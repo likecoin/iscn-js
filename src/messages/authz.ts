@@ -10,7 +10,7 @@ export function formatMsgGrant(
   grantee: string,
   type: string,
   value: Uint8Array,
-  expirationInMs: number,
+  expirationDateInMs: number,
 ): EncodeObject {
   return {
     typeUrl: '/cosmos.authz.v1beta1.MsgGrant',
@@ -23,7 +23,7 @@ export function formatMsgGrant(
           value,
         },
         expiration: Timestamp.fromPartial({
-          seconds: Math.floor(expirationInMs / 1000),
+          seconds: Math.floor(expirationDateInMs / 1000),
           nanos: 0,
         }),
       },
@@ -31,11 +31,11 @@ export function formatMsgGrant(
   };
 }
 
-export function formatSendAuthorizationMsgGrant(
+export function formatMsgGrantSendAuthorization(
   senderAddress: string,
   granteeAddress: string,
   spendLimit: Coin[],
-  expirationInMs: number,
+  expirationDateInMs: number,
 ): EncodeObject {
   return formatMsgGrant(
     senderAddress,
@@ -44,11 +44,11 @@ export function formatSendAuthorizationMsgGrant(
     SendAuthorization.encode(SendAuthorization.fromPartial({
       spendLimit,
     })).finish(),
-    expirationInMs,
+    expirationDateInMs,
   );
 }
 
-export function formatSendAuthorizationMsgExec(
+export function formatMsgExecSendAuthorization(
   execAddress: string,
   granterAddress: string,
   toAddress: string,
@@ -71,7 +71,7 @@ export function formatSendAuthorizationMsgExec(
   return message;
 }
 
-export function formatSendAuthorizationMsgRevoke(
+export function formatMsgRevokeSendAuthorization(
   senderAddress: string,
   granteeAddress: string,
 ): EncodeObject {

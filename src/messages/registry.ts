@@ -33,7 +33,7 @@ export const LikeNFTRegistryTypes: ReadonlyArray<[string, GeneratedType]> = [
   ['/likechain.likenft.MsgDeleteMintableNFT', MsgDeleteMintableNFT],
 ];
 
-const registryTypes: ReadonlyArray<[string, GeneratedType]> = [
+export const registryTypes: ReadonlyArray<[string, GeneratedType]> = [
   ...defaultRegistryTypes,
   ...ISCNRegistryTypes,
   ...LikeNFTRegistryTypes,

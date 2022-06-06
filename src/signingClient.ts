@@ -43,9 +43,9 @@ import {
   formatMsgUpdateClass,
 } from './messages/likenft';
 import {
-  formatSendAuthorizationMsgExec,
-  formatSendAuthorizationMsgGrant,
-  formatSendAuthorizationMsgRevoke,
+  formatMsgExecSendAuthorization,
+  formatMsgGrantSendAuthorization,
+  formatMsgRevokeSendAuthorization,
 } from './messages/authz';
 import signOrBroadcast from './transactions/sign';
 import { estimateISCNTxFee, estimateISCNTxGas } from './transactions/iscn';
@@ -178,7 +178,7 @@ export class ISCNSigningClient {
     if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     if (!fee) {
       const { memo } = signOptions;
-      fee = await this.estimateISCNTxGas(payload, { gasPrice, memo });
+      fee = this.estimateISCNTxGas(payload, { gasPrice, memo });
     }
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
     return response;
@@ -284,7 +284,7 @@ export class ISCNSigningClient {
     const fee = inputFee || formatGasFee({
       gas: LIKENFT_MINT_NFT_GAS,
       gasPrice,
-      gasMultiplier: nftDatas.length,
+      gasMultiplier: messages.length,
       denom: this.denom,
     });
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
@@ -305,7 +305,7 @@ export class ISCNSigningClient {
     const fee = inputFee || formatGasFee({
       gas: SEND_NFT_GAS,
       gasPrice,
-      gasMultiplier: nftIds.length,
+      gasMultiplier: messages.length,
       denom: this.denom,
     });
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
@@ -325,7 +325,7 @@ export class ISCNSigningClient {
     const fee = inputFee || formatGasFee({
       gas: LIKENFT_BURN_NFT_GAS,
       gasPrice,
-      gasMultiplier: nftIds.length,
+      gasMultiplier: messages.length,
       denom: this.denom,
     });
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
@@ -341,7 +341,7 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const messages = [formatSendAuthorizationMsgGrant(
+    const messages = [formatMsgGrantSendAuthorization(
       senderAddress,
       granteeAddress,
       spendLimit,
@@ -373,7 +373,7 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const messages = [formatSendAuthorizationMsgExec(
+    const messages = [formatMsgExecSendAuthorization(
       execAddress,
       granterAddress,
       toAddress,
@@ -396,7 +396,7 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const messages = [formatSendAuthorizationMsgRevoke(senderAddress, granteeAddress)];
+    const messages = [formatMsgRevokeSendAuthorization(senderAddress, granteeAddress)];
     if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     const fee = inputFee || formatGasFee({
       gas: REVOKE_SEND_AUTH_GAS,

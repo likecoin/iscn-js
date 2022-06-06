@@ -142,6 +142,22 @@ export class ISCNQueryClient {
     }
     return null;
   }
+
+  async queryNFTClassIdByTx(txId: string): Promise<string> {
+    const stargateClient = await this.getStargateClient();
+    const res = await stargateClient.getTx(txId);
+    if (res) {
+      const parsed = parseTxInfoFromIndexedTx(res);
+      if (!parsed.logs.length) return '';
+      const event = parsed.logs[0].events.find((e: { type: string }) => e.type === 'likechain.likenft.EventNewClass');
+      if (!event) return '';
+      const attribute = event.attributes.find((a: { key: string }) => a.key === 'class_id');
+      // class id here might contain extra `""`s
+      // https://github.com/oursky/likecoin-chain/issues/277
+      return (attribute?.value || '').replace(/^"(.*)"$/, '$1');
+    }
+    return '';
+  }
 }
 
 export default ISCNQueryClient;

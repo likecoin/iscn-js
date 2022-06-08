@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { sleep } = require('util');
+const { sleep } = require('./util');
 const {
   COSMOS_CHAIN_ID,
   getAccountInfo,

@@ -7,7 +7,7 @@
 - Add x/nft send NFT Token
 - Add x/authz spend limit grant, execute and revoke
 - Add query and transaction message parsing of x/nft, x/likenft and x/authz
-- Improved tranasction message parsing to support all meesage types included in this library
+- Improved transaction message parsing to support all message types included in this library
 - Refactor message creation functions, which can now be used indivdually
 - Add `sendMessages()` which can send a combinations of messages
 

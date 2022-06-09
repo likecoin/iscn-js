@@ -14,14 +14,14 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1): {
     keywords = [],
     url,
     contentFingerprints,
-    stakeholders: inputStakeHolders = [],
+    stakeholders: inputStakeholders = [],
     type,
     usageInfo,
     recordNotes,
     ...data
   } = payload;
 
-  const stakeholders = inputStakeHolders.map((s: Stakeholder) => Buffer.from(
+  const stakeholders = inputStakeholders.map((s: Stakeholder) => Buffer.from(
     JSON.stringify(s),
     'utf8',
   ));

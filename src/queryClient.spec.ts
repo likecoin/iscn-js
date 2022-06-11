@@ -1,6 +1,5 @@
 import { ISCNQueryClient } from './queryClient';
-
-const ISCN_ID = 'iscn://likecoin-chain/dLbKMa8EVO9RF4UmoWKk2ocUq7IsxMcnQL1_Ps5Vg80/1';
+import { ISCN_ID } from './tests/constant';
 
 describe('queryClient', () => {
   const client = new ISCNQueryClient();

@@ -1,6 +1,15 @@
 # Changelog
 ## [Unreleased]
 
+## [0.2.0-alpha.1] - 2022-06-14
+### Added
+- Add query classId by tx hash
+- Add wrapped x/nft query functions
+- Add testcases
+
+### Fixed
+- Use proper cosmjs-types version for peer dependency
+
 ## [0.2.0-alpha.0] - 2022-06-02
 ### Added
 - Add x/likenft NFT Class creation and minting based on ISCN

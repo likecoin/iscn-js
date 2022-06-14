@@ -1,16 +1,24 @@
+import BigNumber from 'bignumber.js';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import {
   QueryClient, setupBankExtension, BankExtension, Coin, StargateClient,
 } from '@cosmjs/stargate';
 import { setupAuthzExtension, AuthzExtension } from '@cosmjs/stargate/build/modules/authz/queries';
-import BigNumber from 'bignumber.js';
+import { PageRequest, PageResponse } from 'cosmjs-types/cosmos/base/query/v1beta1/pagination';
+import { NFT } from '@likecoin/iscn-message-types/dist/nft/nft';
 
 import { setupISCNExtension, ISCNExtension } from './queryExtensions/ISCNQueryExtension';
 import { setupNFTExtension, NFTExtension } from './queryExtensions/NFTQueryExtension';
 import { setupLikeNFTExtension, LikeNFTExtension } from './queryExtensions/LikeNFTQueryExtension';
-import { parseTxInfoFromIndexedTx, parseISCNTxRecordFromQuery } from './messages/parsing';
+import {
+  parseTxInfoFromIndexedTx,
+  parseISCNTxRecordFromQuery,
+  parseNFTClassDataFields,
+  parseNFTDataFields,
+} from './messages/parsing';
 import { DEFAULT_RPC_ENDPOINT } from './constant';
+import { LikeNFT, LikeNFTClass } from './types';
 
 export class ISCNQueryClient {
   private queryClient: QueryClient
@@ -141,6 +149,34 @@ export class ISCNQueryClient {
       return this.feePerByte;
     }
     return null;
+  }
+
+  async queryNFTClass(classId: string): Promise<{ class: LikeNFTClass }|null> {
+    const queryClient = await this.getQueryClient();
+    const { class: classData } = await queryClient.nft.class(classId);
+    if (!classData) return null;
+    return { class: parseNFTClassDataFields(classData) };
+  }
+
+  async queryNFTClasses(pagination?: PageRequest):
+    Promise<{ classes: LikeNFTClass[]; pagination?: PageResponse; }> {
+    const queryClient = await this.getQueryClient();
+    const { classes, ...res } = await queryClient.nft.classes(pagination);
+    return { classes: classes.map((c) => parseNFTClassDataFields(c)), ...res };
+  }
+
+  async queryNFT(classId: string, nftId: string): Promise<{ nft: LikeNFT } | null> {
+    const queryClient = await this.getQueryClient();
+    const { nft } = await queryClient.nft.NFT(classId, nftId);
+    if (!nft) return null;
+    return { nft: parseNFTDataFields(nft) };
+  }
+
+  async queryNFTByClassAndOwner(classId: string, owner: string, pagination?: PageRequest):
+    Promise<{ nfts: LikeNFT[]; pagination?: PageResponse; }> {
+    const queryClient = await this.getQueryClient();
+    const { nfts, ...res } = await queryClient.nft.NFTs(classId, owner, pagination);
+    return { nfts: nfts.map((n: NFT) => parseNFTDataFields(n)), ...res };
   }
 
   async queryNFTClassIdByTx(txId: string): Promise<string> {

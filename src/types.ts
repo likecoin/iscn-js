@@ -92,6 +92,24 @@ export interface MintNFTData {
   metadata?: { [key: string]: string };
 }
 
+export interface LikeNFTClass {
+  id: string;
+  name: string;
+  symbol: string;
+  description: string;
+  uri: string;
+  uriHash: string;
+  data?: any;
+}
+
+export interface LikeNFT {
+  classId: string;
+  id: string;
+  uri: string;
+  uriHash: string;
+  data?: any;
+}
+
 export type TransactionMessage = {
   typeUrl: string;
   value: unknown;

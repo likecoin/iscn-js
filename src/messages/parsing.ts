@@ -15,7 +15,9 @@ import { MsgGrant } from 'cosmjs-types/cosmos/authz/v1beta1/tx';
 import { GenericAuthorization, Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz';
 import { SendAuthorization } from 'cosmjs-types/cosmos/bank/v1beta1/authz';
 import { StakeAuthorization } from 'cosmjs-types/cosmos/staking/v1beta1/authz';
-import { ISCNRecord, ISCNRecordData, ParsedISCNTx } from '../types';
+import {
+  ISCNRecord, ISCNRecordData, LikeNFT, LikeNFTClass, ParsedISCNTx,
+} from '../types';
 import { messageRegistryMap } from './registry';
 
 export function parseISCNRecordFields(record: IscnRecord): ISCNRecordData {
@@ -36,7 +38,7 @@ export function parseISCNRecordFields(record: IscnRecord): ISCNRecordData {
   };
 }
 
-export function parseNFTClassDataFields(record: Class) {
+export function parseNFTClassDataFields(record: Class): LikeNFTClass {
   let data;
   if (record.data && record.data.typeUrl === '/likechain.likenft.ClassData') {
     data = ClassData.decode(record.data.value);
@@ -54,7 +56,7 @@ export function parseNFTClassDataFields(record: Class) {
   return record;
 }
 
-export function parseNFTDataFields(record: NFT) {
+export function parseNFTDataFields(record: NFT): LikeNFT {
   let data;
   if (record.data && record.data.typeUrl === '/likechain.likenft.NFTData') {
     data = NFTData.decode(record.data.value);

@@ -4,7 +4,7 @@ import { DirectSecp256k1HdWallet, AccountData } from '@cosmjs/proto-signing';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import { ISCNSigningClient } from './signingClient';
 import { computeTransactionHash } from './tests/utils';
-import { mnemonic, address1 } from './tests/key.json';
+import { mnemonic0, address1 } from './tests/key.json';
 import testData1 from './tests/iscn-sample-1.json';
 import testData2 from './tests/iscn-sample-2.json';
 import { ISCN_ID, NFT_CLASS_ID } from './tests/constant';
@@ -15,7 +15,7 @@ let signingWallet: AccountData | undefined;
 async function getSigner() {
   if (!signingWallet || !signingClient) {
     const client = new ISCNSigningClient();
-    const signer = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic);
+    const signer = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic0);
     await client.connectWithSigner('https://mainnet-node.like.co/rpc/', signer);
     const [wallet] = await signer.getAccounts();
     signingClient = client;

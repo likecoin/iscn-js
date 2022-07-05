@@ -9,10 +9,10 @@ import {
   QueryClassesByAccountResponse,
   QueryClassesByAccountIndexResponse,
   QueryAccountByClassResponse,
-  QueryMintableNFTResponse,
-  QueryMintableNFTIndexResponse,
-  QueryMintableNFTsResponse,
-} from '@likecoin/iscn-message-types/dist/likenft/query';
+  QueryBlindBoxContentResponse,
+  QueryBlindBoxContentIndexResponse,
+  QueryBlindBoxContentsResponse,
+} from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/query';
 import { PageRequest } from 'cosmjs-types/cosmos/base/query/v1beta1/pagination';
 
 export interface LikeNFTExtension {
@@ -23,9 +23,9 @@ export interface LikeNFTExtension {
     readonly classesByAccount: (account: string, pagination?: PageRequest) => Promise<QueryClassesByAccountResponse>;
     readonly classesByAccountIndex: (pagination?: PageRequest) => Promise<QueryClassesByAccountIndexResponse>;
     readonly accountByClass: (classId: string) => Promise<QueryAccountByClassResponse>;
-    readonly mintableNFT: (classId: string, id: string) => Promise<QueryMintableNFTResponse>;
-    readonly mintableNFTIndex: (pagination?: PageRequest) => Promise<QueryMintableNFTIndexResponse>;
-    readonly mintableNFTs: (classId: string, pagination?: PageRequest) => Promise<QueryMintableNFTsResponse>;
+    readonly BlindBoxContent: (classId: string, id: string) => Promise<QueryBlindBoxContentResponse>;
+    readonly BlindBoxContentIndex: (pagination?: PageRequest) => Promise<QueryBlindBoxContentIndexResponse>;
+    readonly BlindBoxContents: (classId: string, pagination?: PageRequest) => Promise<QueryBlindBoxContentsResponse>;
     readonly params: () => Promise<QueryParamsResponse>
   };
 }
@@ -41,9 +41,9 @@ export function setupLikeNFTExtension(base: QueryClient): LikeNFTExtension {
       classesByAccount: (account, pagination) => queryService.ClassesByAccount({ account, pagination }),
       classesByAccountIndex: (pagination) => queryService.ClassesByAccountIndex({ pagination }),
       accountByClass: (classId) => queryService.AccountByClass({ classId }),
-      mintableNFT: (classId, id) => queryService.MintableNFT({ classId, id }),
-      mintableNFTIndex: (pagination) => queryService.MintableNFTIndex({ pagination }),
-      mintableNFTs: (classId, pagination) => queryService.MintableNFTs({ classId, pagination }),
+      BlindBoxContent: (classId, id) => queryService.BlindBoxContent({ classId, id }),
+      BlindBoxContentIndex: (pagination) => queryService.BlindBoxContentIndex({ pagination }),
+      BlindBoxContents: (classId, pagination) => queryService.BlindBoxContents({ classId, pagination }),
       params: () => queryService.Params({}),
     },
   };

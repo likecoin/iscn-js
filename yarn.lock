@@ -648,10 +648,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@likecoin/iscn-message-types@0.0.3-alpha.0":
-  version "0.0.3-alpha.0"
-  resolved "https://registry.yarnpkg.com/@likecoin/iscn-message-types/-/iscn-message-types-0.0.3-alpha.0.tgz#a51689eb5c7e61064c18ad7e40303e148758275f"
-  integrity sha512-t4OZUZCgziueXGW7F4F7GhpQAo65GYls1e2bLUSR90yRW3bFlmsFTJVZwl0VqJxl/vuAcFZVWekexVH8tD1xTA==
+"@likecoin/iscn-message-types@0.0.3-rc.1":
+  version "0.0.3-rc.1"
+  resolved "https://registry.yarnpkg.com/@likecoin/iscn-message-types/-/iscn-message-types-0.0.3-rc.1.tgz#70ef972f16dd3cb0713013b9fe21e05ea730ac70"
+  integrity sha512-shWRi1DZ8WWRsZCVTsf17MNvCAEdy4v5eYAcZjOcmA8w7RyXIr70ol+AMT468JBszbMQgPOIfOyxxado+SM2xA==
 
 "@noble/hashes@^1", "@noble/hashes@^1.0.0":
   version "1.0.0"

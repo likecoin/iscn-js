@@ -7,7 +7,7 @@ import {
   StdFee,
   DeliverTxResponse,
 } from '@cosmjs/stargate';
-import { ClassConfig } from '@likecoin/iscn-message-types/dist/likenft/class_data';
+import { ClassConfig } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/class_data';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 
 import {

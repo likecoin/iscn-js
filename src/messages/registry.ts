@@ -4,17 +4,17 @@ import {
   MsgCreateIscnRecord,
   MsgUpdateIscnRecord,
   MsgChangeIscnRecordOwnership,
-} from '@likecoin/iscn-message-types/dist/iscn/tx';
+} from '@likecoin/iscn-message-types/dist/likechain/iscn/tx';
 import {
   MsgNewClass,
   MsgUpdateClass,
   MsgMintNFT,
   MsgBurnNFT,
-  MsgCreateMintableNFT,
-  MsgUpdateMintableNFT,
-  MsgDeleteMintableNFT,
-} from '@likecoin/iscn-message-types/dist/likenft/tx';
-import { MsgSend as MsgSendNFT } from '@likecoin/iscn-message-types/dist/nft/tx';
+  MsgCreateBlindBoxContent,
+  MsgUpdateBlindBoxContent,
+  MsgDeleteBlindBoxContent,
+} from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/tx';
+import { MsgSend as MsgSendNFT } from '@likecoin/iscn-message-types/dist/backport/nft/v1beta1/tx';
 import { defaultRegistryTypes } from '@cosmjs/stargate';
 
 export const ISCNRegistryTypes: ReadonlyArray<[string, GeneratedType]> = [
@@ -24,13 +24,13 @@ export const ISCNRegistryTypes: ReadonlyArray<[string, GeneratedType]> = [
 ];
 export const LikeNFTRegistryTypes: ReadonlyArray<[string, GeneratedType]> = [
   ['/cosmos.nft.v1beta1.MsgSend', MsgSendNFT],
-  ['/likechain.likenft.MsgNewClass', MsgNewClass],
-  ['/likechain.likenft.MsgUpdateClass', MsgUpdateClass],
-  ['/likechain.likenft.MsgMintNFT', MsgMintNFT],
-  ['/likechain.likenft.MsgBurnNFT', MsgBurnNFT],
-  ['/likechain.likenft.MsgCreateMintableNFT', MsgCreateMintableNFT],
-  ['/likechain.likenft.MsgUpdateMintableNFT', MsgUpdateMintableNFT],
-  ['/likechain.likenft.MsgDeleteMintableNFT', MsgDeleteMintableNFT],
+  ['/likechain.likenft.v1.MsgNewClass', MsgNewClass],
+  ['/likechain.likenft.v1.MsgUpdateClass', MsgUpdateClass],
+  ['/likechain.likenft.v1.MsgMintNFT', MsgMintNFT],
+  ['/likechain.likenft.v1.MsgBurnNFT', MsgBurnNFT],
+  ['/likechain.likenft.v1.MsgCreateBlindBoxContent', MsgCreateBlindBoxContent],
+  ['/likechain.likenft.v1.MsgUpdateBlindBoxContent', MsgUpdateBlindBoxContent],
+  ['/likechain.likenft.v1.MsgDeleteBlindBoxContent', MsgDeleteBlindBoxContent],
 ];
 
 export const registryTypes: ReadonlyArray<[string, GeneratedType]> = [

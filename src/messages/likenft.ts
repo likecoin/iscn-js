@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { EncodeObject } from '@cosmjs/proto-signing';
-import { ClassConfig } from '@likecoin/iscn-message-types/dist/likenft/class_data';
+import { ClassConfig } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/class_data';
 import { MintNFTData, NewNFTClassData } from '../types';
 
 export function formatMsgNewClass(
@@ -10,7 +10,7 @@ export function formatMsgNewClass(
   classConfig?: ClassConfig,
 ): EncodeObject {
   const message = {
-    typeUrl: '/likechain.likenft.MsgNewClass',
+    typeUrl: '/likechain.likenft.v1.MsgNewClass',
     value: {
       creator: senderAddress,
       parent: {
@@ -42,7 +42,7 @@ export function formatMsgUpdateClass(
   classConfig?: ClassConfig,
 ): EncodeObject {
   const message = {
-    typeUrl: '/likechain.likenft.MsgUpdateClass',
+    typeUrl: '/likechain.likenft.v1.MsgUpdateClass',
     value: {
       creator: senderAddress,
       classId,
@@ -63,7 +63,7 @@ export function formatMsgMintNFT(
   nftData: MintNFTData,
 ): EncodeObject {
   const message = {
-    typeUrl: '/likechain.likenft.MsgMintNFT',
+    typeUrl: '/likechain.likenft.v1.MsgMintNFT',
     value: {
       creator: senderAddress,
       classId,
@@ -104,7 +104,7 @@ export function formatMsgBurnNFT(
   nftId: string,
 ): EncodeObject {
   const message = {
-    typeUrl: '/likechain.likenft.MsgBurnNFT',
+    typeUrl: '/likechain.likenft.v1.MsgBurnNFT',
     value: {
       creator: senderAddress,
       classId,

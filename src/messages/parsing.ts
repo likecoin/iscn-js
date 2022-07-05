@@ -1,16 +1,16 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { decodeTxRaw } from '@cosmjs/proto-signing';
 import { IndexedTx } from '@cosmjs/stargate';
-import { QueryResponseRecord } from '@likecoin/iscn-message-types/dist/iscn/query';
+import { QueryResponseRecord } from '@likecoin/iscn-message-types/dist/likechain/iscn/query';
 import {
   IscnRecord,
   MsgCreateIscnRecord,
   MsgUpdateIscnRecord,
   MsgChangeIscnRecordOwnership,
-} from '@likecoin/iscn-message-types/dist/iscn/tx';
-import { Class, NFT } from '@likecoin/iscn-message-types/dist/nft/nft';
-import { NFTData } from '@likecoin/iscn-message-types/dist/likenft/nft_data';
-import { ClassData } from '@likecoin/iscn-message-types/dist/likenft/class_data';
+} from '@likecoin/iscn-message-types/dist/likechain/iscn/tx';
+import { Class, NFT } from '@likecoin/iscn-message-types/dist/backport/nft/v1beta1/nft';
+import { NFTData } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/nft_data';
+import { ClassData } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/class_data';
 import { MsgGrant } from 'cosmjs-types/cosmos/authz/v1beta1/tx';
 import { GenericAuthorization, Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz';
 import { SendAuthorization } from 'cosmjs-types/cosmos/bank/v1beta1/authz';

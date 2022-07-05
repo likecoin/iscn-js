@@ -53,7 +53,7 @@ describe('parseTxInfoFromIndexedTx', () => {
   test('parseNewNFTClassTx', async () => {
     const res = parseTxInfoFromIndexedTx(convertTxToUint8(newNFTClass));
     expectTxBody(res, {
-      typeUrl: '/likechain.likenft.MsgNewClass',
+      typeUrl: '/likechain.likenft.v1.MsgNewClass',
       value: expect.objectContaining({
         creator: 'like1yney2cqn5qdrlc50yr5l53898ufdhxafqz9gxp',
         parent: expect.objectContaining({
@@ -70,7 +70,7 @@ describe('parseTxInfoFromIndexedTx', () => {
     const res = parseTxInfoFromIndexedTx(convertTxToUint8(mintNFTs));
     expect(res.tx.body.messages).toHaveLength(100);
     expectTxBody(res, {
-      typeUrl: '/likechain.likenft.MsgMintNFT',
+      typeUrl: '/likechain.likenft.v1.MsgMintNFT',
       value: expect.objectContaining({
         creator: 'like1yney2cqn5qdrlc50yr5l53898ufdhxafqz9gxp',
         classId: 'likenft17e6d3zd6td4jygpywe673a4deep2898vuktc37wm5j2vrk4cd3esdzeup0',

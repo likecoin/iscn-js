@@ -55,9 +55,9 @@ describe('parseTxInfoFromIndexedTx', () => {
     expectTxBody(res, {
       typeUrl: '/likechain.likenft.v1.MsgNewClass',
       value: expect.objectContaining({
-        creator: 'like1yney2cqn5qdrlc50yr5l53898ufdhxafqz9gxp',
+        creator: 'like1kgj4504s62hkgc47y3cg93w3x6gvtuxf6yvuur',
         parent: expect.objectContaining({
-          iscnIdPrefix: 'iscn://likecoin-chain/obr5VPRtkMSaDzaQyg1izE0_dqC7yzwNGm8kUrsbHJg',
+          iscnIdPrefix: 'iscn://likecoin-chain/fpa-CT_ZRx_ORzd1U1FSd0erxenVnE-1D_bgaMs22dc/1',
         }),
         input: expect.objectContaining({
           name: 'Liker NFT #1',
@@ -72,9 +72,9 @@ describe('parseTxInfoFromIndexedTx', () => {
     expectTxBody(res, {
       typeUrl: '/likechain.likenft.v1.MsgMintNFT',
       value: expect.objectContaining({
-        creator: 'like1yney2cqn5qdrlc50yr5l53898ufdhxafqz9gxp',
-        classId: 'likenft17e6d3zd6td4jygpywe673a4deep2898vuktc37wm5j2vrk4cd3esdzeup0',
-        id: 'testing-123123423-0',
+        creator: 'like1kgj4504s62hkgc47y3cg93w3x6gvtuxf6yvuur',
+        classId: 'likenft1c9vnhymgygz8krmuzp6x4tffkut3cvhlsw630v7ww7hdvldcmpzqedn6hs',
+        id: 'testing-123123-0',
       }),
     });
   });

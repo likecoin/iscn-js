@@ -1,6 +1,10 @@
 # Changelog
 ## [Unreleased]
 
+## [0.2.0-rc.1] - 2022-07-06
+### Added
+- Update syntax and test according to likecoin chain 3.0.0-rc1
+
 ## [0.2.0-alpha.1] - 2022-06-14
 ### Added
 - Add query classId by tx hash

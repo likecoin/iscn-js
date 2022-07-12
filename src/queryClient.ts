@@ -185,7 +185,7 @@ export class ISCNQueryClient {
     if (res) {
       const parsed = parseTxInfoFromIndexedTx(res);
       if (!parsed.logs.length) return '';
-      const event = parsed.logs[0].events.find((e: { type: string }) => e.type === 'likechain.likenft.EventNewClass');
+      const event = parsed.logs[0].events.find((e: { type: string }) => e.type === 'likechain.likenft.v1.EventNewClass');
       if (!event) return '';
       const attribute = event.attributes.find((a: { key: string }) => a.key === 'class_id');
       // class id here might contain extra `""`s

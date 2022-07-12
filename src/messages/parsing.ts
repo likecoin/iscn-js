@@ -40,7 +40,7 @@ export function parseISCNRecordFields(record: IscnRecord): ISCNRecordData {
 
 export function parseNFTClassDataFields(record: Class): LikeNFTClass {
   let data;
-  if (record.data && record.data.typeUrl === '/likechain.likenft.ClassData') {
+  if (record.data && record.data.typeUrl === '/likechain.likenft.v1.ClassData') {
     data = ClassData.decode(record.data.value);
     if (data.metadata) {
       const metadataString = Buffer.from(data.metadata).toString('utf-8');
@@ -58,7 +58,7 @@ export function parseNFTClassDataFields(record: Class): LikeNFTClass {
 
 export function parseNFTDataFields(record: NFT): LikeNFT {
   let data;
-  if (record.data && record.data.typeUrl === '/likechain.likenft.NFTData') {
+  if (record.data && record.data.typeUrl === '/likechain.likenft.v1.NFTData') {
     data = NFTData.decode(record.data.value);
     if (data.metadata) {
       const metadataString = Buffer.from(data.metadata).toString('utf-8');

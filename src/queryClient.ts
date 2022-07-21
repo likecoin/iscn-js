@@ -1,16 +1,30 @@
+import BigNumber from 'bignumber.js';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import {
   QueryClient, setupBankExtension, BankExtension, Coin, StargateClient,
 } from '@cosmjs/stargate';
-import BigNumber from 'bignumber.js';
+import { setupAuthzExtension, AuthzExtension } from '@cosmjs/stargate/build/modules/authz/queries';
+import { PageRequest, PageResponse } from 'cosmjs-types/cosmos/base/query/v1beta1/pagination';
+import { NFT } from '@likecoin/iscn-message-types/dist/backport/nft/v1beta1/nft';
 
-import { setupISCNExtension, ISCNExtension } from './ISCNQueryExtension';
-import { parseISCNTxInfoFromIndexedTx, parseISCNTxRecordFromQuery } from './parsing';
+import { setupISCNExtension, ISCNExtension } from './queryExtensions/ISCNQueryExtension';
+import { setupNFTExtension, NFTExtension } from './queryExtensions/NFTQueryExtension';
+import { setupLikeNFTExtension, LikeNFTExtension } from './queryExtensions/LikeNFTQueryExtension';
+import {
+  parseTxInfoFromIndexedTx,
+  parseISCNTxRecordFromQuery,
+  parseNFTClassDataFields,
+  parseNFTDataFields,
+} from './messages/parsing';
 import { DEFAULT_RPC_ENDPOINT } from './constant';
+import { LikeNFT, LikeNFTClass } from './types';
 
 export class ISCNQueryClient {
-  private queryClient: QueryClient & ISCNExtension & BankExtension | null = null;
+  private queryClient: QueryClient
+    & ISCNExtension
+    & BankExtension & AuthzExtension
+    & NFTExtension & LikeNFTExtension | null = null;
 
   private stargateClient: StargateClient | null = null;
 
@@ -18,14 +32,20 @@ export class ISCNQueryClient {
 
   async connect(rpcURL = DEFAULT_RPC_ENDPOINT)
     // eslint-disable-next-line max-len
-    : Promise<{ queryClient: QueryClient & ISCNExtension & BankExtension; stargateClient: StargateClient; }> {
+    : Promise<{ queryClient: QueryClient
+      & ISCNExtension & BankExtension & AuthzExtension
+      & NFTExtension & LikeNFTExtension;
+      stargateClient: StargateClient; }> {
     const [tendermintClient, stargateClient] = await Promise.all([
       Tendermint34Client.connect(rpcURL),
       StargateClient.connect(rpcURL),
     ]);
     const queryClient = QueryClient.withExtensions(
       tendermintClient,
+      setupAuthzExtension,
       setupISCNExtension,
+      setupNFTExtension,
+      setupLikeNFTExtension,
       setupBankExtension,
     );
     this.queryClient = queryClient;
@@ -37,7 +57,8 @@ export class ISCNQueryClient {
     };
   }
 
-  async getQueryClient(): Promise<QueryClient & ISCNExtension & BankExtension> {
+  async getQueryClient(): Promise<QueryClient
+    & ISCNExtension & BankExtension & NFTExtension & LikeNFTExtension> {
     let { queryClient } = this;
     if (!queryClient) ({ queryClient } = await this.connect());
     return queryClient;
@@ -53,7 +74,7 @@ export class ISCNQueryClient {
     const stargateClient = await this.getStargateClient();
     const res = await stargateClient.getTx(txId);
     if (res) {
-      const parsed = parseISCNTxInfoFromIndexedTx(res);
+      const parsed = parseTxInfoFromIndexedTx(res);
       const records: string[] = [];
       parsed.tx.body.messages.forEach((m, index) => {
         if (!m || !m.typeUrl.includes('/likechain.iscn')) return;
@@ -128,6 +149,50 @@ export class ISCNQueryClient {
       return this.feePerByte;
     }
     return null;
+  }
+
+  async queryNFTClass(classId: string): Promise<{ class: LikeNFTClass }|null> {
+    const queryClient = await this.getQueryClient();
+    const { class: classData } = await queryClient.nft.class(classId);
+    if (!classData) return null;
+    return { class: parseNFTClassDataFields(classData) };
+  }
+
+  async queryNFTClasses(pagination?: PageRequest):
+    Promise<{ classes: LikeNFTClass[]; pagination?: PageResponse; }> {
+    const queryClient = await this.getQueryClient();
+    const { classes, ...res } = await queryClient.nft.classes(pagination);
+    return { classes: classes.map((c) => parseNFTClassDataFields(c)), ...res };
+  }
+
+  async queryNFT(classId: string, nftId: string): Promise<{ nft: LikeNFT } | null> {
+    const queryClient = await this.getQueryClient();
+    const { nft } = await queryClient.nft.NFT(classId, nftId);
+    if (!nft) return null;
+    return { nft: parseNFTDataFields(nft) };
+  }
+
+  async queryNFTByClassAndOwner(classId: string, owner: string, pagination?: PageRequest):
+    Promise<{ nfts: LikeNFT[]; pagination?: PageResponse; }> {
+    const queryClient = await this.getQueryClient();
+    const { nfts, ...res } = await queryClient.nft.NFTs(classId, owner, pagination);
+    return { nfts: nfts.map((n: NFT) => parseNFTDataFields(n)), ...res };
+  }
+
+  async queryNFTClassIdByTx(txId: string): Promise<string> {
+    const stargateClient = await this.getStargateClient();
+    const res = await stargateClient.getTx(txId);
+    if (res) {
+      const parsed = parseTxInfoFromIndexedTx(res);
+      if (!parsed.logs.length) return '';
+      const event = parsed.logs[0].events.find((e: { type: string }) => e.type === 'likechain.likenft.v1.EventNewClass');
+      if (!event) return '';
+      const attribute = event.attributes.find((a: { key: string }) => a.key === 'class_id');
+      // class id here might contain extra `""`s
+      // https://github.com/oursky/likecoin-chain/issues/277
+      return (attribute?.value || '').replace(/^"(.*)"$/, '$1');
+    }
+    return '';
   }
 }
 

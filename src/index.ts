@@ -1,5 +1,5 @@
-export * from './ISCNQueryExtension';
 export * from './queryClient';
 export * from './signingClient';
-export * from './parsing';
+export * as queryExtensions from './queryExtensions';
+export * as messages from './messages';
 export * from './types';

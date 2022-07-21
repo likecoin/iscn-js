@@ -11,7 +11,7 @@ import {
   QueryGetCidResponse,
   QueryHasCidResponse,
   QueryGetCidSizeResponse,
-} from '@likecoin/iscn-message-types/dist/iscn/query';
+} from '@likecoin/iscn-message-types/dist/likechain/iscn/query';
 
 export interface ISCNExtension {
   readonly iscn: {

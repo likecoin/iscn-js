@@ -1,6 +1,42 @@
 # Changelog
 ## [Unreleased]
 
+## [0.2.0] - 2022-07-22
+### Added
+- Formal release for x/nft and x/likenft suppoer in likecoin chain v3.0.0
+
+### Fixed
+- Fix x/likenft event name changes in likecoin chain v3.0.0
+
+## [0.2.0-rc.1] - 2022-07-06
+### Added
+- Update syntax and test according to likecoin chain 3.0.0-rc1
+
+## [0.2.0-alpha.1] - 2022-06-14
+### Added
+- Add query classId by tx hash
+- Add wrapped x/nft query functions
+- Add testcases
+
+### Fixed
+- Use proper cosmjs-types version for peer dependency
+
+## [0.2.0-alpha.0] - 2022-06-02
+### Added
+- Add x/likenft NFT Class creation and minting based on ISCN
+- Add x/nft send NFT Token
+- Add x/authz spend limit grant, execute and revoke
+- Add query and transaction message parsing of x/nft, x/likenft and x/authz
+- Improved transaction message parsing to support all message types included in this library
+- Refactor message creation functions, which can now be used indivdually
+- Add `sendMessages()` which can send a combinations of messages
+
+### Changed
+- Lower default gas price to 10
+- Refactor code structure
+- Update @cosmjs/stargate 0.28.4
+- Update @likecoin/iscn-message-types
+
 ## [0.1.0] - 2022-03-08
 ### Changed
 - Update breaking change from @cosmjs/stargate 0.27.1

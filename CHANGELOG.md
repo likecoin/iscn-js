@@ -1,6 +1,13 @@
 # Changelog
 ## [Unreleased]
 
+## [0.2.0] - 2022-07-22
+### Added
+- Formal release for x/nft and x/likenft suppoer in likecoin chain v3.0.0
+
+### Fixed
+- Fix x/likenft event name changes in likecoin chain v3.0.0
+
 ## [0.2.0-rc.1] - 2022-07-06
 ### Added
 - Update syntax and test according to likecoin chain 3.0.0-rc1

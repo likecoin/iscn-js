@@ -222,10 +222,7 @@ export class ISCNSigningClient {
       description: nftClassData.description || contentMetadata.description,
       uri: nftClassData.uri,
       uriHash: nftClassData.uriHash,
-      metadata: {
-        ...(contentMetadata || {}),
-        ...(nftClassData.metadata || {}),
-      },
+      metadata: nftClassData.metadata,
     };
     const messages = [formatMsgNewClass(
       senderAddress,

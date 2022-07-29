@@ -1,6 +1,10 @@
 # Changelog
 ## [Unreleased]
 
+## [0.2.1] - 2022-07-29
+### Changed
+- Do not fill ISCN metadata into NFT Class metadata if not specified
+
 ## [0.2.0] - 2022-07-22
 ### Added
 - Formal release for x/nft and x/likenft suppoer in likecoin chain v3.0.0

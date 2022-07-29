@@ -125,25 +125,25 @@ describe('signingClient NFT', () => {
     expect(hash).toEqual('F7DBD65322EB5ECC405172609001ED1B20AB328B601B3E76C882527E6459C430');
   });
 
-  // test('Sign mint NFT', async () => {
-  //   const { client, wallet } = await getSigner();
-  //   const signedTxRaw = await client.mintNFTs(
-  //     wallet.address,
-  //     NFT_CLASS_ID,
-  //     [...Array(100).keys()].map((i) => ({
-  //       id: `testing-321321-${i}`,
-  //       uri: 'testing-12341234',
-  //       metadata: {
-  //         a: 'b',
-  //       },
-  //     })),
-  //     {
-  //       broadcast: false, sequence: 1, accountNumber: 0, chainId: 'likecoin-mainnet-2',
-  //     },
-  //   );
-  //   const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-  //   expect(hash).toEqual('28787C77CD79F0C292B2339DC6480622FC6713971B8E45875126F501AE3CBEFD');
-  // });
+  test('Sign mint NFT', async () => {
+    const { client, wallet } = await getSigner();
+    const signedTxRaw = await client.mintNFTs(
+      wallet.address,
+      NFT_CLASS_ID,
+      [...Array(100).keys()].map((i) => ({
+        id: `testing-321321-${i}`,
+        uri: 'testing-12341234',
+        metadata: {
+          a: 'b',
+        },
+      })),
+      {
+        broadcast: false, sequence: 1, accountNumber: 0, chainId: 'likecoin-mainnet-2',
+      },
+    );
+    const hash = await computeTransactionHash(signedTxRaw as TxRaw);
+    expect(hash).toEqual('0FED285EC46E63C63A1B59525E930A10D9AA4B8BD2610A04C9CBFE7332B37A5E');
+  });
 });
 
 describe('signingClient authz', () => {

@@ -151,6 +151,24 @@ export class ISCNQueryClient {
     return null;
   }
 
+  async queryNFTFeePerByte(): Promise<Coin | null> {
+    if (this.feePerByte) return this.feePerByte;
+    const queryClient = await this.getQueryClient();
+    const res = await queryClient.likenft.params();
+    if (res && res.params && res.params.feePerByte) {
+      const {
+        denom,
+        amount,
+      } = res.params.feePerByte;
+      this.feePerByte = {
+        denom,
+        amount: new BigNumber(amount).shiftedBy(-18).toFixed(),
+      } as Coin;
+      return this.feePerByte;
+    }
+    return null;
+  }
+
   async queryNFTClass(classId: string): Promise<{ class: LikeNFTClass }|null> {
     const queryClient = await this.getQueryClient();
     const { class: classData } = await queryClient.nft.class(classId);

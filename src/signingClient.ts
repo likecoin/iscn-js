@@ -20,6 +20,9 @@ import {
   GRANT_SEND_AUTH_GAS,
   EXEC_SEND_AUTH_GAS,
   REVOKE_SEND_AUTH_GAS,
+  STUB_WALLET,
+  STUB_ISCN_ID,
+  STUB_CLASS_ID,
 } from './constant';
 import { ISCNQueryClient } from './queryClient';
 import { messageRegistry as registry } from './messages/registry';
@@ -46,6 +49,7 @@ import {
 import signOrBroadcast from './transactions/sign';
 import { estimateISCNTxFee, estimateISCNTxGas } from './transactions/iscn';
 import { formatGasFee, estimateMsgTxGas, estimateMsgsTxGas } from './transactions/gas';
+import estimateNFTTxFee from './transactions/nft';
 
 export class ISCNSigningClient {
   private signingClient: SigningStargateClient | null = null;
@@ -98,11 +102,11 @@ export class ISCNSigningClient {
 
   async esimateISCNTxGasAndFee(
     payload: ISCNSignPayload,
-    { gasPrice, memo }: { gasPrice?: number, memo?: string } = {},
+    { gasPrice = DEFAULT_GAS_PRICE_NUMBER, memo }: { gasPrice?: number, memo?: string } = {},
   ): Promise<{ gas: { fee: StdFee; }; iscnFee: Coin; }> {
     const [fee, iscnFee] = await Promise.all([
-      this.estimateISCNTxGas(payload, { gasPrice, memo }),
-      this.estimateISCNTxFee(payload),
+      estimateISCNTxGas(payload, { denom: this.denom, gasPrice, memo }),
+      estimateISCNTxFee(this.queryClient, payload, this.denom, { version: 1 }),
     ]);
     return {
       gas: { fee },
@@ -110,19 +114,35 @@ export class ISCNSigningClient {
     };
   }
 
-  async estimateISCNTxFee(
-    payload: ISCNSignPayload,
-    { version = 1 } = {},
-  ): Promise<Coin> {
-    return estimateISCNTxFee(this.queryClient, payload, this.denom, { version });
+  async esimateNFTClassTxGasAndFee(
+    payload: NewNFTClassData,
+    classConfig: ClassConfig,
+    { gasPrice, memo }: { gasPrice?: number, memo?: string } = {},
+  ): Promise<{ gas: { fee: StdFee; }; nftFee: Coin; }> {
+    const msg = formatMsgNewClass(STUB_WALLET, STUB_ISCN_ID, payload, classConfig);
+    const [fee, nftFee] = await Promise.all([
+      estimateMsgTxGas([msg], { denom: this.denom, gasPrice, memo }),
+      estimateNFTTxFee(this.queryClient, [msg], this.denom, memo),
+    ]);
+    return {
+      gas: { fee },
+      nftFee,
+    };
   }
 
-  estimateISCNTxGas(
-    payload: ISCNSignPayload,
-    { denom = this.denom, gasPrice = DEFAULT_GAS_PRICE_NUMBER, memo }
-    : { denom?: string, gasPrice?: number, memo?: string } = {},
-  ): StdFee {
-    return estimateISCNTxGas(payload, { denom, gasPrice, memo });
+  async esimateNFTMintTxGasAndFee(
+    payload: MintNFTData,
+    { gasPrice, memo }: { gasPrice?: number, memo?: string } = {},
+  ): Promise<{ gas: { fee: StdFee; }; iscnFee: Coin; }> {
+    const msg = formatMsgMintNFT(STUB_WALLET, STUB_CLASS_ID, payload);
+    const [fee, iscnFee] = await Promise.all([
+      estimateMsgTxGas([msg], { denom: this.denom, gasPrice, memo }),
+      estimateNFTTxFee(this.queryClient, [msg], this.denom, memo),
+    ]);
+    return {
+      gas: { fee },
+      iscnFee,
+    };
   }
 
   async sendMessages(
@@ -154,7 +174,7 @@ export class ISCNSigningClient {
     if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     if (!fee) {
       const { memo } = signOptions;
-      fee = this.estimateISCNTxGas(payload, { gasPrice, memo });
+      fee = estimateISCNTxGas(payload, { denom: this.denom, gasPrice, memo });
     }
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
     return response;
@@ -173,7 +193,7 @@ export class ISCNSigningClient {
     if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     if (!fee) {
       const { memo } = signOptions;
-      fee = this.estimateISCNTxGas(payload, { gasPrice, memo });
+      fee = estimateISCNTxGas(payload, { denom: this.denom, gasPrice, memo });
     }
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
     return response;

@@ -35,7 +35,7 @@ describe('formatGasFee', () => {
     );
   });
 
-  test('formatGasFee: multiplier', async () => {
+  test('formatGasFee: gas unit', async () => {
     const res = formatGasFee({
       gas: 10000,
       denom: 'nanolike',
@@ -52,24 +52,7 @@ describe('formatGasFee', () => {
     );
   });
 
-  test('formatGasFee: multiplier', async () => {
-    const res = formatGasFee({
-      gasPrice: 1000,
-      denom: 'nanolike',
-    });
-    expect(res).toEqual(
-      expect.objectContaining({
-        gas: DEFAULT_MESSAGE_GAS.toString(),
-        amount: expect.arrayContaining([expect.objectContaining(
-          { amount: (DEFAULT_MESSAGE_GAS * 1000).toString() },
-        ), expect.objectContaining(
-          { denom: 'nanolike' },
-        )]),
-      }),
-    );
-  });
-
-  test('formatGasFee: multiplier', async () => {
+  test('formatGasFee: gas price', async () => {
     const res = formatGasFee({
       gasPrice: 1000,
       denom: 'nanolike',

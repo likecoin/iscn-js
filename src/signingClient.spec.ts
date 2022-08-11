@@ -32,8 +32,8 @@ describe('signingClient ISCN', () => {
       expect.objectContaining({
         gas: expect.objectContaining({
           fee: expect.objectContaining({
-            gas: '180950',
-            amount: expect.arrayContaining([expect.objectContaining({ amount: '1809500' })]),
+            gas: '180925',
+            amount: expect.arrayContaining([expect.objectContaining({ amount: '1809250' })]),
           }),
         }),
       }),
@@ -50,8 +50,8 @@ describe('signingClient ISCN', () => {
       expect.objectContaining({
         gas: expect.objectContaining({
           fee: expect.objectContaining({
-            gas: '181169',
-            amount: expect.arrayContaining([expect.objectContaining({ amount: '1811690' })]),
+            gas: '181143',
+            amount: expect.arrayContaining([expect.objectContaining({ amount: '1811430' })]),
           }),
         }),
       }),
@@ -65,7 +65,7 @@ describe('signingClient ISCN', () => {
     const { client } = await getSigner();
     const res = await client.esimateISCNTxGasAndFee(testData2);
     expect(res).toEqual(
-      expect.objectContaining({ gas: expect.objectContaining({ fee: expect.objectContaining({ gas: '254479' }) }) }),
+      expect.objectContaining({ gas: expect.objectContaining({ fee: expect.objectContaining({ gas: '254454' }) }) }),
     );
     expect(res).toEqual(
       expect.objectContaining({ iscnFee: expect.objectContaining({ amount: '5986000' }) }),
@@ -79,8 +79,8 @@ describe('signingClient ISCN', () => {
       expect.objectContaining({
         gas: expect.objectContaining({
           fee: expect.objectContaining({
-            gas: '180950',
-            amount: expect.arrayContaining([expect.objectContaining({ amount: '180950' })]),
+            gas: '180925',
+            amount: expect.arrayContaining([expect.objectContaining({ amount: '180925' })]),
           }),
         }),
       }),
@@ -98,14 +98,14 @@ describe('signingClient ISCN', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('79EF19B2E76F5A2066E753D1F60D30174263C4EB73CBEEE1339A9BD18F80FE6A');
+    expect(hash).toEqual('9409BD2C37245A51B5BC69847F8792B92A8BDE8EACE688AF33127F235B0FAA6B');
     const signedTxRaw2 = await client.createISCNRecord(
       wallet.address, testData2, {
         broadcast: false, sequence: 2, accountNumber: 0, chainId: 'likecoin-mainnet-2',
       },
     );
     const hash2 = await computeTransactionHash(signedTxRaw2 as TxRaw);
-    expect(hash2).toEqual('EE5515A0798E8CC26EFB62851ACFFFCC20C1423FF8088F07DAD1A07071A98C85');
+    expect(hash2).toEqual('F67C1A184DBEEEDA84F917663890D0F38103E0D09CE9D23721B7BD43861DD368');
   });
 });
 

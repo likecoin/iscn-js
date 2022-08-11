@@ -16,14 +16,10 @@ import {
   COSMOS_DENOM,
   ISCN_CHANGE_OWNER_GAS,
   SEND_NFT_GAS,
-  LIKENFT_MINT_NFT_GAS,
-  LIKENFT_CREATE_CLASS_GAS,
   LIKENFT_BURN_NFT_GAS,
-  LIKENFT_UPDATE_CLASS_GAS,
   GRANT_SEND_AUTH_GAS,
   EXEC_SEND_AUTH_GAS,
   REVOKE_SEND_AUTH_GAS,
-  DEFAULT_MESSAGE_GAS,
 } from './constant';
 import { ISCNQueryClient } from './queryClient';
 import { messageRegistry as registry } from './messages/registry';
@@ -49,7 +45,7 @@ import {
 } from './messages/authz';
 import signOrBroadcast from './transactions/sign';
 import { estimateISCNTxFee, estimateISCNTxGas } from './transactions/iscn';
-import formatGasFee from './transactions/gas';
+import { formatGasFee, estimateMsgTxGas } from './transactions/gas';
 
 export class ISCNSigningClient {
   private signingClient: SigningStargateClient | null = null;
@@ -136,13 +132,12 @@ export class ISCNSigningClient {
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
     if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    const fee = inputFee || formatGasFee({
-      gas: DEFAULT_MESSAGE_GAS,
-      gasPrice,
-      gasMultiplier: messages.length,
-      denom: this.denom,
-    });
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages, { denom: this.denom, gasPrice, memo });
+    }
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
     return response;
   }
@@ -230,12 +225,12 @@ export class ISCNSigningClient {
       combinedClassData,
       classConfig,
     )];
-    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    const fee = inputFee || formatGasFee({
-      gas: LIKENFT_CREATE_CLASS_GAS,
-      gasPrice,
-      denom: this.denom,
-    });
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages, { denom: this.denom, gasPrice, memo });
+    }
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
     return response;
   }
@@ -255,12 +250,12 @@ export class ISCNSigningClient {
       nftClassData,
       classConfig,
     )];
-    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    const fee = inputFee || formatGasFee({
-      gas: LIKENFT_UPDATE_CLASS_GAS,
-      gasPrice,
-      denom: this.denom,
-    });
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages, { denom: this.denom, gasPrice, memo });
+    }
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
     return response;
   }
@@ -278,12 +273,12 @@ export class ISCNSigningClient {
     if (!res || !res.class) throw new Error('Class not found');
     const messages = nftDatas.map((n) => formatMsgMintNFT(senderAddress, classId, n));
     if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    const fee = inputFee || formatGasFee({
-      gas: LIKENFT_MINT_NFT_GAS,
-      gasPrice,
-      gasMultiplier: messages.length,
-      denom: this.denom,
-    });
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages, { denom: this.denom, gasPrice, memo });
+    }
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
     return response;
   }

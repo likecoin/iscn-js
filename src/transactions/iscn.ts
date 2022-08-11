@@ -5,15 +5,11 @@ import { Coin } from 'cosmjs-types/cosmos/base/v1beta1/coin';
 
 import {
   ISCN_REGISTRY_NAME,
-  GAS_ESTIMATOR_INTERCEPT,
-  GAS_ESTIMATOR_SLOPE,
-  GAS_ESTIMATOR_BUFFER_RATIO,
-  DEFAULT_GAS_PRICE_NUMBER,
   STUB_WALLET,
 } from '../constant';
 import { formatISCNPayload, formatMsgCreateIscnRecord } from '../messages/iscn';
 import { ISCNSignPayload } from '../types';
-import formatGasFee from './gas';
+import { estimateMsgTxGas } from './gas';
 import ISCNQueryClient from '../queryClient';
 
 export async function estimateISCNTxFee(
@@ -76,33 +72,11 @@ export async function estimateISCNTxFee(
   } as Coin;
 }
 
-export function estimateISCNTxGas(payload: ISCNSignPayload, {
-  denom,
-  gasPrice = DEFAULT_GAS_PRICE_NUMBER,
-  memo,
-}: {
+export function estimateISCNTxGas(payload: ISCNSignPayload, options: {
     denom: string,
     gasPrice?: number,
     memo?: string,
   }): StdFee {
   const msg = formatMsgCreateIscnRecord(STUB_WALLET, payload);
-  const value = {
-    msg: [msg],
-    // temp number here for estimation
-    fee: formatGasFee({ gas: '200000', gasPrice: '1', denom }),
-  };
-  const obj = {
-    type: 'cosmos-sdk/StdTx',
-    value,
-    memo, // directly append memo to object if exists, since we only need its length
-  };
-  const txBytes = Buffer.from(jsonStringify(obj), 'utf-8');
-  const byteSize = new BigNumber(txBytes.length);
-  const gasUsedEstimationBeforeBuffer = byteSize
-    .multipliedBy(GAS_ESTIMATOR_SLOPE)
-    .plus(GAS_ESTIMATOR_INTERCEPT);
-  const buffer = gasUsedEstimationBeforeBuffer.multipliedBy(GAS_ESTIMATOR_BUFFER_RATIO);
-  const gasUsedEstimation = gasUsedEstimationBeforeBuffer.plus(buffer);
-  const gas = gasUsedEstimation.toFixed(0, 0);
-  return formatGasFee({ gas, gasPrice, denom });
+  return estimateMsgTxGas([msg], options);
 }

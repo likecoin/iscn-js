@@ -122,7 +122,7 @@ describe('signingClient NFT', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('F7DBD65322EB5ECC405172609001ED1B20AB328B601B3E76C882527E6459C430');
+    expect(hash).toEqual('21C16C52DF6D012491D81AE9ACF7A515A08205710352B04DFDD33F6D5A3C7A8F');
   });
 
   test('Sign mint NFT', async () => {
@@ -142,7 +142,7 @@ describe('signingClient NFT', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('0FED285EC46E63C63A1B59525E930A10D9AA4B8BD2610A04C9CBFE7332B37A5E');
+    expect(hash).toEqual('026BAF32FD3B8DFEEEAB56C3C357B73071EB6CD7F4C4E15779855B043C92B68F');
   });
 });
 

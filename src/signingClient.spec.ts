@@ -142,7 +142,7 @@ describe('signingClient NFT', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('026BAF32FD3B8DFEEEAB56C3C357B73071EB6CD7F4C4E15779855B043C92B68F');
+    expect(hash).toEqual('DCEFD72642CCC5B392568F4AAA1A8613F1C3394FC75EF3838E522864B367C642');
   });
 });
 

@@ -45,7 +45,7 @@ import {
 } from './messages/authz';
 import signOrBroadcast from './transactions/sign';
 import { estimateISCNTxFee, estimateISCNTxGas } from './transactions/iscn';
-import { formatGasFee, estimateMsgTxGas } from './transactions/gas';
+import { formatGasFee, estimateMsgTxGas, estimateMsgsTxGas } from './transactions/gas';
 
 export class ISCNSigningClient {
   private signingClient: SigningStargateClient | null = null;
@@ -136,7 +136,7 @@ export class ISCNSigningClient {
     if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     if (!fee) {
       const { memo } = signOptions;
-      fee = estimateMsgTxGas(messages, { denom: this.denom, gasPrice, memo });
+      fee = estimateMsgsTxGas(messages, { denom: this.denom, gasPrice, memo });
     }
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
     return response;
@@ -229,7 +229,7 @@ export class ISCNSigningClient {
     if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     if (!fee) {
       const { memo } = signOptions;
-      fee = estimateMsgTxGas(messages, { denom: this.denom, gasPrice, memo });
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
     }
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
     return response;
@@ -254,7 +254,7 @@ export class ISCNSigningClient {
     if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     if (!fee) {
       const { memo } = signOptions;
-      fee = estimateMsgTxGas(messages, { denom: this.denom, gasPrice, memo });
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
     }
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
     return response;
@@ -277,7 +277,12 @@ export class ISCNSigningClient {
     if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
     if (!fee) {
       const { memo } = signOptions;
-      fee = estimateMsgTxGas(messages, { denom: this.denom, gasPrice, memo });
+      fee = estimateMsgTxGas(
+        messages[0],
+        {
+          denom: this.denom, gasPrice, memo, gasMultiplier: messages.length,
+        },
+      );
     }
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
     return response;

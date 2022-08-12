@@ -78,5 +78,5 @@ export function estimateISCNTxGas(payload: ISCNSignPayload, options: {
     memo?: string,
   }): StdFee {
   const msg = formatMsgCreateIscnRecord(STUB_WALLET, payload);
-  return estimateMsgTxGas([msg], options);
+  return estimateMsgTxGas(msg, options);
 }

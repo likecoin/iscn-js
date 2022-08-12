@@ -35,17 +35,19 @@ export function formatGasFee({
   return fee;
 }
 
-export function estimateMsgTxGas(msgs: EncodeObject[], {
+export function estimateMsgTxGas(msg: EncodeObject, {
   denom,
   gasPrice = DEFAULT_GAS_PRICE_NUMBER,
+  gasMultiplier = 1,
   memo,
 }: {
     denom: string,
     gasPrice?: number,
     memo?: string,
+    gasMultiplier?: number,
   }): StdFee {
   const value = {
-    msg: msgs,
+    msg: [msg],
     // temp number here for estimation
     fee: formatGasFee({ gas: '200000', gasPrice: '1', denom }),
   };
@@ -59,8 +61,24 @@ export function estimateMsgTxGas(msgs: EncodeObject[], {
   const gasUsedEstimationBeforeBuffer = byteSize
     .multipliedBy(GAS_ESTIMATOR_SLOPE)
     .plus(GAS_ESTIMATOR_INTERCEPT);
-  const buffer = gasUsedEstimationBeforeBuffer.multipliedBy(GAS_ESTIMATOR_BUFFER_RATIO);
-  const gasUsedEstimation = gasUsedEstimationBeforeBuffer.plus(buffer);
+
+  const gasUsedEstimation = gasUsedEstimationBeforeBuffer
+    .multipliedBy(gasMultiplier)
+    .multipliedBy(GAS_ESTIMATOR_BUFFER_RATIO);
   const gas = gasUsedEstimation.toFixed(0, 0);
   return formatGasFee({ gas, gasPrice, denom });
+}
+
+export function estimateMsgsTxGas(messages: EncodeObject[], option: {
+  denom: string,
+  gasPrice?: number,
+  memo?: string,
+  gasMultiplier?: number,
+}): StdFee {
+  const msgSizes = messages.map((m) => (Buffer.from(jsonStringify(m), 'utf-8').length));
+  const maxIndex = msgSizes.reduce((acc, curr, index) => {
+    if (curr > msgSizes[acc]) return index;
+    return acc;
+  }, -1);
+  return estimateMsgTxGas(messages[maxIndex], { ...option, gasMultiplier: messages.length });
 }

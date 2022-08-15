@@ -1,6 +1,10 @@
 # Changelog
 ## [Unreleased]
 
+## [0.2.2] - 2022-08-15
+### Changed
+- Refactor gas estimation for NFT mint, class and multiple message send.
+
 ## [0.2.1] - 2022-07-29
 ### Changed
 - Do not fill ISCN metadata into NFT Class metadata if not specified

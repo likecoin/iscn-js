@@ -121,7 +121,7 @@ export class ISCNSigningClient {
   ): Promise<{ gas: { fee: StdFee; }; nftFee: Coin; }> {
     const msg = formatMsgNewClass(STUB_WALLET, STUB_ISCN_ID, payload, classConfig);
     const [fee, nftFee] = await Promise.all([
-      estimateMsgTxGas([msg], { denom: this.denom, gasPrice, memo }),
+      estimateMsgTxGas(msg, { denom: this.denom, gasPrice, memo }),
       estimateNFTTxFee(this.queryClient, [msg], this.denom, memo),
     ]);
     return {
@@ -136,7 +136,7 @@ export class ISCNSigningClient {
   ): Promise<{ gas: { fee: StdFee; }; iscnFee: Coin; }> {
     const msg = formatMsgMintNFT(STUB_WALLET, STUB_CLASS_ID, payload);
     const [fee, iscnFee] = await Promise.all([
-      estimateMsgTxGas([msg], { denom: this.denom, gasPrice, memo }),
+      estimateMsgTxGas(msg, { denom: this.denom, gasPrice, memo }),
       estimateNFTTxFee(this.queryClient, [msg], this.denom, memo),
     ]);
     return {

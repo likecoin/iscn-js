@@ -1,6 +1,13 @@
 # Changelog
 ## [Unreleased]
 
+## [0.2.3] - 2022-08-30
+### Changed
+- Breaking: `estimateISCNTxFee` and `estimateISCNTxGas` are not exposed as indivdual functions in `signingClient` anymore, please use `esimateISCNTxGasAndFee`
+
+### Added
+- Add NFT fee and gas query and esimation functions
+
 ## [0.2.2] - 2022-08-15
 ### Changed
 - Refactor gas estimation for NFT mint, class and multiple message send.

@@ -15,13 +15,13 @@ describe('likerIdsAddresses', () => {
         likeWallet: 'like1twr950vdy4gr9aggq5lehden8m023e0apkx5zz',
       },
     }));
-    const res = await getLikeWalletByLikerId('kuan85998', 'https://api.rinkeby.like.co');
+    const res = await getLikeWalletByLikerId('kuan85998', { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co' });
     expect(res).toEqual('like1twr950vdy4gr9aggq5lehden8m023e0apkx5zz');
   });
 
   test('getLikeWalletByLikerId testnet not found', async () => {
     mockedAxios.get.mockRejectedValue(new Error('error'));
-    const res = await getLikeWalletByLikerId('noThisLiker', 'https://api.rinkeby.like.co');
+    const res = await getLikeWalletByLikerId('noThisLiker', { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co' });
     expect(res).toEqual(null);
   });
 
@@ -35,17 +35,17 @@ describe('likerIdsAddresses', () => {
         likeWallet: 'like156gedr03g3ggwktzhygfusax4df46k8dh6w0me',
       },
     }));
-    const res = await getLikeWalletByLikerId('hsuehkuan', 'https://api.like.co');
+    const res = await getLikeWalletByLikerId('hsuehkuan', { LIKE_CO_API_ROOT: 'https://api.like.co' });
     expect(res).toEqual('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me');
   });
 
   test('getLikeWalletByLikerId mainnet not found', async () => {
     mockedAxios.get.mockRejectedValue(new Error('error'));
-    const res = await getLikeWalletByLikerId('noThisLiker', 'https://api.like.co');
+    const res = await getLikeWalletByLikerId('noThisLiker', { LIKE_CO_API_ROOT: 'https://api.like.co' });
     expect(res).toEqual(null);
   });
 
-  test('getLikeWalletByLikerId mainnet (no need isTestnet)', async () => {
+  test('getLikeWalletByLikerId mainnet (no need LIKE_CO_API_ROOT)', async () => {
     mockedAxios.get.mockImplementation(() => Promise.resolve({
       data: {
         user: 'hsuehkuan',
@@ -71,13 +71,13 @@ describe('likerIdsAddresses', () => {
         civicLikerSince: 1649933818906,
       },
     }));
-    const res = await getLikerIdByWallet('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me', 'https://api.rinkeby.like.co');
+    const res = await getLikerIdByWallet('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me', { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co' });
     expect(res).toEqual('hsuehkuan');
   });
 
   test('getLikerIdByWallet testnet not found', async () => {
     mockedAxios.get.mockRejectedValue(new Error('error'));
-    const res = await getLikerIdByWallet('noThisLiker', 'https://api.like.co');
+    const res = await getLikerIdByWallet('noThisLiker', { LIKE_CO_API_ROOT: 'https://api.like.co' });
     expect(res).toEqual(null);
   });
 
@@ -91,17 +91,17 @@ describe('likerIdsAddresses', () => {
         likeWallet: 'like156gedr03g3ggwktzhygfusax4df46k8dh6w0me',
       },
     }));
-    const res = await getLikerIdByWallet('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me', 'https://api.rinkeby.like.co');
+    const res = await getLikerIdByWallet('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me', { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co' });
     expect(res).toEqual('hsuehkuan');
   });
 
   test('getLikerIdByWallet mainnet not found', async () => {
     mockedAxios.get.mockRejectedValue(new Error('error'));
-    const res = await getLikerIdByWallet('noThisLiker', 'https://api.like.co');
+    const res = await getLikerIdByWallet('noThisLiker', { LIKE_CO_API_ROOT: 'https://api.like.co' });
     expect(res).toEqual(null);
   });
 
-  test('getLikerIdByWallet mainnet (no need isTestnet)', async () => {
+  test('getLikerIdByWallet mainnet (no need LIKE_CO_API_ROOT)', async () => {
     mockedAxios.get.mockImplementation(() => Promise.resolve({
       data: {
         user: 'hsuehkuan',

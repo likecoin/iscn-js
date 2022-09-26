@@ -9,8 +9,7 @@
     "lint": "eslint src --ext .ts",
     "generate": "npm run build",
     "prepublish": "npm run build",
-    "test": "jest --coverage",
-    "test_function": "jest addressParsing.test likerIdsAddresses.test stakeholderRatioCalculation.test --coverage"
+    "test": "jest --coverage"
   },
   "files": [
     "dist/",

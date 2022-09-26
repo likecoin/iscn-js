@@ -1,6 +1,9 @@
 import axios, { AxiosResponse } from 'axios';
 
-export async function getLikeWalletByLikerId(likerId: string, LIKE_CO_API_ROOT = 'https://api.like.co')
+export async function getLikeWalletByLikerId(
+  likerId: string,
+  { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co' },
+)
 : Promise < string | void | null > {
   try {
     return await axios.get(`${LIKE_CO_API_ROOT}/users/id/${likerId}/min`)
@@ -10,7 +13,10 @@ export async function getLikeWalletByLikerId(likerId: string, LIKE_CO_API_ROOT =
   }
 }
 
-export async function getLikerIdByWallet(wallet: string | null, LIKE_CO_API_ROOT = 'https://api.like.co')
+export async function getLikerIdByWallet(
+  wallet: string | null,
+  { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co' },
+)
 : Promise < string | void | null > {
   try {
     return await axios.get(`${LIKE_CO_API_ROOT}/users/addr/${wallet}/min`)

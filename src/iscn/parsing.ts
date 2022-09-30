@@ -1,32 +1,8 @@
 import BigNumber from 'bignumber.js';
-import { ISCNQueryClient } from '../queryClient';
 import { getLikeWalletAddress } from './addressParsing';
 import { getLikerIdByWallet, getLikeWalletByLikerId } from './likerIdsAddresses';
 
-export async function getNFTQueryClient(
-  { LIKE_CO_API_ROOT }: { LIKE_CO_API_ROOT?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co' },
-)
-: Promise < ISCNQueryClient > {
-  const client = new ISCNQueryClient();
-  const NFT_RPC_ENDPOINT = (LIKE_CO_API_ROOT === 'https://api.like.co') ? 'https://node.like.co/rpc/' : 'https://node.testnet.like.co/rpc/';
-  await client.connect(NFT_RPC_ENDPOINT);
-  return client;
-}
-export async function getNFTISCNData(
-  iscnId:string,
-  { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co' },
-)
-: Promise < { owner: string | undefined, data: any | undefined } > {
-  const client = await getNFTQueryClient({ LIKE_CO_API_ROOT });
-  const res = await client.queryRecordsById(iscnId);
-  console.log(res);
-  return {
-    owner: res?.owner,
-    data: res?.records[0]?.data,
-  };
-}
-
-export async function getLikeWalletAndLikerIdFromId(
+async function getLikeWalletAndLikerIdFromId(
   id: string,
   { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co' },
 )
@@ -44,15 +20,13 @@ export async function getLikeWalletAndLikerIdFromId(
   return { likeWallet, likerId };
 }
 
-export async function getStakeholderMap(
-  iscnId: string,
+export async function getStakeholderMapFromIscnData(
+  iscnData: Record < any, any >,
   { LIKE_CO_API_ROOT = 'https://api.like.co', totalLIKE = 1 }: { LIKE_CO_API_ROOT?: string, totalLIKE?: number } = { LIKE_CO_API_ROOT: 'https://api.like.co', totalLIKE: 1 },
 )
 : Promise < Map < string, { LIKE: number, likerId: string } > > {
-  const { owner, data } = await getNFTISCNData(iscnId, { LIKE_CO_API_ROOT });
-  if (!owner) throw new Error(`ISCN with ID ${iscnId} not found`);
   const LIKEMap = new Map();
-  const { stakeholders } = data;
+  const { stakeholders } = iscnData.records[0].data;
   if (stakeholders?.length) {
     const likeWalletsAndLikerIds = await Promise.all(stakeholders.map((stakeholder:any) => {
       const id: string = stakeholder.entity['@id'];
@@ -78,8 +52,31 @@ export async function getStakeholderMap(
   }
 
   if (!LIKEMap.size) {
-    const likerId = await getLikerIdByWallet(owner, { LIKE_CO_API_ROOT });
-    LIKEMap.set(owner, { LIKE: totalLIKE, likerId });
+    const likerId = await getLikerIdByWallet(iscnData.owner, { LIKE_CO_API_ROOT });
+    LIKEMap.set(iscnData.owner, { LIKE: totalLIKE, likerId });
   }
   return LIKEMap;
+}
+
+export async function addressParsingFromIscnData(
+  iscnData: Record < any, any >,
+  { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string, totalLIKE?: number } = { LIKE_CO_API_ROOT: 'https://api.like.co', totalLIKE: 1 },
+)
+: Promise < Record < any, any > > {
+  const parsedIscnData = iscnData;
+  const { stakeholders } = iscnData.records[0].data;
+  let parsedStakeholders;
+  if (stakeholders?.length) {
+    parsedStakeholders = await Promise.all(stakeholders.map(
+      async (stakeholder:any) => {
+        const parsedStakeholder = stakeholder;
+        const id: string = stakeholder.entity['@id'];
+        const { likeWallet } = await getLikeWalletAndLikerIdFromId(id, { LIKE_CO_API_ROOT });
+        parsedStakeholder.entity['@id'] = likeWallet;
+        return parsedStakeholder;
+      },
+    ));
+  }
+  parsedIscnData.records[0].data.stakeholders = parsedStakeholders;
+  return parsedIscnData;
 }

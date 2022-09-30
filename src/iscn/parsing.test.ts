@@ -1,4 +1,4 @@
-import { getStakeholderMapFromIscnData, addressParsingFromIscnData } from './stakeholderRatioCalculation';
+import { getStakeholderMapFromIscnData, addressParsingFromIscnData } from './parsing';
 
 const iscnDataTestnet = {
   owner: 'like1tej2qstg4q255s620ld74gyvw0nzhklu8aezr5',

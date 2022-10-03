@@ -96,20 +96,15 @@ export class ISCNQueryClient {
 
   async queryRecordsById(iscnId: string, fromVersion?: number, toVersion?: number) {
     const queryClient = await this.getQueryClient();
-    let response;
-    try {
-      const res = await queryClient.iscn.recordsById(iscnId, fromVersion, toVersion);
-      if (res && res.records) {
-        const records = parseISCNTxRecordFromQuery(res.records);
-        response = {
-          ...res,
-          records,
-        };
-      }
-    } catch (error) {
-      response = null;
+    const res = await queryClient.iscn.recordsById(iscnId, fromVersion, toVersion);
+    if (res && res.records) {
+      const records = parseISCNTxRecordFromQuery(res.records);
+      return {
+        ...res,
+        records,
+      };
     }
-    return response;
+    return null;
   }
 
   async queryRecordsByFingerprint(fingerprint: string, fromSequence?: number) {

@@ -40,6 +40,39 @@ const iscnDataTestnet = {
     },
   ],
 };
+
+const iscnDataTestnet2 = {
+  '@context': {
+    '@vocab': 'http://iscn.io/',
+    contentMetadata: { '@context': null },
+    recordParentIPLD: { '@container': '@index' },
+    stakeholders: {
+      '@context': {
+        '@vocab': 'http://schema.org/',
+        contributionType: 'http://iscn.io/contributionType',
+        entity: 'http://iscn.io/entity',
+        footprint: 'http://iscn.io/footprint',
+        rewardProportion: 'http://iscn.io/rewardProportion',
+      },
+    },
+  },
+  '@id': 'iscn://likecoin-chain/25L-03N8vJCLZOypQUYsjYd4ZbI6iRPUxFynm31mGQU/1',
+  '@type': 'Record',
+  contentFingerprints: [],
+  contentMetadata: {
+    '@context': 'http://schema.org/',
+    '@type': 'Article',
+    description: 'Launch of LikeCoin Airdrop The long-awaited 50 million...',
+    keywords: 'Airdrop,Civic Liker,Depub,LikeCoin,Progress Update',
+    usageInfo: '',
+    version: 1,
+  },
+  recordNotes: '',
+  recordTimestamp: '2022-05-04T14:32:38+00:00',
+  recordVersion: 1,
+  stakeholders: [
+  ],
+};
 const iscnDataMainnet = {
   '@context': {
     '@vocab': 'http://iscn.io/',
@@ -164,15 +197,25 @@ const iscnDataMainnet2 = {
 
 describe('stakeholderRatioCalculation', () => {
   test('stakeholderRatioCalculation testnet totalLIKE100', async () => {
-    const res = await getStakeholderMapFromParsedIscnData(iscnDataTestnet, { totalLIKE: 100 });
+    const res = await getStakeholderMapFromParsedIscnData(iscnDataTestnet, { totalLIKE: 100, owner: 'ownerForTest' });
     const LIKEMap = new Map();
+    LIKEMap.set('ownerForTest', { LIKE: 100 });
     expect(res).toEqual(LIKEMap);
   });
 
   test('stakeholderRatioCalculation testnet no totalLIKE', async () => {
-    const res = await getStakeholderMapFromParsedIscnData(iscnDataTestnet, {});
+    const res = await getStakeholderMapFromParsedIscnData(iscnDataTestnet, { owner: 'ownerForTest' });
     const LIKEMap = new Map();
+    LIKEMap.set('ownerForTest', { LIKE: 1 });
     expect(res).toEqual(LIKEMap);
+  });
+
+  test('stakeholderRatioCalculation testnet no totalLIKE', async () => {
+    try {
+      await getStakeholderMapFromParsedIscnData(iscnDataTestnet, {});
+    } catch (error) {
+      expect(error).toEqual(new Error('Need owner'));
+    }
   });
 
   test('stakeholderRatioCalculation mainnet totalLIKE100', async () => {
@@ -219,10 +262,17 @@ describe('stakeholderRatioCalculation', () => {
   });
 
   test('getStakeholderMapFromIscnData mainnet ', async () => {
-    const res = await getStakeholderMapFromIscnData(iscnDataMainnet2, { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co', totalLIKE: 100 });
+    const res = await getStakeholderMapFromIscnData(iscnDataMainnet2, { LIKE_CO_API_ROOT: 'https://api.like.co', totalLIKE: 100 });
     const LIKEMap = new Map();
     LIKEMap.set('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me', { LIKE: 50 });
     LIKEMap.set('like1tej2qstg4q255s620ld74gyvw0nzhklu8aezr5', { LIKE: 50 });
+    expect(res).toEqual(LIKEMap);
+  });
+
+  test('getStakeholderMapFromIscnData mainnet ', async () => {
+    const res = await getStakeholderMapFromIscnData(iscnDataTestnet2, { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co', totalLIKE: 100, owner: 'ownerForTest' });
+    const LIKEMap = new Map();
+    LIKEMap.set('ownerForTest', { LIKE: 100 });
     expect(res).toEqual(LIKEMap);
   });
 });

@@ -14,7 +14,6 @@ async function getLikeWalletFromId(
   if (res) {
     [, likerId] = res;
     likeWallet = await getLikeWalletByLikerId(likerId, { LIKE_CO_API_ROOT });
-    console.log('likeWallet', likeWallet);
   } else {
     likeWallet = getLikeWalletAddress(id);
   }
@@ -23,7 +22,7 @@ async function getLikeWalletFromId(
 
 export async function getStakeholderMapFromParsedIscnData(
   iscnData: ISCNRecordData,
-  { totalLIKE = 1 }: { totalLIKE?: number } = { totalLIKE: 1 },
+  { totalLIKE = 1, owner }: { totalLIKE?: number, owner?: string } = { totalLIKE: 1 },
 )
 : Promise < Map < string, { LIKE: number } > > {
   const LIKEMap = new Map();
@@ -54,7 +53,10 @@ export async function getStakeholderMapFromParsedIscnData(
       LIKEMap.set(address, { LIKE });
     });
   }
-
+  if (LIKEMap.size === 0) {
+    if (!owner) throw new Error('Need owner');
+    LIKEMap.set(owner, { LIKE: totalLIKE });
+  }
   return LIKEMap;
 }
 
@@ -83,10 +85,10 @@ export async function addressParsingFromIscnData(
 
 export async function getStakeholderMapFromIscnData(
   iscnData: ISCNRecordData,
-  { LIKE_CO_API_ROOT = 'https://api.like.co', totalLIKE = 1 }: { LIKE_CO_API_ROOT?: string, totalLIKE?: number } = { LIKE_CO_API_ROOT: 'https://api.like.co', totalLIKE: 1 },
+  { LIKE_CO_API_ROOT = 'https://api.like.co', totalLIKE = 1, owner }: { LIKE_CO_API_ROOT?: string, totalLIKE?: number, owner?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co', totalLIKE: 1 },
 )
 : Promise < Map < string, { LIKE: number } > > {
   const parsedIscnData = await addressParsingFromIscnData(iscnData, { LIKE_CO_API_ROOT });
-  const map = await getStakeholderMapFromParsedIscnData(parsedIscnData, { totalLIKE });
+  const map = await getStakeholderMapFromParsedIscnData(parsedIscnData, { totalLIKE, owner });
   return map;
 }

@@ -54,13 +54,23 @@ describe('addressParsing', () => {
     expect(res).toEqual(null);
   });
 
-  test('getLikeWalletAddress did:cosmos input', async () => {
+  test('getLikeWalletAddress did:cosmos 1 input', async () => {
     const res = getLikeWalletAddress('did:cosmos:156gedr03g3ggwktzhygfusax4df46k8dyxjdcz');
     expect(res).toEqual('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me');
   });
 
-  test('getLikeWalletAddress did:like input', async () => {
+  test('getLikeWalletAddress did:cosmos input', async () => {
+    const res = getLikeWalletAddress('did:cosmos:56gedr03g3ggwktzhygfusax4df46k8dyxjdcz');
+    expect(res).toEqual('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me');
+  });
+
+  test('getLikeWalletAddress did:like 1 input', async () => {
     const res = getLikeWalletAddress('did:like:1tej2qstg4q255s620ld74gyvw0nzhklu8aezr5');
+    expect(res).toEqual('like1tej2qstg4q255s620ld74gyvw0nzhklu8aezr5');
+  });
+
+  test('getLikeWalletAddress did:like input', async () => {
+    const res = getLikeWalletAddress('did:like:tej2qstg4q255s620ld74gyvw0nzhklu8aezr5');
     expect(res).toEqual('like1tej2qstg4q255s620ld74gyvw0nzhklu8aezr5');
   });
 

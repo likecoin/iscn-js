@@ -197,16 +197,16 @@ const iscnDataMainnet2 = {
 
 describe('stakeholderRatioCalculation', () => {
   test('stakeholderRatioCalculation testnet totalLIKE100', async () => {
-    const res = await getStakeholderMapFromParsedIscnData(iscnDataTestnet, { totalLIKE: 100, owner: 'ownerForTest' });
+    const res = await getStakeholderMapFromParsedIscnData(iscnDataTestnet, { totalLIKE: 100, defaultWallet: 'defaultWalletForTest' });
     const LIKEMap = new Map();
-    LIKEMap.set('ownerForTest', { LIKE: 100 });
+    LIKEMap.set('defaultWalletForTest', { LIKE: 100 });
     expect(res).toEqual(LIKEMap);
   });
 
   test('stakeholderRatioCalculation testnet no totalLIKE', async () => {
-    const res = await getStakeholderMapFromParsedIscnData(iscnDataTestnet, { owner: 'ownerForTest' });
+    const res = await getStakeholderMapFromParsedIscnData(iscnDataTestnet, { defaultWallet: 'defaultWalletForTest' });
     const LIKEMap = new Map();
-    LIKEMap.set('ownerForTest', { LIKE: 1 });
+    LIKEMap.set('defaultWalletForTest', { LIKE: 1 });
     expect(res).toEqual(LIKEMap);
   });
 
@@ -214,7 +214,7 @@ describe('stakeholderRatioCalculation', () => {
     try {
       await getStakeholderMapFromParsedIscnData(iscnDataTestnet, {});
     } catch (error) {
-      expect(error).toEqual(new Error('Need owner'));
+      expect(error).toEqual(new Error('No valid stakeholders and default wallet is not set'));
     }
   });
 
@@ -270,9 +270,9 @@ describe('stakeholderRatioCalculation', () => {
   });
 
   test('getStakeholderMapFromIscnData mainnet ', async () => {
-    const res = await getStakeholderMapFromIscnData(iscnDataTestnet2, { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co', totalLIKE: 100, owner: 'ownerForTest' });
+    const res = await getStakeholderMapFromIscnData(iscnDataTestnet2, { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co', totalLIKE: 100, defaultWallet: 'defaultWalletForTest' });
     const LIKEMap = new Map();
-    LIKEMap.set('ownerForTest', { LIKE: 100 });
+    LIKEMap.set('defaultWalletForTest', { LIKE: 100 });
     expect(res).toEqual(LIKEMap);
   });
 });

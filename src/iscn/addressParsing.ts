@@ -17,7 +17,7 @@ export function changeAddressPrefix(address: string, newPrefix: string): string 
 export function getLikeWalletAddress(id: string): string | null {
   const addressLengthWithoutPrefixAnd1 = 38;
   let add = id;
-  let likeWallet;
+  let likeWallet: string | null = null;
   if (id.startsWith('did:like:')) {
     add = `like1${id.slice(id.length - addressLengthWithoutPrefixAnd1)}`;
   } else if (id.startsWith('did:cosmos:')) {
@@ -26,5 +26,5 @@ export function getLikeWalletAddress(id: string): string | null {
   if (isValidAddress(add)) {
     likeWallet = changeAddressPrefix(add, 'like');
   }
-  return likeWallet || null;
+  return likeWallet;
 }

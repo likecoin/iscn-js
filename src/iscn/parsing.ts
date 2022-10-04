@@ -22,19 +22,20 @@ async function getLikeWalletFromId(
 
 export async function getStakeholderMapFromParsedIscnData(
   iscnData: ISCNRecordData,
-  { totalLIKE = 1, owner }: { totalLIKE?: number, owner?: string } = { totalLIKE: 1 },
+  { totalLIKE = 1, defaultWallet }: { totalLIKE?: number, defaultWallet?: string }
+  = { totalLIKE: 1 },
 )
 : Promise < Map < string, { LIKE: number } > > {
   const LIKEMap = new Map();
   const { stakeholders } = iscnData;
   if (stakeholders?.length) {
-    const likeWallets = await Promise.all(stakeholders.map((stakeholder:any) => {
+    const likeWallets = stakeholders.map((stakeholder:any) => {
       const id: string = stakeholder.entity['@id'];
       if (isValidAddress(id)) {
         return changeAddressPrefix(id, 'like');
       }
       return null;
-    }));
+    });
     const weightMap = new Map();
     likeWallets.forEach((element: any, i) => {
       if (element) {
@@ -54,8 +55,8 @@ export async function getStakeholderMapFromParsedIscnData(
     });
   }
   if (LIKEMap.size === 0) {
-    if (!owner) throw new Error('Need owner');
-    LIKEMap.set(owner, { LIKE: totalLIKE });
+    if (!defaultWallet) throw new Error('No valid stakeholders and default wallet is not set');
+    LIKEMap.set(defaultWallet, { LIKE: totalLIKE });
   }
   return LIKEMap;
 }
@@ -85,10 +86,10 @@ export async function addressParsingFromIscnData(
 
 export async function getStakeholderMapFromIscnData(
   iscnData: ISCNRecordData,
-  { LIKE_CO_API_ROOT = 'https://api.like.co', totalLIKE = 1, owner }: { LIKE_CO_API_ROOT?: string, totalLIKE?: number, owner?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co', totalLIKE: 1 },
+  { LIKE_CO_API_ROOT = 'https://api.like.co', totalLIKE = 1, defaultWallet }: { LIKE_CO_API_ROOT?: string, totalLIKE?: number, defaultWallet?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co', totalLIKE: 1 },
 )
 : Promise < Map < string, { LIKE: number } > > {
   const parsedIscnData = await addressParsingFromIscnData(iscnData, { LIKE_CO_API_ROOT });
-  const map = await getStakeholderMapFromParsedIscnData(parsedIscnData, { totalLIKE, owner });
+  const map = await getStakeholderMapFromParsedIscnData(parsedIscnData, { totalLIKE, defaultWallet });
   return map;
 }

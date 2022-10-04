@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 
 export async function getLikeWalletByLikerId(
   likerId: string,
-  { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co' },
+  { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = {},
 )
 : Promise < string | null > {
   try {
@@ -20,7 +20,7 @@ export async function getLikeWalletByLikerId(
 
 export async function getLikerIdByWallet(
   wallet: string | null,
-  { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co' },
+  { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = {},
 )
 : Promise < string | null > {
   try {

@@ -5,7 +5,7 @@ import { ISCNRecordData } from '../types';
 
 async function getLikeWalletFromId(
   id: string,
-  { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co' },
+  { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = {},
 )
 : Promise < { likeWallet: string | void | null } > {
   let likeWallet: string | void | null = null;
@@ -22,8 +22,7 @@ async function getLikeWalletFromId(
 
 export async function getStakeholderMapFromParsedIscnData(
   iscnData: ISCNRecordData,
-  { totalLIKE = 1, defaultWallet }: { totalLIKE?: number, defaultWallet?: string }
-  = { totalLIKE: 1 },
+  { totalLIKE = 1, defaultWallet }: { totalLIKE?: number, defaultWallet?: string } = {},
 )
 : Promise < Map < string, { LIKE: number } > > {
   const LIKEMap = new Map();
@@ -63,7 +62,7 @@ export async function getStakeholderMapFromParsedIscnData(
 
 export async function addressParsingFromIscnData(
   iscnData: ISCNRecordData,
-  { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co' },
+  { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = {},
 )
 : Promise < ISCNRecordData > {
   const parsedIscnData: ISCNRecordData = iscnData;
@@ -86,7 +85,7 @@ export async function addressParsingFromIscnData(
 
 export async function getStakeholderMapFromIscnData(
   iscnData: ISCNRecordData,
-  { LIKE_CO_API_ROOT = 'https://api.like.co', totalLIKE = 1, defaultWallet }: { LIKE_CO_API_ROOT?: string, totalLIKE?: number, defaultWallet?: string } = { LIKE_CO_API_ROOT: 'https://api.like.co', totalLIKE: 1 },
+  { LIKE_CO_API_ROOT = 'https://api.like.co', totalLIKE = 1, defaultWallet }: { LIKE_CO_API_ROOT?: string, totalLIKE?: number, defaultWallet?: string } = {},
 )
 : Promise < Map < string, { LIKE: number } > > {
   const parsedIscnData = await addressParsingFromIscnData(iscnData, { LIKE_CO_API_ROOT });

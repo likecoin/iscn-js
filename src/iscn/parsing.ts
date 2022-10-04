@@ -90,6 +90,9 @@ export async function getStakeholderMapFromIscnData(
 )
 : Promise < Map < string, { LIKE: number } > > {
   const parsedIscnData = await addressParsingFromIscnData(iscnData, { LIKE_CO_API_ROOT });
-  const map = await getStakeholderMapFromParsedIscnData(parsedIscnData, { totalLIKE, defaultWallet });
+  const map = await getStakeholderMapFromParsedIscnData(
+    parsedIscnData,
+    { totalLIKE, defaultWallet },
+  );
   return map;
 }

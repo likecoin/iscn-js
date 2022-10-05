@@ -10,9 +10,9 @@ async function getLikeWalletFromId(
 : Promise < { likeWallet: string | void | null } > {
   let likeWallet: string | void | null = null;
   let likerId: string | void | null = null;
-  const res = id.match(/^https:\/\/like\.co\/([a-z0-9_-]{6,20})/);
-  if (res) {
-    [, likerId] = res;
+  const match = id.match(/^https:\/\/like\.co\/([a-z0-9_-]{6,20})/);
+  if (match) {
+    [, likerId] = match;
     likeWallet = await getLikeWalletByLikerId(likerId, { LIKE_CO_API_ROOT });
   } else {
     likeWallet = getLikeWalletAddress(id);
@@ -20,11 +20,12 @@ async function getLikeWalletFromId(
   return { likeWallet };
 }
 
-export async function getStakeholderMapFromParsedIscnData(
+export function getStakeholderMapFromParsedIscnData(
   iscnData: ISCNRecordData,
-  { totalLIKE = 1, defaultWallet }: { totalLIKE?: number, defaultWallet?: string } = {},
+  defaultWallet: string,
+  { totalLIKE = 1 }: { totalLIKE?: number } = {},
 )
-: Promise < Map < string, { LIKE: number } > > {
+: Map < string, { LIKE: number } > {
   const LIKEMap = new Map();
   const { stakeholders } = iscnData;
   if (stakeholders?.length) {
@@ -36,13 +37,13 @@ export async function getStakeholderMapFromParsedIscnData(
       return null;
     });
     const weightMap = new Map();
-    likeWallets.forEach((element: any, i) => {
-      if (element) {
+    likeWallets.forEach((likeWallet: any, i) => {
+      if (likeWallet) {
         let weight = new BigNumber(stakeholders[i].rewardProportion);
-        if (weightMap.has(element)) {
-          weight = weightMap.get(element).weight.plus(weight);
+        if (weightMap.has(likeWallet)) {
+          weight = weightMap.get(likeWallet).weight.plus(weight);
         }
-        weightMap.set(element, { weight });
+        weightMap.set(likeWallet, { weight });
       }
     });
     const totalWeight = [...weightMap.values()]
@@ -54,7 +55,6 @@ export async function getStakeholderMapFromParsedIscnData(
     });
   }
   if (LIKEMap.size === 0) {
-    if (!defaultWallet) throw new Error('No valid stakeholders and default wallet is not set');
     LIKEMap.set(defaultWallet, { LIKE: totalLIKE });
   }
   return LIKEMap;
@@ -85,13 +85,15 @@ export async function addressParsingFromIscnData(
 
 export async function getStakeholderMapFromIscnData(
   iscnData: ISCNRecordData,
-  { LIKE_CO_API_ROOT = 'https://api.like.co', totalLIKE = 1, defaultWallet }: { LIKE_CO_API_ROOT?: string, totalLIKE?: number, defaultWallet?: string } = {},
+  defaultWallet: string,
+  { LIKE_CO_API_ROOT = 'https://api.like.co', totalLIKE = 1 }: { LIKE_CO_API_ROOT?: string, totalLIKE?: number } = {},
 )
 : Promise < Map < string, { LIKE: number } > > {
   const parsedIscnData = await addressParsingFromIscnData(iscnData, { LIKE_CO_API_ROOT });
-  const map = await getStakeholderMapFromParsedIscnData(
+  const map = getStakeholderMapFromParsedIscnData(
     parsedIscnData,
-    { totalLIKE, defaultWallet },
+    defaultWallet,
+    { totalLIKE },
   );
   return map;
 }

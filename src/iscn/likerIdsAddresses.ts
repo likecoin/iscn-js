@@ -11,7 +11,7 @@ export async function getLikeWalletByLikerId(
   } catch (error: any) {
     if (error?.response?.status !== 404) {
       // eslint-disable-next-line
-      console.error('getLikeWalletByLikerId Error', error?.response?.statusText);
+      console.error('getLikeWalletByLikerId Error', error?.response?.data || error);
       throw error;
     }
     return null;
@@ -29,7 +29,7 @@ export async function getLikerIdByWallet(
   } catch (error:any) {
     if (error?.response?.status !== 404) {
       // eslint-disable-next-line
-      console.error('getLikerIdByWallet Error', error?.response?.statusText);
+      console.error('getLikerIdByWallet Error', error?.response?.data || error);
       throw error;
     }
     return null;

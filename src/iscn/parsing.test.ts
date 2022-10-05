@@ -196,46 +196,46 @@ const iscnDataMainnet2 = {
 };
 
 describe('stakeholderRatioCalculation', () => {
-  test('stakeholderRatioCalculation testnet totalLIKE100', async () => {
-    const res = await getStakeholderMapFromParsedIscnData(iscnDataTestnet, { totalLIKE: 100, defaultWallet: 'defaultWalletForTest' });
+  test('stakeholderRatioCalculation testnet totalLIKE100', () => {
+    const res = getStakeholderMapFromParsedIscnData(iscnDataTestnet, 'defaultWalletForTest', { totalLIKE: 100 });
     const LIKEMap = new Map();
     LIKEMap.set('defaultWalletForTest', { LIKE: 100 });
     expect(res).toEqual(LIKEMap);
   });
 
-  test('stakeholderRatioCalculation testnet no totalLIKE', async () => {
-    const res = await getStakeholderMapFromParsedIscnData(iscnDataTestnet, { defaultWallet: 'defaultWalletForTest' });
+  test('stakeholderRatioCalculation testnet no totalLIKE', () => {
+    const res = getStakeholderMapFromParsedIscnData(iscnDataTestnet, 'defaultWalletForTest', { });
     const LIKEMap = new Map();
     LIKEMap.set('defaultWalletForTest', { LIKE: 1 });
     expect(res).toEqual(LIKEMap);
   });
 
-  test('stakeholderRatioCalculation testnet no totalLIKE', async () => {
+  test('stakeholderRatioCalculation testnet no totalLIKE', () => {
     try {
-      await getStakeholderMapFromParsedIscnData(iscnDataTestnet, {});
+      getStakeholderMapFromParsedIscnData(iscnDataTestnet, 'defaultWalletForTest', {});
     } catch (error) {
       expect(error).toEqual(new Error('No valid stakeholders and default wallet is not set'));
     }
   });
 
-  test('stakeholderRatioCalculation mainnet totalLIKE100', async () => {
-    const res = await getStakeholderMapFromParsedIscnData(iscnDataMainnet, { totalLIKE: 100 });
+  test('stakeholderRatioCalculation mainnet totalLIKE100', () => {
+    const res = getStakeholderMapFromParsedIscnData(iscnDataMainnet, 'defaultWalletForTest', { totalLIKE: 100 });
     const LIKEMap = new Map();
     LIKEMap.set('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me', { LIKE: 50 });
     LIKEMap.set('like1tej2qstg4q255s620ld74gyvw0nzhklu8aezr5', { LIKE: 50 });
     expect(res).toEqual(LIKEMap);
   });
 
-  test('stakeholderRatioCalculation mainnet no totalLIKE', async () => {
-    const res = await getStakeholderMapFromParsedIscnData(iscnDataMainnet, {});
+  test('stakeholderRatioCalculation mainnet no totalLIKE', () => {
+    const res = getStakeholderMapFromParsedIscnData(iscnDataMainnet, 'defaultWalletForTest', {});
     const LIKEMap = new Map();
     LIKEMap.set('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me', { LIKE: 0.5 });
     LIKEMap.set('like1tej2qstg4q255s620ld74gyvw0nzhklu8aezr5', { LIKE: 0.5 });
     expect(res).toEqual(LIKEMap);
   });
 
-  test('stakeholderRatioCalculation mainnet (no need LIKE_CO_API_ROOT)', async () => {
-    const res = await getStakeholderMapFromParsedIscnData(iscnDataMainnet, { totalLIKE: 100 });
+  test('stakeholderRatioCalculation mainnet (no need LIKE_CO_API_ROOT)', () => {
+    const res = getStakeholderMapFromParsedIscnData(iscnDataMainnet, 'defaultWalletForTest', { totalLIKE: 100 });
     const LIKEMap = new Map();
     LIKEMap.set('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me', { LIKE: 50 });
     LIKEMap.set('like1tej2qstg4q255s620ld74gyvw0nzhklu8aezr5', { LIKE: 50 });
@@ -262,7 +262,7 @@ describe('stakeholderRatioCalculation', () => {
   });
 
   test('getStakeholderMapFromIscnData mainnet ', async () => {
-    const res = await getStakeholderMapFromIscnData(iscnDataMainnet2, { LIKE_CO_API_ROOT: 'https://api.like.co', totalLIKE: 100 });
+    const res = await getStakeholderMapFromIscnData(iscnDataMainnet2, 'defaultWalletForTest', { LIKE_CO_API_ROOT: 'https://api.like.co', totalLIKE: 100 });
     const LIKEMap = new Map();
     LIKEMap.set('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me', { LIKE: 50 });
     LIKEMap.set('like1tej2qstg4q255s620ld74gyvw0nzhklu8aezr5', { LIKE: 50 });
@@ -270,7 +270,7 @@ describe('stakeholderRatioCalculation', () => {
   });
 
   test('getStakeholderMapFromIscnData mainnet ', async () => {
-    const res = await getStakeholderMapFromIscnData(iscnDataTestnet2, { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co', totalLIKE: 100, defaultWallet: 'defaultWalletForTest' });
+    const res = await getStakeholderMapFromIscnData(iscnDataTestnet2, 'defaultWalletForTest', { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co', totalLIKE: 100 });
     const LIKEMap = new Map();
     LIKEMap.set('defaultWalletForTest', { LIKE: 100 });
     expect(res).toEqual(LIKEMap);

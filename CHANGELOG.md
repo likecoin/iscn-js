@@ -1,6 +1,11 @@
 # Changelog
 ## [Unreleased]
 
+## [0.3.0] - 2022-10-05
+### Added
+- Add ISCN stakeholder ratio parsing function
+- Add ISCN @id to like wallet parsing function
+
 ## [0.2.3] - 2022-08-30
 ### Changed
 - Breaking: `estimateISCNTxFee` and `estimateISCNTxGas` are not exposed as indivdual functions in `signingClient` anymore, please use `esimateISCNTxGasAndFee`

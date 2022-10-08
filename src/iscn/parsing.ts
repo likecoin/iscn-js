@@ -20,16 +20,16 @@ async function getLikeWalletFromId(
   return { likeWallet };
 }
 
-export function getStakeholderMapFromParsedIscnData(
+export function calculateStakeholderRewards(
   iscnData: ISCNRecordData,
   defaultWallet: string,
-  { totalLIKE = 1 }: { totalLIKE?: number } = {},
+  { totalAmount = '1', precision = 9 }: { totalAmount?: string | number, precision?: number } = {},
 )
-: Map < string, { LIKE: number } > {
-  const LIKEMap = new Map();
+: Map<string, { amount: string }> {
+  const LIKEMap: Map<string, { amount: string }> = new Map();
   const { stakeholders } = iscnData;
   if (stakeholders?.length) {
-    const likeWallets = stakeholders.map((stakeholder:any) => {
+    const likeWallets = stakeholders.map((stakeholder: any) => {
       const id: string = stakeholder.entity['@id'];
       if (isValidAddress(id)) {
         return changeAddressPrefix(id, 'like');
@@ -37,7 +37,7 @@ export function getStakeholderMapFromParsedIscnData(
       return null;
     });
     const weightMap = new Map();
-    likeWallets.forEach((likeWallet: any, i) => {
+    likeWallets.forEach((likeWallet: string | null, i) => {
       if (likeWallet) {
         let weight = new BigNumber(stakeholders[i].rewardProportion);
         if (weightMap.has(likeWallet)) {
@@ -50,17 +50,19 @@ export function getStakeholderMapFromParsedIscnData(
       .map(({ weight }) => weight)
       .reduce((prev, curr) => prev.plus(curr), new BigNumber(0));
     weightMap.forEach(({ weight }, address) => {
-      const LIKE = new BigNumber(weight.times(totalLIKE).div(totalWeight).toFixed(9, 1)).toNumber();
-      LIKEMap.set(address, { LIKE });
+      const amount = new BigNumber(
+        weight.times(totalAmount).div(totalWeight).toFixed(precision, 1),
+      );
+      LIKEMap.set(address, { amount });
     });
   }
   if (LIKEMap.size === 0) {
-    LIKEMap.set(defaultWallet, { LIKE: totalLIKE });
+    LIKEMap.set(defaultWallet, { amount: new BigNumber(totalAmount).toFixed(precision, 1) });
   }
   return LIKEMap;
 }
 
-export async function addressParsingFromIscnData(
+export async function parseStakeholderAddresses(
   iscnData: ISCNRecordData,
   { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = {},
 )
@@ -83,17 +85,17 @@ export async function addressParsingFromIscnData(
   return parsedIscnData;
 }
 
-export async function getStakeholderMapFromIscnData(
+export async function parseAndCalculateStakeholderRewards(
   iscnData: ISCNRecordData,
   defaultWallet: string,
-  { LIKE_CO_API_ROOT = 'https://api.like.co', totalLIKE = 1 }: { LIKE_CO_API_ROOT?: string, totalLIKE?: number } = {},
+  { LIKE_CO_API_ROOT = 'https://api.like.co', totalAmount = '1' }: { LIKE_CO_API_ROOT?: string, totalAmount?: string | number } = {},
 )
-: Promise < Map < string, { LIKE: number } > > {
-  const parsedIscnData = await addressParsingFromIscnData(iscnData, { LIKE_CO_API_ROOT });
-  const map = getStakeholderMapFromParsedIscnData(
+: Promise < Map < string, { amount: string } > > {
+  const parsedIscnData = await parseStakeholderAddresses(iscnData, { LIKE_CO_API_ROOT });
+  const map = calculateStakeholderRewards(
     parsedIscnData,
     defaultWallet,
-    { totalLIKE },
+    { totalAmount },
   );
   return map;
 }

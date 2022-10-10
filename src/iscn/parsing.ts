@@ -51,7 +51,7 @@ export function calculateStakeholderRewards(
       .reduce((prev, curr) => prev.plus(curr), new BigNumber(0));
     weightMap.forEach(({ weight }, address) => {
       const amount = new BigNumber(
-        weight.times(totalAmount).div(totalWeight).toFixed(precision, 1),
+        weight.times(totalAmount).div(totalWeight).toFixed(precision, BigNumber.ROUND_DOWN),
       );
       LIKEMap.set(address, { amount: amount.toFixed() });
     });

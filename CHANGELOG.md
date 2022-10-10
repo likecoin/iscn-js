@@ -1,6 +1,12 @@
 # Changelog
 ## [Unreleased]
 
+## [0.4.0] - 2022-10-10
+### Changed
+- Breaking: Renamed getStakeholderMapFromParsedIscnData, addressParsingFromIscnData, getStakeholderMapFromIscnData to calculateStakeholderRewards, parseStakeholderAddresses, parseAndCalculateStakeholderRewards
+- Breaking: Rename LIKE to amount in calculateStakeholderRewards params and output
+- Breaking: Output amount as string instead of number in the result of calculateStakeholderRewards
+
 ## [0.3.0] - 2022-10-05
 ### Added
 - Add ISCN stakeholder ratio parsing function

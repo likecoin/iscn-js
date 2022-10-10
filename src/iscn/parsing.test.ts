@@ -269,8 +269,15 @@ describe('stakeholderRatioCalculation', () => {
     expect(res).toEqual(LIKEMap);
   });
 
-  test('parseAndCalculateStakeholderRewards mainnet ', async () => {
+  test('parseAndCalculateStakeholderRewards testnet ', async () => {
     const res = await parseAndCalculateStakeholderRewards(iscnDataTestnet2, 'defaultWalletForTest', { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co', totalAmount: '100' });
+    const LIKEMap = new Map();
+    LIKEMap.set('defaultWalletForTest', { amount: '100' });
+    expect(res).toEqual(LIKEMap);
+  });
+
+  test('parseAndCalculateStakeholderRewards testnet, number input ', async () => {
+    const res = await parseAndCalculateStakeholderRewards(iscnDataTestnet2, 'defaultWalletForTest', { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co', totalAmount: 100 });
     const LIKEMap = new Map();
     LIKEMap.set('defaultWalletForTest', { amount: '100' });
     expect(res).toEqual(LIKEMap);

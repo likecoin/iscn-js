@@ -53,11 +53,11 @@ export function calculateStakeholderRewards(
       const amount = new BigNumber(
         weight.times(totalAmount).div(totalWeight).toFixed(precision, 1),
       );
-      LIKEMap.set(address, { amount });
+      LIKEMap.set(address, { amount: amount.toFixed() });
     });
   }
   if (LIKEMap.size === 0) {
-    LIKEMap.set(defaultWallet, { amount: new BigNumber(totalAmount).toFixed(precision, 1) });
+    LIKEMap.set(defaultWallet, { amount: new BigNumber(totalAmount).toFixed() });
   }
   return LIKEMap;
 }

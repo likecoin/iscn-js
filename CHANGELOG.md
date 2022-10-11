@@ -1,6 +1,14 @@
 # Changelog
 ## [Unreleased]
 
+## [0.4.1] - 2022-10-11
+### Fixed
+- Fix error caused by undefined @id
+
+### Changed
+- Breaking: getLikeWalletFromId return string instead of object, simplify interface
+
+
 ## [0.4.0] - 2022-10-10
 ### Changed
 - Breaking: Renamed getStakeholderMapFromParsedIscnData, addressParsingFromIscnData, getStakeholderMapFromIscnData to calculateStakeholderRewards, parseStakeholderAddresses, parseAndCalculateStakeholderRewards

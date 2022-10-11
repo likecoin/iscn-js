@@ -7,17 +7,17 @@ async function getLikeWalletFromId(
   id: string,
   { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = {},
 )
-: Promise < { likeWallet: string | void | null } > {
-  let likeWallet: string | void | null = null;
-  let likerId: string | void | null = null;
+: Promise < string | null > {
+  let likeWallet: string | null = null;
+  if (!id) return null;
   const match = id.match(/^https:\/\/like\.co\/([a-z0-9_-]{6,20})/);
   if (match) {
-    [, likerId] = match;
-    likeWallet = await getLikeWalletByLikerId(likerId, { LIKE_CO_API_ROOT });
+    const [, likerId] = match;
+    if (likerId) likeWallet = await getLikeWalletByLikerId(likerId, { LIKE_CO_API_ROOT });
   } else {
     likeWallet = getLikeWalletAddress(id);
   }
-  return { likeWallet };
+  return likeWallet;
 }
 
 export function calculateStakeholderRewards(

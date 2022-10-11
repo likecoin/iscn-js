@@ -31,7 +31,7 @@ export function calculateStakeholderRewards(
   if (stakeholders?.length) {
     const likeWallets = stakeholders.map((stakeholder: any) => {
       const id: string = stakeholder.entity['@id'];
-      if (isValidAddress(id)) {
+      if (id && isValidAddress(id)) {
         return changeAddressPrefix(id, 'like');
       }
       return null;
@@ -75,8 +75,10 @@ export async function parseStakeholderAddresses(
       async (stakeholder:any) => {
         const parsedStakeholder = stakeholder;
         const id: string = stakeholder.entity['@id'];
-        const { likeWallet } = await getLikeWalletFromId(id, { LIKE_CO_API_ROOT });
-        parsedStakeholder.entity['@id'] = likeWallet;
+        if (id) {
+          const likeWallet = await getLikeWalletFromId(id, { LIKE_CO_API_ROOT });
+          parsedStakeholder.entity['@id'] = likeWallet;
+        }
         return parsedStakeholder;
       },
     ));

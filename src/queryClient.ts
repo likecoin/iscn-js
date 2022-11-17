@@ -58,7 +58,7 @@ export class ISCNQueryClient {
   }
 
   async getQueryClient(): Promise<QueryClient
-    & ISCNExtension & BankExtension & NFTExtension & LikeNFTExtension> {
+    & ISCNExtension & BankExtension & AuthzExtension & NFTExtension & LikeNFTExtension> {
     let { queryClient } = this;
     if (!queryClient) ({ queryClient } = await this.connect());
     return queryClient;

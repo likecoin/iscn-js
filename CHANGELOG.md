@@ -1,6 +1,10 @@
 # Changelog
 ## [Unreleased]
 
+## [0.4.2] - 2022-11-18
+### Fixed
+- Fix missing authz type definition in query client
+
 ## [0.4.1] - 2022-10-11
 ### Fixed
 - Fix error caused by undefined @id

@@ -53,11 +53,14 @@ export function calculateStakeholderRewards(
       const amount = new BigNumber(
         weight.times(totalAmount).div(totalWeight).toFixed(precision, BigNumber.ROUND_DOWN),
       );
-      LIKEMap.set(address, { amount: amount.toFixed() });
+      if (amount && amount.gt(0)) LIKEMap.set(address, { amount: amount.toFixed() });
     });
   }
   if (LIKEMap.size === 0) {
-    LIKEMap.set(defaultWallet, { amount: new BigNumber(totalAmount).toFixed() });
+    const amount = new BigNumber(totalAmount).toFixed(precision, BigNumber.ROUND_DOWN);
+    LIKEMap.set(defaultWallet, {
+      amount: new BigNumber(amount).toFixed(),
+    });
   }
   return LIKEMap;
 }
@@ -90,14 +93,16 @@ export async function parseStakeholderAddresses(
 export async function parseAndCalculateStakeholderRewards(
   iscnData: ISCNRecordData,
   defaultWallet: string,
-  { LIKE_CO_API_ROOT = 'https://api.like.co', totalAmount = '1' }: { LIKE_CO_API_ROOT?: string, totalAmount?: string | number } = {},
+  { LIKE_CO_API_ROOT = 'https://api.like.co', totalAmount = '1', precision = 9 }: {
+    LIKE_CO_API_ROOT?: string, totalAmount?: string | number, precision?: number,
+  } = {},
 )
 : Promise < Map < string, { amount: string } > > {
   const parsedIscnData = await parseStakeholderAddresses(iscnData, { LIKE_CO_API_ROOT });
   const map = calculateStakeholderRewards(
     parsedIscnData,
     defaultWallet,
-    { totalAmount },
+    { totalAmount, precision },
   );
   return map;
 }

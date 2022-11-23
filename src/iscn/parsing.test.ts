@@ -269,6 +269,28 @@ describe('stakeholderRatioCalculation', () => {
     expect(res).toEqual(LIKEMap);
   });
 
+  test('parseAndCalculateStakeholderRewards precision 0 input 0.1 ', async () => {
+    const res = await parseAndCalculateStakeholderRewards(iscnDataMainnet2, 'defaultWalletForTest', { LIKE_CO_API_ROOT: 'https://api.like.co', totalAmount: '0.1', precision: 0 });
+    const LIKEMap = new Map();
+    LIKEMap.set('defaultWalletForTest', { amount: '0' });
+    expect(res).toEqual(LIKEMap);
+  });
+
+  test('parseAndCalculateStakeholderRewards precision 0 input 1.1', async () => {
+    const res = await parseAndCalculateStakeholderRewards(iscnDataMainnet2, 'defaultWalletForTest', { LIKE_CO_API_ROOT: 'https://api.like.co', totalAmount: '1.1', precision: 0 });
+    const LIKEMap = new Map();
+    LIKEMap.set('defaultWalletForTest', { amount: '1' });
+    expect(res).toEqual(LIKEMap);
+  });
+
+  test('parseAndCalculateStakeholderRewards precision 0 input 10.1', async () => {
+    const res = await parseAndCalculateStakeholderRewards(iscnDataMainnet2, 'defaultWalletForTest', { LIKE_CO_API_ROOT: 'https://api.like.co', totalAmount: '10.1', precision: 0 });
+    const LIKEMap = new Map();
+    LIKEMap.set('like156gedr03g3ggwktzhygfusax4df46k8dh6w0me', { amount: '5' });
+    LIKEMap.set('like1tej2qstg4q255s620ld74gyvw0nzhklu8aezr5', { amount: '5' });
+    expect(res).toEqual(LIKEMap);
+  });
+
   test('parseAndCalculateStakeholderRewards testnet ', async () => {
     const res = await parseAndCalculateStakeholderRewards(iscnDataTestnet2, 'defaultWalletForTest', { LIKE_CO_API_ROOT: 'https://api.rinkeby.like.co', totalAmount: '100' });
     const LIKEMap = new Map();

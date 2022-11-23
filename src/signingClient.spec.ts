@@ -146,6 +146,28 @@ describe('signingClient NFT', () => {
   });
 });
 
+describe('signingClient Royalty', () => {
+  test('Sign create royalty config', async () => {
+    const { client, wallet } = await getSigner();
+    const signedTxRaw = await client.createRoyaltyConfig(
+      wallet.address,
+      NFT_CLASS_ID,
+      {
+        rateBasisPoints: 10000,
+        stakeholders: [{
+          account: wallet.address,
+          weight: 1,
+        }],
+      },
+      {
+        broadcast: false, sequence: 1, accountNumber: 0, chainId: 'likecoin-mainnet-2',
+      },
+    );
+    const hash = await computeTransactionHash(signedTxRaw as TxRaw);
+    expect(hash).toEqual('EB6A9B6C6C95D1C7FBD7C96518944FDD77D7949A92F266D38C5A0435AE80EF46');
+  });
+});
+
 describe('signingClient authz', () => {
   test('Sign createSendGrant', async () => {
     const { client, wallet } = await getSigner();

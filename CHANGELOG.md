@@ -1,5 +1,10 @@
 # Changelog
 ## [Unreleased]
+### Changed
+- Breaking: `calculateStakeholderRewards()` would not set a Map value if `amount` is not larger than 0
+- Breaking: `calculateStakeholderRewards()` amount set into `defaultWallet` now also respect `precision`
+- `parseStakeholderAddresses()` now accept `precision` as optional parameter.
+
 
 ## [0.4.2] - 2022-11-18
 ### Fixed

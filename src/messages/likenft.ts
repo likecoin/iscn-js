@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { EncodeObject } from '@cosmjs/proto-signing';
 import { ClassConfig } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/class_data';
+import { RoyaltyConfigInput } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/royalty_config';
 import { MintNFTData, NewNFTClassData } from '../types';
 
 export function formatMsgNewClass(
@@ -109,6 +110,52 @@ export function formatMsgBurnNFT(
       creator: senderAddress,
       classId,
       nftId,
+    },
+  };
+  return message;
+}
+
+export function formatMsgCreateRoyaltyConfig(
+  senderAddress: string,
+  classId: string,
+  royaltyConfig: RoyaltyConfigInput,
+): EncodeObject {
+  const message = {
+    typeUrl: '/likechain.likenft.v1.MsgCreateRoyaltyConfig',
+    value: {
+      creator: senderAddress,
+      classId,
+      royaltyConfig,
+    },
+  };
+  return message;
+}
+
+export function formatMsgUpdateRoyaltyConfig(
+  senderAddress: string,
+  classId: string,
+  royaltyConfig: RoyaltyConfigInput,
+): EncodeObject {
+  const message = {
+    typeUrl: '/likechain.likenft.v1.MsgUpdateRoyaltyConfig',
+    value: {
+      creator: senderAddress,
+      classId,
+      royaltyConfig,
+    },
+  };
+  return message;
+}
+
+export function formatMsgDeleteRoyaltyConfig(
+  senderAddress: string,
+  classId: string,
+): EncodeObject {
+  const message = {
+    typeUrl: '/likechain.likenft.v1.MsgDeleteRoyaltyConfig',
+    value: {
+      creator: senderAddress,
+      classId,
     },
   };
   return message;

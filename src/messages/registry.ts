@@ -13,6 +13,9 @@ import {
   MsgCreateBlindBoxContent,
   MsgUpdateBlindBoxContent,
   MsgDeleteBlindBoxContent,
+  MsgCreateRoyaltyConfig,
+  MsgUpdateRoyaltyConfig,
+  MsgDeleteRoyaltyConfig,
 } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/tx';
 import { MsgSend as MsgSendNFT } from '@likecoin/iscn-message-types/dist/backport/nft/v1beta1/tx';
 import { defaultRegistryTypes } from '@cosmjs/stargate';
@@ -31,6 +34,9 @@ export const LikeNFTRegistryTypes: ReadonlyArray<[string, GeneratedType]> = [
   ['/likechain.likenft.v1.MsgCreateBlindBoxContent', MsgCreateBlindBoxContent],
   ['/likechain.likenft.v1.MsgUpdateBlindBoxContent', MsgUpdateBlindBoxContent],
   ['/likechain.likenft.v1.MsgDeleteBlindBoxContent', MsgDeleteBlindBoxContent],
+  ['/likechain.likenft.v1.MsgCreateRoyaltyConfig', MsgCreateRoyaltyConfig],
+  ['/likechain.likenft.v1.MsgUpdateRoyaltyConfig', MsgUpdateRoyaltyConfig],
+  ['/likechain.likenft.v1.MsgDeleteRoyaltyConfig', MsgDeleteRoyaltyConfig],
 ];
 
 export const registryTypes: ReadonlyArray<[string, GeneratedType]> = [

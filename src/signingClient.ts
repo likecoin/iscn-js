@@ -9,6 +9,8 @@ import {
 } from '@cosmjs/stargate';
 import { ClassConfig } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/class_data';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import Long from 'long';
 
 import {
   DEFAULT_RPC_ENDPOINT,
@@ -36,10 +38,13 @@ import {
 } from './messages/iscn';
 import {
   formatMsgBurnNFT,
+  formatMsgCreateRoyaltyConfig,
+  formatMsgDeleteRoyaltyConfig,
   formatMsgMintNFT,
   formatMsgNewClass,
   formatMsgSend,
   formatMsgUpdateClass,
+  formatMsgUpdateRoyaltyConfig,
 } from './messages/likenft';
 import {
   formatMsgExecSendAuthorization,
@@ -345,6 +350,117 @@ export class ISCNSigningClient {
       gasMultiplier: messages.length,
       denom: this.denom,
     });
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
+  async createRoyaltyConfig(
+    senderAddress: string,
+    classId: string,
+    royaltyConfig: {
+      rateBasisPoints: number,
+      stakeholders: {
+        account: string;
+        weight: number;
+      }[]
+    },
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const {
+      rateBasisPoints,
+      stakeholders,
+    } = royaltyConfig;
+    const messages = [formatMsgCreateRoyaltyConfig(
+      senderAddress,
+      classId,
+      {
+        rateBasisPoints: Long.fromNumber(rateBasisPoints),
+        stakeholders: stakeholders.map((s) => {
+          const {
+            account,
+            weight,
+          } = s;
+          return {
+            account,
+            weight: Long.fromNumber(weight),
+          };
+        }),
+      },
+    )];
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
+    }
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
+  async updateRoyaltyConfig(
+    senderAddress: string,
+    classId: string,
+    royaltyConfig: {
+      rateBasisPoints: number,
+      stakeholders: {
+        account: string;
+        weight: number;
+      }[]
+    },
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const {
+      rateBasisPoints,
+      stakeholders,
+    } = royaltyConfig;
+    const messages = [formatMsgUpdateRoyaltyConfig(
+      senderAddress,
+      classId,
+      {
+        rateBasisPoints: Long.fromNumber(rateBasisPoints),
+        stakeholders: stakeholders.map((s) => {
+          const {
+            account,
+            weight,
+          } = s;
+          return {
+            account,
+            weight: Long.fromNumber(weight),
+          };
+        }),
+      },
+    )];
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
+    }
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
+  async deleteRoyaltyConfig(
+    senderAddress: string,
+    classId: string,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [formatMsgDeleteRoyaltyConfig(
+      senderAddress,
+      classId,
+    )];
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
+    }
     const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
     return response;
   }

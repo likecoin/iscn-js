@@ -1,5 +1,7 @@
 # Changelog
 ## [Unreleased]
+### Added
+- Add royalty config functions
 ### Changed
 - Breaking: `calculateStakeholderRewards()` would not set a Map value if `amount` is not larger than 0
 - Breaking: `calculateStakeholderRewards()` amount set into `defaultWallet` now also respect `precision`

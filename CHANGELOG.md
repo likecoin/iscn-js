@@ -1,5 +1,7 @@
 # Changelog
 ## [Unreleased]
+
+## [0.5.0] - 2022-11-24
 ### Added
 - Add royalty config functions
 ### Changed

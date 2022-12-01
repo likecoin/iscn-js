@@ -27,9 +27,9 @@ export interface Stakeholder {
 
 export interface ISCNSignPayload {
   [key: string]: unknown;
-  name: string;
+  name?: string;
   description?: string;
-  keywords?: string[];
+  keywords?: string[] | string;
   url?: string;
   contentFingerprints: string[];
   stakeholders: (Stakeholder & unknown)[];

@@ -18,6 +18,7 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1): {
     type,
     usageInfo,
     recordNotes,
+    contentMetadata: inputMetadata = {},
     ...data
   } = payload;
 
@@ -32,9 +33,10 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1): {
     description,
     version,
     url,
-    keywords: keywords.join(','),
+    keywords: Array.isArray(keywords) ? keywords.join(',') : keywords,
     usageInfo,
     ...data,
+    ...inputMetadata,
   };
   return {
     recordNotes,

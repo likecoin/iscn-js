@@ -36,6 +36,7 @@ export interface ISCNSignPayload {
   type?: string;
   usageInfo?: string;
   recordNotes?: string;
+  contentMetadata?: { [key: string]: unknown };
 }
 
 export interface ISCNSignOptions {

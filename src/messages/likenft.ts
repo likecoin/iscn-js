@@ -218,16 +218,16 @@ export function formatMsgDeleteListing(
 }
 
 export function formatMsgBuyNFT(
-  creator: string,
-  seller: string,
+  senderAddress: string,
   classId: string,
   nftId: string,
+  seller: string,
   price: string,
 ): EncodeObject {
   const message = {
     typeUrl: '/likechain.likenft.v1.MsgBuyNFT',
     value: {
-      creator,
+      creator: senderAddress,
       classId,
       nftId,
       seller,
@@ -294,16 +294,16 @@ export function formatMsgDeleteOffer(
 }
 
 export function formatMsgSellNFT(
-  creator: string,
-  buyer: string,
+  senderAddress: string,
   classId: string,
   nftId: string,
+  buyer: string,
   price: string,
 ): EncodeObject {
   const message = {
     typeUrl: '/likechain.likenft.v1.MsgSellNFT',
     value: {
-      creator,
+      creator: senderAddress,
       classId,
       nftId,
       buyer,

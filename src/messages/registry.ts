@@ -16,6 +16,14 @@ import {
   MsgCreateRoyaltyConfig,
   MsgUpdateRoyaltyConfig,
   MsgDeleteRoyaltyConfig,
+  MsgCreateListing,
+  MsgUpdateListing,
+  MsgDeleteListing,
+  MsgBuyNFT,
+  MsgCreateOffer,
+  MsgUpdateOffer,
+  MsgDeleteOffer,
+  MsgSellNFT,
 } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/tx';
 import { MsgSend as MsgSendNFT } from '@likecoin/iscn-message-types/dist/backport/nft/v1beta1/tx';
 import { defaultRegistryTypes } from '@cosmjs/stargate';
@@ -37,6 +45,14 @@ export const LikeNFTRegistryTypes: ReadonlyArray<[string, GeneratedType]> = [
   ['/likechain.likenft.v1.MsgCreateRoyaltyConfig', MsgCreateRoyaltyConfig],
   ['/likechain.likenft.v1.MsgUpdateRoyaltyConfig', MsgUpdateRoyaltyConfig],
   ['/likechain.likenft.v1.MsgDeleteRoyaltyConfig', MsgDeleteRoyaltyConfig],
+  ['/likechain.likenft.v1.MsgCreateListing', MsgCreateListing],
+  ['/likechain.likenft.v1.MsgUpdateListing', MsgUpdateListing],
+  ['/likechain.likenft.v1.MsgDeleteListing', MsgDeleteListing],
+  ['/likechain.likenft.v1.MsgBuyNFT', MsgBuyNFT],
+  ['/likechain.likenft.v1.MsgCreateOffer', MsgCreateOffer],
+  ['/likechain.likenft.v1.MsgUpdateOffer', MsgUpdateOffer],
+  ['/likechain.likenft.v1.MsgDeleteOffer', MsgDeleteOffer],
+  ['/likechain.likenft.v1.MsgSellNFT', MsgSellNFT],
 ];
 
 export const registryTypes: ReadonlyArray<[string, GeneratedType]> = [

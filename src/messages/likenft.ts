@@ -160,3 +160,155 @@ export function formatMsgDeleteRoyaltyConfig(
   };
   return message;
 }
+
+export function formatMsgCreateListing(
+  senderAddress: string,
+  classId: string,
+  nftId: string,
+  price: string,
+  expiration?: number,
+): EncodeObject {
+  const message = {
+    typeUrl: '/likechain.likenft.v1.MsgCreateListing',
+    value: {
+      creator: senderAddress,
+      classId,
+      nftId,
+      price,
+      expiration: expiration ? new Date(expiration) : undefined,
+    },
+  };
+  return message;
+}
+
+export function formatMsgUpdateListing(
+  senderAddress: string,
+  classId: string,
+  nftId: string,
+  price: string,
+  expiration?: number,
+): EncodeObject {
+  const message = {
+    typeUrl: '/likechain.likenft.v1.MsgUpdateListing',
+    value: {
+      creator: senderAddress,
+      classId,
+      nftId,
+      price,
+      expiration: expiration ? new Date(expiration) : undefined,
+    },
+  };
+  return message;
+}
+
+export function formatMsgDeleteListing(
+  senderAddress: string,
+  classId: string,
+  nftId: string,
+): EncodeObject {
+  const message = {
+    typeUrl: '/likechain.likenft.v1.MsgDeleteListing',
+    value: {
+      creator: senderAddress,
+      classId,
+      nftId,
+    },
+  };
+  return message;
+}
+
+export function formatMsgBuyNFT(
+  creator: string,
+  seller: string,
+  classId: string,
+  nftId: string,
+  price: string,
+): EncodeObject {
+  const message = {
+    typeUrl: '/likechain.likenft.v1.MsgBuyNFT',
+    value: {
+      creator,
+      classId,
+      nftId,
+      seller,
+      price,
+    },
+  };
+  return message;
+}
+
+export function formatMsgCreateOffer(
+  senderAddress: string,
+  classId: string,
+  nftId: string,
+  price: string,
+  expiration?: number,
+): EncodeObject {
+  const message = {
+    typeUrl: '/likechain.likenft.v1.MsgCreateOffer',
+    value: {
+      creator: senderAddress,
+      classId,
+      nftId,
+      price,
+      expiration: expiration ? new Date(expiration) : undefined,
+    },
+  };
+  return message;
+}
+
+export function formatMsgUpdateOffer(
+  senderAddress: string,
+  classId: string,
+  nftId: string,
+  price: string,
+  expiration?: number,
+): EncodeObject {
+  const message = {
+    typeUrl: '/likechain.likenft.v1.MsgUpdateOffer',
+    value: {
+      creator: senderAddress,
+      classId,
+      nftId,
+      price,
+      expiration: expiration ? new Date(expiration) : undefined,
+    },
+  };
+  return message;
+}
+
+export function formatMsgDeleteOffer(
+  senderAddress: string,
+  classId: string,
+  nftId: string,
+): EncodeObject {
+  const message = {
+    typeUrl: '/likechain.likenft.v1.MsgDeleteOffer',
+    value: {
+      creator: senderAddress,
+      classId,
+      nftId,
+    },
+  };
+  return message;
+}
+
+export function formatMsgSellNFT(
+  creator: string,
+  buyer: string,
+  classId: string,
+  nftId: string,
+  price: string,
+): EncodeObject {
+  const message = {
+    typeUrl: '/likechain.likenft.v1.MsgSellNFT',
+    value: {
+      creator,
+      classId,
+      nftId,
+      buyer,
+      price,
+    },
+  };
+  return message;
+}

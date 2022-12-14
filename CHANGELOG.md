@@ -1,6 +1,14 @@
 # Changelog
 ## [Unreleased]
 
+## [0.5.1] - 2022-12-14
+### Added
+- Add royalty config in query client
+- Add NFT marketplace related messages and query
+### Changed
+- Support array and string type for ISCN keywords
+- Support using `contentMetadata` object directly when creating or updating ISCN
+
 ## [0.5.0] - 2022-11-24
 ### Added
 - Add royalty config functions

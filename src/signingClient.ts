@@ -45,6 +45,14 @@ import {
   formatMsgSend,
   formatMsgUpdateClass,
   formatMsgUpdateRoyaltyConfig,
+  formatMsgCreateListing,
+  formatMsgUpdateListing,
+  formatMsgDeleteListing,
+  formatMsgBuyNFT,
+  formatMsgCreateOffer,
+  formatMsgUpdateOffer,
+  formatMsgDeleteOffer,
+  formatMsgSellNFT,
 } from './messages/likenft';
 import {
   formatMsgExecSendAuthorization,
@@ -454,6 +462,214 @@ export class ISCNSigningClient {
     const messages = [formatMsgDeleteRoyaltyConfig(
       senderAddress,
       classId,
+    )];
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
+    }
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
+  async createNFTListing(
+    senderAddress: string,
+    classId: string,
+    nftId: string,
+    price: number,
+    expirationInMs?: number,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [formatMsgCreateListing(
+      senderAddress,
+      classId,
+      nftId,
+      new BigNumber(price).shiftedBy(9).toFixed(0),
+      expirationInMs,
+    )];
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
+    }
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
+  async updateNFTListing(
+    senderAddress: string,
+    classId: string,
+    nftId: string,
+    price: number,
+    expirationInMs?: number,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [formatMsgUpdateListing(
+      senderAddress,
+      classId,
+      nftId,
+      new BigNumber(price).shiftedBy(9).toFixed(0),
+      expirationInMs,
+    )];
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
+    }
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
+  async deleteNFTListing(
+    senderAddress: string,
+    classId: string,
+    nftId: string,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [formatMsgDeleteListing(
+      senderAddress,
+      classId,
+      nftId,
+    )];
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
+    }
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
+  async buyNFT(
+    senderAddress: string,
+    classId: string,
+    nftId: string,
+    seller: string,
+    price: number,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [formatMsgBuyNFT(
+      senderAddress,
+      classId,
+      nftId,
+      seller,
+      new BigNumber(price).shiftedBy(9).toFixed(0),
+    )];
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
+    }
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
+  async createNFTOffer(
+    senderAddress: string,
+    classId: string,
+    nftId: string,
+    price: number,
+    expirationInMs?: number,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [formatMsgCreateOffer(
+      senderAddress,
+      classId,
+      nftId,
+      new BigNumber(price).shiftedBy(9).toFixed(0),
+      expirationInMs,
+    )];
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
+    }
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
+  async updateNFTOffer(
+    senderAddress: string,
+    classId: string,
+    nftId: string,
+    price: number,
+    expirationInMs?: number,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [formatMsgUpdateOffer(
+      senderAddress,
+      classId,
+      nftId,
+      new BigNumber(price).shiftedBy(9).toFixed(0),
+      expirationInMs,
+    )];
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
+    }
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
+  async deleteNFTOffer(
+    senderAddress: string,
+    classId: string,
+    nftId: string,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [formatMsgDeleteOffer(
+      senderAddress,
+      classId,
+      nftId,
+    )];
+    let fee = inputFee;
+    if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    if (!fee) {
+      const { memo } = signOptions;
+      fee = estimateMsgTxGas(messages[0], { denom: this.denom, gasPrice, memo });
+    }
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
+  async sellNFT(
+    senderAddress: string,
+    classId: string,
+    nftId: string,
+    buyer: string,
+    price: number,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [formatMsgSellNFT(
+      senderAddress,
+      classId,
+      nftId,
+      buyer,
+      new BigNumber(price).shiftedBy(9).toFixed(0),
     )];
     let fee = inputFee;
     if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');

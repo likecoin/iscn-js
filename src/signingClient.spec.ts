@@ -7,7 +7,7 @@ import { computeTransactionHash } from './tests/utils';
 import { mnemonic0, address1 } from './tests/key.json';
 import testData1 from './tests/iscn-sample-1.json';
 import testData2 from './tests/iscn-sample-2.json';
-import { ISCN_ID, NFT_CLASS_ID } from './tests/constant';
+import { ISCN_ID, NFT_CLASS_ID, NFT_ID } from './tests/constant';
 
 let signingClient: ISCNSigningClient | undefined;
 let signingWallet: AccountData | undefined;
@@ -165,6 +165,40 @@ describe('signingClient Royalty', () => {
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
     expect(hash).toEqual('EB6A9B6C6C95D1C7FBD7C96518944FDD77D7949A92F266D38C5A0435AE80EF46');
+  });
+});
+
+describe('signingClient NFT marketplace', () => {
+  test('Sign create NFT listing', async () => {
+    const { client, wallet } = await getSigner();
+    const signedTxRaw = await client.createNFTListing(
+      wallet.address,
+      NFT_CLASS_ID,
+      NFT_ID,
+      100,
+      867686400000,
+      {
+        broadcast: false, sequence: 1, accountNumber: 0, chainId: 'likecoin-mainnet-2',
+      },
+    );
+    const hash = await computeTransactionHash(signedTxRaw as TxRaw);
+    expect(hash).toEqual('FA38C8FD430A10EAFEEA34DD80F6B25174159943CC93CF712E255633B25ABE41');
+  });
+
+  test('Sign create NFT offer', async () => {
+    const { client, wallet } = await getSigner();
+    const signedTxRaw = await client.createNFTOffer(
+      wallet.address,
+      NFT_CLASS_ID,
+      NFT_ID,
+      100,
+      867686400000,
+      {
+        broadcast: false, sequence: 1, accountNumber: 0, chainId: 'likecoin-mainnet-2',
+      },
+    );
+    const hash = await computeTransactionHash(signedTxRaw as TxRaw);
+    expect(hash).toEqual('67BE7498AF5BA3C9AFF8641953BA8B3A97FBDA677F079351CC067FA7AEBF527B');
   });
 });
 

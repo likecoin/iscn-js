@@ -2,6 +2,8 @@
 import { EncodeObject } from '@cosmjs/proto-signing';
 import { ClassConfig } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/class_data';
 import { RoyaltyConfigInput } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/royalty_config';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import Long from 'long';
 import { MintNFTData, NewNFTClassData } from '../types';
 
 export function formatMsgNewClass(
@@ -174,8 +176,8 @@ export function formatMsgCreateListing(
       creator: senderAddress,
       classId,
       nftId,
-      price,
-      expiration: expiration ? new Date(expiration) : undefined,
+      price: Long.fromString(price),
+      expiration: expiration ? new Date(expiration) : new Date(Date.now() + 86400 * 180),
     },
   };
   return message;
@@ -194,8 +196,8 @@ export function formatMsgUpdateListing(
       creator: senderAddress,
       classId,
       nftId,
-      price,
-      expiration: expiration ? new Date(expiration) : undefined,
+      price: Long.fromString(price),
+      expiration: expiration ? new Date(expiration) : new Date(Date.now() + 86400 * 180),
     },
   };
   return message;
@@ -231,7 +233,7 @@ export function formatMsgBuyNFT(
       classId,
       nftId,
       seller,
-      price,
+      price: Long.fromString(price),
     },
   };
   return message;
@@ -250,8 +252,8 @@ export function formatMsgCreateOffer(
       creator: senderAddress,
       classId,
       nftId,
-      price,
-      expiration: expiration ? new Date(expiration) : undefined,
+      price: Long.fromString(price),
+      expiration: expiration ? new Date(expiration) : new Date(Date.now() + 86400 * 180),
     },
   };
   return message;
@@ -270,8 +272,8 @@ export function formatMsgUpdateOffer(
       creator: senderAddress,
       classId,
       nftId,
-      price,
-      expiration: expiration ? new Date(expiration) : undefined,
+      price: Long.fromString(price),
+      expiration: expiration ? new Date(expiration) : new Date(Date.now() + 86400 * 180),
     },
   };
   return message;
@@ -307,7 +309,7 @@ export function formatMsgSellNFT(
       classId,
       nftId,
       buyer,
-      price,
+      price: Long.fromString(price),
     },
   };
   return message;

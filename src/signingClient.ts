@@ -477,7 +477,7 @@ export class ISCNSigningClient {
     senderAddress: string,
     classId: string,
     nftId: string,
-    price: string,
+    price: number,
     expirationInMs?: number,
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ): Promise<TxRaw | DeliverTxResponse> {
@@ -487,7 +487,7 @@ export class ISCNSigningClient {
       senderAddress,
       classId,
       nftId,
-      price,
+      new BigNumber(price).shiftedBy(9).toFixed(0),
       expirationInMs,
     )];
     let fee = inputFee;
@@ -504,7 +504,7 @@ export class ISCNSigningClient {
     senderAddress: string,
     classId: string,
     nftId: string,
-    price: string,
+    price: number,
     expirationInMs?: number,
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ): Promise<TxRaw | DeliverTxResponse> {
@@ -514,7 +514,7 @@ export class ISCNSigningClient {
       senderAddress,
       classId,
       nftId,
-      price,
+      new BigNumber(price).shiftedBy(9).toFixed(0),
       expirationInMs,
     )];
     let fee = inputFee;
@@ -555,7 +555,7 @@ export class ISCNSigningClient {
     classId: string,
     nftId: string,
     seller: string,
-    price: string,
+    price: number,
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
@@ -565,7 +565,7 @@ export class ISCNSigningClient {
       classId,
       nftId,
       seller,
-      price,
+      new BigNumber(price).shiftedBy(9).toFixed(0),
     )];
     let fee = inputFee;
     if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
@@ -581,7 +581,7 @@ export class ISCNSigningClient {
     senderAddress: string,
     classId: string,
     nftId: string,
-    price: string,
+    price: number,
     expirationInMs?: number,
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ): Promise<TxRaw | DeliverTxResponse> {
@@ -591,7 +591,7 @@ export class ISCNSigningClient {
       senderAddress,
       classId,
       nftId,
-      price,
+      new BigNumber(price).shiftedBy(9).toFixed(0),
       expirationInMs,
     )];
     let fee = inputFee;
@@ -608,7 +608,7 @@ export class ISCNSigningClient {
     senderAddress: string,
     classId: string,
     nftId: string,
-    price: string,
+    price: number,
     expirationInMs?: number,
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ): Promise<TxRaw | DeliverTxResponse> {
@@ -618,7 +618,7 @@ export class ISCNSigningClient {
       senderAddress,
       classId,
       nftId,
-      price,
+      new BigNumber(price).shiftedBy(9).toFixed(0),
       expirationInMs,
     )];
     let fee = inputFee;
@@ -659,7 +659,7 @@ export class ISCNSigningClient {
     classId: string,
     nftId: string,
     buyer: string,
-    price: string,
+    price: number,
     { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
   ): Promise<TxRaw | DeliverTxResponse> {
     const client = this.signingClient;
@@ -669,7 +669,7 @@ export class ISCNSigningClient {
       classId,
       nftId,
       buyer,
-      price,
+      new BigNumber(price).shiftedBy(9).toFixed(0),
     )];
     let fee = inputFee;
     if (fee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');

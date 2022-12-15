@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { EncodeObject } from '@cosmjs/proto-signing';
+import { Buffer } from 'buffer/';
 import { ISCNSignPayload, Stakeholder } from '../types';
 
 export function formatISCNPayload(payload: ISCNSignPayload, version = 1): {

@@ -1,5 +1,6 @@
 import { StdFee } from '@cosmjs/stargate';
 import BigNumber from 'bignumber.js';
+import { Buffer } from 'buffer/';
 import jsonStringify from 'fast-json-stable-stringify';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { EncodeObject } from '@cosmjs/proto-signing';

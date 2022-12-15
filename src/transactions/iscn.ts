@@ -2,6 +2,7 @@ import jsonStringify from 'fast-json-stable-stringify';
 import BigNumber from 'bignumber.js';
 import { StdFee } from '@cosmjs/stargate';
 import { Coin } from 'cosmjs-types/cosmos/base/v1beta1/coin';
+import { Buffer } from 'buffer/';
 
 import {
   ISCN_REGISTRY_NAME,

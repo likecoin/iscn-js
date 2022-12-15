@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { EncodeObject } from '@cosmjs/proto-signing';
 import { Coin } from 'cosmjs-types/cosmos/base/v1beta1/coin';
+import { Buffer } from 'buffer/';
 
 import { formatGasFee } from './gas';
 import ISCNQueryClient from '../queryClient';

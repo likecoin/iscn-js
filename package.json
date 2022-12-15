@@ -3,7 +3,7 @@
   "version": "0.5.1",
   "description": "",
   "main": "./dist/index.js",
-  "module": "./dist/esm/index.js",
+  "module": "./dist/module/index.js",
   "scripts": {
     "build": "rm -rf dist && tsc && tsc --project tsconfig.es6.json",
     "lint": "eslint src --ext .ts",

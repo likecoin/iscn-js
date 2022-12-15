@@ -1,6 +1,12 @@
 # Changelog
 ## [Unreleased]
 
+## [0.5.2] - 2022-12-15
+### Changed
+- Update @likecoin/iscn-message-types to 0.0.5
+### Fixed
+- Fix invalid module path in package.json
+
 ## [0.5.1] - 2022-12-14
 ### Added
 - Add royalty config in query client

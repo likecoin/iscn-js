@@ -48,7 +48,7 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1): {
 }
 
 export function formatMsgCreateIscnRecord(
-  senderAddress: string, payload: ISCNSignPayload,
+  senderAddress: string, payload: ISCNSignPayload, nonce?: number,
 ): EncodeObject {
   const record = formatISCNPayload(payload);
   const message = {
@@ -56,6 +56,7 @@ export function formatMsgCreateIscnRecord(
     value: {
       from: senderAddress,
       record,
+      nonce,
     },
   };
   return message;

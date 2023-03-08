@@ -129,7 +129,7 @@ export class ISCNSigningClient {
 
   async esimateNFTClassTxGasAndFee(
     payload: NewNFTClassData,
-    classConfig: ClassConfig,
+    classConfig?: ClassConfig,
     { gasPrice, memo }: { gasPrice?: number, memo?: string } = {},
   ): Promise<{ gas: { fee: StdFee; }; nftFee: Coin; }> {
     const msg = formatMsgNewClass(STUB_WALLET, STUB_ISCN_ID, payload, classConfig);

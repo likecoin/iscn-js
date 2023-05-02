@@ -1,6 +1,12 @@
 # Changelog
 ## [Unreleased]
 
+## [0.5.3] - 2023-05-02
+### Changed
+- `estimateMsgTxGas()` would now return gas amount not lower than `DEFAULT_MESSAGE_GAS(200000)`;
+### Fixed
+- Fix class config was not set as optional param in `esimateNFTClassTxGasAndFee()`
+
 ## [0.5.2] - 2022-12-15
 ### Changed
 - Update @likecoin/iscn-message-types to 0.0.5

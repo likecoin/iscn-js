@@ -66,7 +66,7 @@ export function estimateMsgTxGas(msg: EncodeObject, {
   const gasUsedEstimation = gasUsedEstimationBeforeBuffer
     .multipliedBy(gasMultiplier)
     .multipliedBy(GAS_ESTIMATOR_BUFFER_RATIO);
-  const gas = gasUsedEstimation.toFixed(0, 0);
+  const gas = BigNumber.max(DEFAULT_MESSAGE_GAS, gasUsedEstimation).toFixed(0, 0);
   return formatGasFee({ gas, gasPrice, denom });
 }
 

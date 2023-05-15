@@ -33,10 +33,10 @@ export function getMsgCreateIscnRecordJSON(
   return jsonStableStringify(obj);
 }
 
-export function getISCNIdPrefix(from: string, payload: ISCNRecordData, nonce = 0): string {
+export function getISCNIdPrefix(from: string, payload: ISCNRecordData, nonce = 0, registryName = 'likecoin-chain'): string {
   const json = getMsgCreateIscnRecordJSON(from, payload, nonce);
   const sha256 = createHash('sha256');
-  return sha256.update(`likecoin-chain/${json}`).digest('base64')
+  return sha256.update(`${registryName}/${json}`).digest('base64')
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=/g, '');

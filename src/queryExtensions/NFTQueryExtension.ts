@@ -9,7 +9,7 @@ import {
   QueryNFTsResponse,
   QueryOwnerResponse,
   QuerySupplyResponse,
-} from '@likecoin/iscn-message-types/dist/backport/nft/v1beta1/query';
+} from 'cosmjs-types/cosmos/nft/v1beta1/query';
 import { PageRequest } from 'cosmjs-types/cosmos/base/query/v1beta1/pagination';
 
 export interface NFTExtension {

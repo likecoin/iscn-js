@@ -8,7 +8,7 @@ import {
   MsgUpdateIscnRecord,
   MsgChangeIscnRecordOwnership,
 } from '@likecoin/iscn-message-types/dist/likechain/iscn/tx';
-import { Class, NFT } from '@likecoin/iscn-message-types/dist/backport/nft/v1beta1/nft';
+import { Class, NFT } from 'cosmjs-types/cosmos/nft/v1beta1/nft';
 import { NFTData } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/nft_data';
 import { ClassData } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/class_data';
 import { MsgGrant } from 'cosmjs-types/cosmos/authz/v1beta1/tx';

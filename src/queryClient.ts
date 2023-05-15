@@ -6,7 +6,7 @@ import {
 } from '@cosmjs/stargate';
 import { setupAuthzExtension, AuthzExtension } from '@cosmjs/stargate/build/modules/authz/queries';
 import { PageRequest, PageResponse } from 'cosmjs-types/cosmos/base/query/v1beta1/pagination';
-import { NFT } from '@likecoin/iscn-message-types/dist/backport/nft/v1beta1/nft';
+import { NFT } from 'cosmjs-types/cosmos/nft/v1beta1/nft';
 
 import { setupISCNExtension, ISCNExtension } from './queryExtensions/ISCNQueryExtension';
 import { setupNFTExtension, NFTExtension } from './queryExtensions/NFTQueryExtension';

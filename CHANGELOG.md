@@ -1,5 +1,8 @@
 # Changelog
 ## [Unreleased]
+### Changed
+- Update @likecoin/iscn-message-types to 0.0.6
+- `getISCNIdPrefix` now allows custom registry name for computing ISCN ID
 
 ## [0.5.3] - 2023-05-02
 ### Changed

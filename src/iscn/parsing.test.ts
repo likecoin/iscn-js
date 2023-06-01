@@ -1,4 +1,9 @@
-import { calculateStakeholderRewards, parseStakeholderAddresses, parseAndCalculateStakeholderRewards } from './parsing';
+import {
+  calculateStakeholderRewards,
+  parseStakeholderAddresses,
+  parseAndCalculateStakeholderRewards,
+  getISCNPrefix,
+} from './parsing';
 
 const iscnDataTestnet = {
   '@context': {
@@ -194,6 +199,21 @@ const iscnDataMainnet2 = {
     },
   ],
 };
+
+const ISCNPrefix = 'iscn://likecoin-chain/4UC3ZhKokFv3_rxP1p8QtCuDfHAcxcDZhbe4-rPMBGI';
+const ISCNId = `${ISCNPrefix}/2`;
+
+describe('getISCNPrefix', () => {
+  test('getISCNPrefix with full version', () => {
+    const res = getISCNPrefix(ISCNPrefix);
+    expect(res).toEqual(ISCNPrefix);
+  });
+
+  test('getISCNPrefix with prefix', () => {
+    const res = getISCNPrefix(ISCNId);
+    expect(res).toEqual(ISCNPrefix);
+  });
+});
 
 describe('stakeholderRatioCalculation', () => {
   test('calculateStakeholderRewards testnet totalAmount100', () => {

@@ -3,6 +3,13 @@ import { getLikeWalletAddress, isValidAddress, changeAddressPrefix } from './add
 import { getLikeWalletByLikerId } from './likerIdsAddresses';
 import { ISCNRecordData } from '../types';
 
+export function getISCNPrefix(input: string): string {
+  const res = /^(iscn:\/\/likecoin-chain\/[A-Za-z0-9-_]+)(?:\/([0-9]*))?$/.exec(input);
+  if (!res) throw new Error(`Invalid ISCN ID ${input}`);
+  const [, prefix] = res;
+  return prefix;
+}
+
 async function getLikeWalletFromId(
   id: string,
   { LIKE_CO_API_ROOT = 'https://api.like.co' }: { LIKE_CO_API_ROOT?: string } = {},

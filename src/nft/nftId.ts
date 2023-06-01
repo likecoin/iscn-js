@@ -2,14 +2,13 @@ import { createHash } from 'crypto';
 import { bech32 } from 'bech32';
 import { getISCNPrefix } from '../iscn/parsing';
 
-export function calculateNFTClassIdByAccount(
-  account: string,
-  numberOfExistingNFTClass = 0,
+function calculateNFTClassId(
+  prefix: Uint8Array,
+  serial = 0,
 ): string {
-  let bytes = Buffer.from(account, 'utf8');
-  bytes = Buffer.concat([
-    bytes,
-    Buffer.from(numberOfExistingNFTClass.toString(), 'utf8'),
+  const bytes = Buffer.concat([
+    prefix,
+    Buffer.from(serial.toString(), 'utf8'),
   ]);
   const sha256 = createHash('sha256');
   const hash = sha256.update(bytes).digest();
@@ -21,5 +20,8 @@ export function calculateNFTClassIdByISCNId(
   numberOfExistingNFTClass = 0,
 ): string {
   const iscnIdPrefix = getISCNPrefix(iscnId);
-  return calculateNFTClassIdByAccount(iscnIdPrefix, numberOfExistingNFTClass);
+  const prefix = Buffer.from(iscnIdPrefix, 'utf8');
+  return calculateNFTClassId(prefix, numberOfExistingNFTClass);
 }
+
+export default calculateNFTClassIdByISCNId;

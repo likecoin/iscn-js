@@ -1,8 +1,9 @@
 # Changelog
 ## [Unreleased]
+
+## [0.5.4] - 2023-06-01
 ### Added
 - Add offline calculate NFT Class ID functions
-
 
 ## [0.5.3] - 2023-05-02
 ### Changed

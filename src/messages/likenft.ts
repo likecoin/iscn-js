@@ -31,7 +31,7 @@ export function formatMsgNewClass(
           ...(nftClassData.metadata || {}),
         }), 'utf8'),
         config: classConfig || {
-          burnable: false,
+          burnable: true,
         },
       },
     },
@@ -53,7 +53,7 @@ export function formatMsgUpdateClass(
       input: {
         ...nftClassData,
         config: classConfig || {
-          burnable: false,
+          burnable: true,
         },
       },
     },

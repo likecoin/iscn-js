@@ -1,6 +1,16 @@
 # Changelog
 ## [Unreleased]
 
+## [0.6.0] - 2023-06-06
+### Changed
+- Upgrade to Cosmos SDK v0.46 and CosmJS v0.30.1
+- Upgrade Node.js requirement to >=16
+- Upgrade @likecoin/iscn-message-types to 0.0.7
+
+### Added
+- Add calculating ISCN ID prefix by metadata
+- Add nonce support in ISCN payload
+
 ## [0.5.4] - 2023-06-01
 ### Added
 - Add offline calculate NFT Class ID functions

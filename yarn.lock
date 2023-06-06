@@ -647,10 +647,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@likecoin/iscn-message-types@0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@likecoin/iscn-message-types/-/iscn-message-types-0.0.6.tgz#3a1137141a221ea55ab7776237fc3960b9e478bd"
-  integrity sha512-v9ZQnfBuBO4LqS2cIh6JhgjgCfl6xryXRxCf4gDQYCOBORlteMrV2dSjPVhjcD16DliBCn5EIY/rHPhsLfn1oA==
+"@likecoin/iscn-message-types@0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@likecoin/iscn-message-types/-/iscn-message-types-0.0.7.tgz#fde2693bb5c650932e62b30279458256c804eed9"
+  integrity sha512-xcYcFvvH2NXlalRwxRG/jrwbXWOPHQy1sVZRztuGcdFyssDTdF8YfAxN0wdMVhIuijdVzN7jSnOWRPX5Uch2qg==
   dependencies:
     buffer "^6.0.3"
 

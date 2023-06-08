@@ -1,5 +1,6 @@
 # Changelog
 ## [Unreleased]
+- Upgrade cosmjs-types to v0.8.0
 
 ## [0.6.0] - 2023-06-06
 ### Changed

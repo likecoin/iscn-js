@@ -63,6 +63,7 @@ import signOrBroadcast from './transactions/sign';
 import { estimateISCNTxFee, estimateISCNTxGas } from './transactions/iscn';
 import { formatGasFee, estimateMsgTxGas, estimateMsgsTxGas } from './transactions/gas';
 import estimateNFTTxFee from './transactions/nft';
+import aminoTypes from './messages/amino';
 
 export class ISCNSigningClient {
   private signingClient: SigningStargateClient | null = null;
@@ -95,7 +96,7 @@ export class ISCNSigningClient {
     this.signingClient = await SigningStargateClient.connectWithSigner(
       this.rpcURL,
       signer,
-      { registry },
+      { registry, aminoTypes },
     );
   }
 

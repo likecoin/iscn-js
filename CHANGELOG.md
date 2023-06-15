@@ -1,5 +1,9 @@
 # Changelog
 ## [Unreleased]
+
+## [0.6.1] - 2023-06-16
+### Changed
+- Support amino signing for iscn, likenft and some authz messages
 - Upgrade cosmjs-types to v0.8.0
 
 ## [0.6.0] - 2023-06-06

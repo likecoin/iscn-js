@@ -34,6 +34,41 @@ export function formatMsgGrant(
   };
 }
 
+export function formatMsgGrantGenericAuthorization(
+  senderAddress: string,
+  granteeAddress: string,
+  messageTypeUrl: string,
+  expirationDateInMs: number,
+): EncodeObject {
+  return formatMsgGrant(
+    senderAddress,
+    granteeAddress,
+    '/cosmos.authz.v1beta1.GenericAuthorization',
+    GenericAuthorization.encode(
+      GenericAuthorization.fromPartial({
+        msg: messageTypeUrl,
+      }),
+    ).finish(),
+    expirationDateInMs,
+  );
+}
+
+export function formatMsgRevokeGenericAuthorization(
+  senderAddress: string,
+  granteeAddress: string,
+  messageTypeUrl: string,
+): EncodeObject {
+  const message = {
+    typeUrl: '/cosmos.authz.v1beta1.MsgRevoke',
+    value: {
+      granter: senderAddress,
+      grantee: granteeAddress,
+      msgTypeUrl: messageTypeUrl,
+    },
+  };
+  return message;
+}
+
 export function formatMsgGrantSendAuthorization(
   senderAddress: string,
   granteeAddress: string,
@@ -84,15 +119,11 @@ export function formatMsgRevokeSendAuthorization(
   senderAddress: string,
   granteeAddress: string,
 ): EncodeObject {
-  const message = {
-    typeUrl: '/cosmos.authz.v1beta1.MsgRevoke',
-    value: {
-      granter: senderAddress,
-      grantee: granteeAddress,
-      msgTypeUrl: '/cosmos.bank.v1beta1.MsgSend',
-    },
-  };
-  return message;
+  return formatMsgRevokeGenericAuthorization(
+    senderAddress,
+    granteeAddress,
+    '/cosmos.bank.v1beta1.MsgSend',
+  );
 }
 
 export function createAuthzAminoConverters(): Record<string, AminoConverter> {

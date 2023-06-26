@@ -56,7 +56,9 @@ import {
 } from './messages/likenft';
 import {
   formatMsgExecSendAuthorization,
+  formatMsgGrantGenericAuthorization,
   formatMsgGrantSendAuthorization,
+  formatMsgRevokeGenericAuthorization,
   formatMsgRevokeSendAuthorization,
 } from './messages/authz';
 import signOrBroadcast from './transactions/sign';
@@ -682,6 +684,59 @@ export class ISCNSigningClient {
     return response;
   }
 
+  async createGenericGrant(
+    senderAddress: string,
+    granteeAddress: string,
+    messageTypeUrl: string,
+    expirationInMs: number,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [formatMsgGrantGenericAuthorization(
+      senderAddress,
+      granteeAddress,
+      messageTypeUrl,
+      expirationInMs,
+    )];
+    let fee = inputFee;
+    if (!fee) {
+      fee = {
+        amount: [{
+          amount: new BigNumber(GRANT_SEND_AUTH_GAS)
+            .multipliedBy(gasPrice || DEFAULT_GAS_PRICE_NUMBER).toFixed(0, 0),
+          denom: this.denom,
+        }],
+        gas: GRANT_SEND_AUTH_GAS.toString(),
+      };
+    } else if (gasPrice) {
+      throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    }
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
+  async revokeGenericGrant(
+    senderAddress: string,
+    granteeAddress: string,
+    messageTypeUrl: string,
+    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+  ): Promise<TxRaw | DeliverTxResponse> {
+    const client = this.signingClient;
+    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
+    const messages = [formatMsgRevokeGenericAuthorization(
+      senderAddress, granteeAddress, messageTypeUrl,
+    )];
+    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
+    const fee = inputFee || formatGasFee({
+      gas: REVOKE_SEND_AUTH_GAS,
+      gasPrice,
+      denom: this.denom,
+    });
+    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
+    return response;
+  }
+
   async createSendGrant(
     senderAddress: string,
     granteeAddress: string,
@@ -742,19 +797,9 @@ export class ISCNSigningClient {
   async revokeSendGrant(
     senderAddress: string,
     granteeAddress: string,
-    { fee: inputFee, gasPrice, ...signOptions }: ISCNSignOptions = {},
+    signOptions: ISCNSignOptions = {},
   ): Promise<TxRaw | DeliverTxResponse> {
-    const client = this.signingClient;
-    if (!client) throw new Error('SIGNING_CLIENT_NOT_CONNECTED');
-    const messages = [formatMsgRevokeSendAuthorization(senderAddress, granteeAddress)];
-    if (inputFee && gasPrice) throw new Error('CANNOT_SET_BOTH_FEE_AND_GASPRICE');
-    const fee = inputFee || formatGasFee({
-      gas: REVOKE_SEND_AUTH_GAS,
-      gasPrice,
-      denom: this.denom,
-    });
-    const response = await signOrBroadcast(senderAddress, messages, fee, client, signOptions);
-    return response;
+    return this.revokeGenericGrant(senderAddress, granteeAddress, '/cosmos.bank.v1beta1.MsgSend', signOptions);
   }
 }
 

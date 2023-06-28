@@ -1,6 +1,9 @@
 # Changelog
 ## [Unreleased]
 
+## [0.6.3] - 2023-06-28
+- Add GenericAuthorization related functions
+
 ## [0.6.2] - 2023-06-16
 - Proper release of 0.6.1
 

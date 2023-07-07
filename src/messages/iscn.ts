@@ -1,6 +1,8 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { EncodeObject } from '@cosmjs/proto-signing';
 import { Buffer } from 'buffer/';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import Long from 'long';
 import { ISCNSignPayload, Stakeholder } from '../types';
 
 export function formatISCNPayload(payload: ISCNSignPayload, version = 1): {
@@ -56,7 +58,7 @@ export function formatMsgCreateIscnRecord(
     value: {
       from: senderAddress,
       record,
-      nonce,
+      nonce: nonce ? Long.fromNumber(nonce) : undefined,
     },
   };
   return message;

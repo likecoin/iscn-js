@@ -1,14 +1,24 @@
 import { createHash } from 'crypto';
 import jsonStableStringify from 'fast-json-stable-stringify';
-import { ISCNRecordData } from '../types';
+import { formatISCNPayload } from '../messages/iscn';
+import { ISCNSignPayload } from '../types';
 
-export function getMsgCreateIscnRecordJSON(
+export function getMsgCreateISCNRecordJSON(
   iscnSender: string,
-  iscnRecord: ISCNRecordData,
+  payload: ISCNSignPayload,
   nonce = 0,
 ): string {
-  const record = {} as any;
-  Object.entries(iscnRecord).forEach(([key, value]) => {
+  const bufferRecord = formatISCNPayload(payload);
+  const stringRecord = {
+    recordNotes: bufferRecord.recordNotes,
+    contentFingerprints: bufferRecord.contentFingerprints,
+    stakeholders: bufferRecord.stakeholders
+      .map((b) => b.toString())
+      .map((s) => JSON.parse(s)),
+    contentMetadata: JSON.parse(bufferRecord.contentMetadata.toString()),
+  };
+  const record = { contentMetadata: null } as any;
+  Object.entries(stringRecord).forEach(([key, value]) => {
     if (typeof value === 'string' && value !== '') {
       // handle recordNotes
       record[key] = value;
@@ -33,8 +43,8 @@ export function getMsgCreateIscnRecordJSON(
   return jsonStableStringify(obj);
 }
 
-export function getISCNIdPrefix(from: string, payload: ISCNRecordData, nonce = 0, registryName = 'likecoin-chain'): string {
-  const json = getMsgCreateIscnRecordJSON(from, payload, nonce);
+export function getISCNIdPrefix(from: string, payload: ISCNSignPayload, nonce = 0, registryName = 'likecoin-chain'): string {
+  const json = getMsgCreateISCNRecordJSON(from, payload, nonce);
   const sha256 = createHash('sha256');
   return sha256.update(`${registryName}/${json}`).digest('base64')
     .replace(/\+/g, '-')

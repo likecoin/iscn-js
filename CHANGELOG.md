@@ -1,6 +1,9 @@
 # Changelog
 ## [Unreleased]
 
+## [0.6.4] - 2023-07-08
+- Fix getISCNIdPrefix() does not calculate the expected ISCN hash of createISCNRecord()
+
 ## [0.6.3] - 2023-06-28
 - Add GenericAuthorization related functions
 

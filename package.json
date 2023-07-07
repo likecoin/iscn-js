@@ -1,6 +1,6 @@
 {
   "name": "@likecoin/iscn-js",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "",
   "engines": {
     "node": ">=16"

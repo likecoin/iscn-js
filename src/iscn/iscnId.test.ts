@@ -48,6 +48,13 @@ const iscnSignPayloadEmpty = {
   contentMetadata: {},
 } as ISCNSignPayload;
 
+const iscnSignPayloadToEscape = {
+  recordNotes: '<>&\u2028\u2029\u2029\u2028&><',
+  contentFingerprints: [],
+  stakeholders: [],
+  contentMetadata: {},
+} as ISCNSignPayload;
+
 describe('getMsgCreateIscnRecordJSON', () => {
   test('Test basic message', async () => {
     const res = getMsgCreateISCNRecordJSON(
@@ -117,5 +124,13 @@ describe('getISCNId', () => {
       1,
     );
     expect(res).toEqual('9BTHkP5NiO_Zo2L5rnXy7H4bGocv3qZp7UH82kYVvjY');
+  });
+
+  test('Test message with chars need to be escaped', async () => {
+    const res = getISCNIdPrefix(
+      sender,
+      iscnSignPayloadToEscape,
+    );
+    expect(res).toEqual('42NjT3XiIHNOrZL54UJb0QDoZOyaVAPfB_9cmgrlqeM');
   });
 });

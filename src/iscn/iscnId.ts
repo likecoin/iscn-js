@@ -43,10 +43,21 @@ export function getMsgCreateISCNRecordJSON(
   return jsonStableStringify(obj);
 }
 
+// reference to: https://pkg.go.dev/encoding/json#Marshal
+function escapeUnsafeChar(s: string): string {
+  return s
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+}
+
 export function getISCNIdPrefix(from: string, payload: ISCNSignPayload, nonce = 0, registryName = 'likecoin-chain'): string {
   const json = getMsgCreateISCNRecordJSON(from, payload, nonce);
+  const escaped = escapeUnsafeChar(json);
   const sha256 = createHash('sha256');
-  return sha256.update(`${registryName}/${json}`).digest('base64')
+  return sha256.update(`${registryName}/${escaped}`).digest('base64')
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=/g, '');

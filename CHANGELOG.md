@@ -1,6 +1,9 @@
 # Changelog
 ## [Unreleased]
 
+## [0.6.5] - 2023-07-17
+- Fix getISCNIdPrefix() does not escape the string in the way Go's json.Marshal does.
+
 ## [0.6.4] - 2023-07-08
 - Fix getISCNIdPrefix() does not calculate the expected ISCN hash of createISCNRecord()
 

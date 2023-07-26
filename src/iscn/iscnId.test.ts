@@ -48,8 +48,32 @@ const iscnSignPayloadEmpty = {
   contentMetadata: {},
 } as ISCNSignPayload;
 
+const toEscapeChars = ['\b', '\v', '\f', '&', '<', '>', '\u2028', '\u2029'];
+const iscnPrefixes = [
+  '_taL3_yyHGp-D9RaZ7SPR9-vIR_9vlnVow9b9DvhmX0',
+  'Ua4NYnlcxYAjMIFoaxJEuYefRYKsBs27tKDA-r5PDuE',
+  'LIOVEMF0QOa8jWHRPtC0gCIhpUYaQjcehgIsNIQVaNY',
+  'qFpssVqtLyIGhbPeuiIWtz1eRIB36r-8l_Qe4fL_iJg',
+  'JkgbEeipLlii8HPy6AktfKf6XJTgJaVdMeuRQXhxs_s',
+  'YJHeT_exqazC9aCZlhVJsAGxhrw8gQJntJj7qgc3ZjM',
+  '6l6vB9tVZtgi1VYKNwz45PSe4633wK2RtCwjHntf4-I',
+  'q7LaD9-LOjc3YM30RFWKZLuNoS9ZgE7p3QyV9Qu3AGY',
+];
+
 const iscnSignPayloadToEscape = {
   recordNotes: '<>&\u2028\u2029\u2029\u2028&><',
+  contentFingerprints: [],
+  stakeholders: [],
+  contentMetadata: {},
+} as ISCNSignPayload;
+
+let allASCIIChars = '';
+for (let i = 0; i < 128; i += 1) {
+  allASCIIChars += String.fromCharCode(i);
+}
+
+const iscnSignPayloadASCII = {
+  recordNotes: allASCIIChars,
   contentFingerprints: [],
   stakeholders: [],
   contentMetadata: {},
@@ -126,11 +150,33 @@ describe('getISCNId', () => {
     expect(res).toEqual('9BTHkP5NiO_Zo2L5rnXy7H4bGocv3qZp7UH82kYVvjY');
   });
 
+  for (let i = 0; i < toEscapeChars.length; i += 1) {
+    const char = toEscapeChars[i];
+    // eslint-disable-next-line no-loop-func
+    test(`Test message with char ${char}`, async () => {
+      const iscnSignPayload = iscnSignPayloadEmpty;
+      iscnSignPayload.recordNotes = char;
+      const res = getISCNIdPrefix(
+        sender,
+        iscnSignPayload,
+      );
+      expect(res).toEqual(iscnPrefixes[i]);
+    });
+  }
+
   test('Test message with chars need to be escaped', async () => {
     const res = getISCNIdPrefix(
       sender,
       iscnSignPayloadToEscape,
     );
     expect(res).toEqual('42NjT3XiIHNOrZL54UJb0QDoZOyaVAPfB_9cmgrlqeM');
+  });
+
+  test('Test all ASCII chars', async () => {
+    const res = getISCNIdPrefix(
+      sender,
+      iscnSignPayloadASCII,
+    );
+    expect(res).toEqual('ZWCb3fOKAPxxm68T-Tiv_Q78y8OwqvCg7ye_N0obLSw');
   });
 });

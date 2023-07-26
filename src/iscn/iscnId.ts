@@ -46,9 +46,12 @@ export function getMsgCreateISCNRecordJSON(
 // reference to: https://pkg.go.dev/encoding/json#Marshal
 function escapeUnsafeChar(s: string): string {
   return s
+    .replace(/\\b/g, '\\u0008')
+    .replace(/\\v/g, '\\u000b')
+    .replace(/\\f/g, '\\u000c')
+    .replace(/&/g, '\\u0026')
     .replace(/</g, '\\u003c')
     .replace(/>/g, '\\u003e')
-    .replace(/&/g, '\\u0026')
     .replace(/\u2028/g, '\\u2028')
     .replace(/\u2029/g, '\\u2029');
 }

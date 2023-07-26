@@ -1,6 +1,9 @@
 # Changelog
 ## [Unreleased]
 
+## [0.6.6] - 2023-07-26
+- Fix inconsistency of ascii escaping character between JavaScript and Go in getISCNIdPrefix()
+
 ## [0.6.5] - 2023-07-17
 - Fix getISCNIdPrefix() does not escape the string in the way Go's json.Marshal does.
 

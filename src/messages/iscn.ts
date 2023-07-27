@@ -58,9 +58,12 @@ export function formatMsgCreateIscnRecord(
     value: {
       from: senderAddress,
       record,
-      nonce: nonce ? Long.fromNumber(nonce) : undefined,
-    },
+    } as any,
   };
+  // field nonce: 0 will be ignored when Marshaling in Go
+  if (nonce) {
+    message.value.nonce = Long.fromNumber(nonce);
+  }
   return message;
 }
 

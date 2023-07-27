@@ -105,7 +105,16 @@ describe('getMsgCreateIscnRecordJSON', () => {
     expect(res).toEqual('{"type":"likecoin-chain/MsgCreateIscnRecord","value":{"from":"like1ukmjl5s6pnw2txkvz2hd2n0f6dulw34h9rw5zn","record":{"contentMetadata":{"@context":"http://schema.org/","keywords":"","version":1}}}}');
   });
 
-  test('Test message with nonce and empty metadata', async () => {
+  test('Test message with nonce 0 and empty payload', async () => {
+    const res = getMsgCreateISCNRecordJSON(
+      sender,
+      iscnSignPayloadEmpty,
+      0,
+    );
+    expect(res).toEqual('{"type":"likecoin-chain/MsgCreateIscnRecord","value":{"from":"like1ukmjl5s6pnw2txkvz2hd2n0f6dulw34h9rw5zn","record":{"contentMetadata":{"@context":"http://schema.org/","keywords":"","version":1}}}}');
+  });
+
+  test('Test message with nonce 1 and empty metadata', async () => {
     const res = getMsgCreateISCNRecordJSON(
       sender,
       iscnSignPayloadEmpty,
@@ -141,7 +150,16 @@ describe('getISCNId', () => {
     expect(res).toEqual('RDdHkXNUy-iAXkY2lZQMwjRxAihs_jymeI3Mrw7cLuI');
   });
 
-  test('Test message with nonce and empty payload', async () => {
+  test('Test message with nonce 0 and empty payload', async () => {
+    const res = getISCNIdPrefix(
+      sender,
+      iscnSignPayloadEmpty,
+      0,
+    );
+    expect(res).toEqual('RDdHkXNUy-iAXkY2lZQMwjRxAihs_jymeI3Mrw7cLuI');
+  });
+
+  test('Test message with nonce 1 and empty payload', async () => {
     const res = getISCNIdPrefix(
       sender,
       iscnSignPayloadEmpty,

@@ -1,6 +1,10 @@
 # Changelog
 ## [Unreleased]
 
+## [0.6.7] - 2023-07-27
+### Changed
+- ignore nonce 0 in formatMsgCreateIscnRecord to align with Go behaviour
+
 ## [0.6.6] - 2023-07-26
 - Fix inconsistency of ascii escaping character between JavaScript and Go in getISCNIdPrefix()
 

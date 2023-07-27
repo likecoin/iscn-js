@@ -58,9 +58,11 @@ export function formatMsgCreateIscnRecord(
     value: {
       from: senderAddress,
       record,
-      nonce: nonce ? Long.fromNumber(nonce) : undefined,
-    },
+    } as any,
   };
+  if (nonce) {
+    message.value.nonce = Long.fromNumber(nonce);
+  }
   return message;
 }
 

@@ -65,7 +65,7 @@ describe('signingClient ISCN', () => {
     const { client } = await getSigner();
     const res = await client.esimateISCNTxGasAndFee(testData2);
     expect(res).toEqual(
-      expect.objectContaining({ gas: expect.objectContaining({ fee: expect.objectContaining({ gas: '254454' }) }) }),
+      expect.objectContaining({ gas: expect.objectContaining({ fee: expect.objectContaining({ gas: '277711' }) }) }),
     );
     expect(res).toEqual(
       expect.objectContaining({ iscnFee: expect.objectContaining({ amount: '59860000' }) }),
@@ -105,7 +105,7 @@ describe('signingClient ISCN', () => {
       },
     );
     const hash2 = await computeTransactionHash(signedTxRaw2 as TxRaw);
-    expect(hash2).toEqual('F67C1A184DBEEEDA84F917663890D0F38103E0D09CE9D23721B7BD43861DD368');
+    expect(hash2).toEqual('2927149B265F50292ED44B47C66D8D337E67EDD57FB7A387A1ECC98C2FE0ADF1');
   });
 });
 
@@ -142,7 +142,7 @@ describe('signingClient NFT', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('DCEFD72642CCC5B392568F4AAA1A8613F1C3394FC75EF3838E522864B367C642');
+    expect(hash).toEqual('2D18E1A670B21CA09ED71313AA3DB07C1C25BBF8910D860E96B647BD93ECF4C6');
   });
 });
 

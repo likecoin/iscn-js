@@ -5,7 +5,7 @@ export const DEFAULT_GAS_PRICE = [{ amount: 10, denom: COSMOS_DENOM }];
 export const DEFAULT_GAS_PRICE_NUMBER = DEFAULT_GAS_PRICE[0].amount;
 
 export const GAS_ESTIMATOR_BUFFER_RATIO = 1.25;
-export const GAS_ESTIMATOR_SLOPE = 10.3;
+export const GAS_ESTIMATOR_SLOPE = 12.36;
 export const GAS_ESTIMATOR_INTERCEPT = 110533;
 
 export const DEFAULT_MESSAGE_GAS = 200000;

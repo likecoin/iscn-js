@@ -1,6 +1,10 @@
 # Changelog
 ## [Unreleased]
 
+## [0.6.8] - 2023-08-22
+### Changed
+- Increase gas estimator buffer size multiplier by 20%
+
 ## [0.6.7] - 2023-07-27
 ### Changed
 - ignore nonce 0 in formatMsgCreateIscnRecord to align with Go behaviour

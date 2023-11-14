@@ -33,7 +33,7 @@ describe('signingClient ISCN', () => {
         gas: expect.objectContaining({
           fee: expect.objectContaining({
             gas: '200000',
-            amount: expect.arrayContaining([expect.objectContaining({ amount: '2000000' })]),
+            amount: expect.arrayContaining([expect.objectContaining({ amount: '2000000000' })]),
           }),
         }),
       }),
@@ -51,7 +51,7 @@ describe('signingClient ISCN', () => {
         gas: expect.objectContaining({
           fee: expect.objectContaining({
             gas: '200000',
-            amount: expect.arrayContaining([expect.objectContaining({ amount: '2000000' })]),
+            amount: expect.arrayContaining([expect.objectContaining({ amount: '2000000000' })]),
           }),
         }),
       }),
@@ -98,14 +98,14 @@ describe('signingClient ISCN', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('B6F85222672D37A302AC323F3FF5DA83E873B31419FD3979DBBEED431497FE98');
+    expect(hash).toEqual('C0C2F3A2597B6369EF25BCD8277691EA994DDC3169CAE87A960B7F37EB50E7B9');
     const signedTxRaw2 = await client.createISCNRecord(
       wallet.address, testData2, {
         broadcast: false, sequence: 2, accountNumber: 0, chainId: 'likecoin-mainnet-2',
       },
     );
     const hash2 = await computeTransactionHash(signedTxRaw2 as TxRaw);
-    expect(hash2).toEqual('2927149B265F50292ED44B47C66D8D337E67EDD57FB7A387A1ECC98C2FE0ADF1');
+    expect(hash2).toEqual('F95E3B46E8E8478545AAE61693E92E17833E8FAE6BA40036A513C81351C6863E');
   });
 });
 
@@ -122,7 +122,7 @@ describe('signingClient NFT', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('EFC802279A38BD4315C1B0FF164336F3E49D61B2234D979FFFFF605F1610F941');
+    expect(hash).toEqual('816DE1B2C47C721696C392D85DA1F3EE711B2C93B2CB748D8B8262C07C40C121');
   });
 
   test('Sign mint NFT', async () => {
@@ -142,7 +142,7 @@ describe('signingClient NFT', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('2D18E1A670B21CA09ED71313AA3DB07C1C25BBF8910D860E96B647BD93ECF4C6');
+    expect(hash).toEqual('02B2D991D4683CFD853333C40425F9139162DDE8702F5DC6DCAD449FB01D0C2B');
   });
 });
 
@@ -164,7 +164,7 @@ describe('signingClient Royalty', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('F322242AC30D829ACA54261E1D9B9600136964ABE8F12F216A72A9F63E1045D7');
+    expect(hash).toEqual('7FE8A745F5C5A01708DFE08998F5BBA32591D26FBE55833254ABF799BD0A0933');
   });
 });
 
@@ -182,7 +182,7 @@ describe('signingClient NFT marketplace', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('8143EE793B6BE87AC65BD0E1B6064A246893699410C5C3A9473771A926FC6F7E');
+    expect(hash).toEqual('59BB525CC5FD4D740D07453990E23B3ADBBA927688715ED73A88F6F6B538F37A');
   });
 
   test('Sign create NFT offer', async () => {
@@ -198,7 +198,7 @@ describe('signingClient NFT marketplace', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('091A830053500BD6DB4C20EF7CDD5CCF46F7D17FB3AE52E395DB09A815F1D64E');
+    expect(hash).toEqual('386C409920F2C371B2806860A472EFF6318B531CB1F3299DDCDF4A814AA52C56');
   });
 });
 
@@ -215,7 +215,7 @@ describe('signingClient authz', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('3A2510680B81F4C7F06DBAFDDB300A26E0731F7422C85683166CAB91E897B9D5');
+    expect(hash).toEqual('2D79206BBA9E422E735693A795A230AFF9A3A9BFEFF193EF3CE6548EC711F4F6');
   });
 
   test('Sign executeSendGrant', async () => {
@@ -230,6 +230,6 @@ describe('signingClient authz', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('28787C77CD79F0C292B2339DC6480622FC6713971B8E45875126F501AE3CBEFD');
+    expect(hash).toEqual('6A5393AAB1D2213E12DFA881D778F1B2B1A8929C5D81270C2D2D930FDA1B4CDD');
   });
 });

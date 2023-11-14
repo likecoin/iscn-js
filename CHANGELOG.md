@@ -1,6 +1,10 @@
 # Changelog
 ## [Unreleased]
 
+## [0.6.9] - 2023-11-14
+### Changed
+- Increase default gas price by 1000 as per proposal 74
+
 ## [0.6.8] - 2023-08-22
 ### Changed
 - Increase gas estimator buffer size multiplier by 20%

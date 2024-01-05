@@ -32,8 +32,8 @@ describe('signingClient ISCN', () => {
       expect.objectContaining({
         gas: expect.objectContaining({
           fee: expect.objectContaining({
-            gas: '200000',
-            amount: expect.arrayContaining([expect.objectContaining({ amount: '2000000000' })]),
+            gas: '301310',
+            amount: expect.arrayContaining([expect.objectContaining({ amount: '3013100000' })]),
           }),
         }),
       }),
@@ -50,8 +50,8 @@ describe('signingClient ISCN', () => {
       expect.objectContaining({
         gas: expect.objectContaining({
           fee: expect.objectContaining({
-            gas: '200000',
-            amount: expect.arrayContaining([expect.objectContaining({ amount: '2000000000' })]),
+            gas: '301573',
+            amount: expect.arrayContaining([expect.objectContaining({ amount: '3015730000' })]),
           }),
         }),
       }),
@@ -65,7 +65,7 @@ describe('signingClient ISCN', () => {
     const { client } = await getSigner();
     const res = await client.esimateISCNTxGasAndFee(testData2);
     expect(res).toEqual(
-      expect.objectContaining({ gas: expect.objectContaining({ fee: expect.objectContaining({ gas: '277711' }) }) }),
+      expect.objectContaining({ gas: expect.objectContaining({ fee: expect.objectContaining({ gas: '389545' }) }) }),
     );
     expect(res).toEqual(
       expect.objectContaining({ iscnFee: expect.objectContaining({ amount: '59860000' }) }),
@@ -79,8 +79,8 @@ describe('signingClient ISCN', () => {
       expect.objectContaining({
         gas: expect.objectContaining({
           fee: expect.objectContaining({
-            gas: '200000',
-            amount: expect.arrayContaining([expect.objectContaining({ amount: '200000' })]),
+            gas: '301310',
+            amount: expect.arrayContaining([expect.objectContaining({ amount: '301310' })]),
           }),
         }),
       }),
@@ -98,14 +98,14 @@ describe('signingClient ISCN', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('C0C2F3A2597B6369EF25BCD8277691EA994DDC3169CAE87A960B7F37EB50E7B9');
+    expect(hash).toEqual('471F89BD0AC79AE9DD9444BD73E22E98C6B11BAA172036B6C53DCC490928EDDD');
     const signedTxRaw2 = await client.createISCNRecord(
       wallet.address, testData2, {
         broadcast: false, sequence: 2, accountNumber: 0, chainId: 'likecoin-mainnet-2',
       },
     );
     const hash2 = await computeTransactionHash(signedTxRaw2 as TxRaw);
-    expect(hash2).toEqual('F95E3B46E8E8478545AAE61693E92E17833E8FAE6BA40036A513C81351C6863E');
+    expect(hash2).toEqual('9A1443971336F73D259A717F9252D13E5921606C61CD652E6753E15548467098');
   });
 });
 
@@ -122,7 +122,7 @@ describe('signingClient NFT', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('816DE1B2C47C721696C392D85DA1F3EE711B2C93B2CB748D8B8262C07C40C121');
+    expect(hash).toEqual('8DCE3F2AC76216449FE7B126E9505817847290DD9FCF0EFADF12DC451DAA54D9');
   });
 
   test('Sign mint NFT', async () => {
@@ -142,7 +142,7 @@ describe('signingClient NFT', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('02B2D991D4683CFD853333C40425F9139162DDE8702F5DC6DCAD449FB01D0C2B');
+    expect(hash).toEqual('28C279F64C06A28A0F2861231C6A6395C6FA90E507CCB6052E80FF82F94632A3');
   });
 });
 
@@ -164,7 +164,7 @@ describe('signingClient Royalty', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('7FE8A745F5C5A01708DFE08998F5BBA32591D26FBE55833254ABF799BD0A0933');
+    expect(hash).toEqual('200CEA82422C5122BB648C393F3AA43AAF7B3DEEBBE2CD9138F2301045D856F0');
   });
 });
 
@@ -182,7 +182,7 @@ describe('signingClient NFT marketplace', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('59BB525CC5FD4D740D07453990E23B3ADBBA927688715ED73A88F6F6B538F37A');
+    expect(hash).toEqual('FC8AA031CAA7ACF1ECB0A4FC5BC753D2B3A29A1B45ACD19D9156575DB525012E');
   });
 
   test('Sign create NFT offer', async () => {
@@ -198,7 +198,7 @@ describe('signingClient NFT marketplace', () => {
       },
     );
     const hash = await computeTransactionHash(signedTxRaw as TxRaw);
-    expect(hash).toEqual('386C409920F2C371B2806860A472EFF6318B531CB1F3299DDCDF4A814AA52C56');
+    expect(hash).toEqual('BBFD14DC52CCE6227CB5C3881787ED11ECC74517D78443CF8AA2EA21A20D05A8');
   });
 });
 

@@ -1,6 +1,11 @@
 # Changelog
 ## [Unreleased]
 
+## [0.6.10] - 2024-01-05
+### Changed
+- Increase default gas price estimator intercept to 200000
+- Bump axios, minimist, express dependencies version
+
 ## [0.6.9] - 2023-11-14
 ### Changed
 - Increase default gas price by 1000 as per proposal 74

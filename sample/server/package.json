@@ -9,7 +9,7 @@
   "author": "",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@cosmjs/stargate": "^0.26.0",
+    "@cosmjs/stargate": "^0.32.2",
     "@likecoin/iscn-js": "0.0.7",
     "body-parser": "^1.19.1",
     "express": "^4.17.3"

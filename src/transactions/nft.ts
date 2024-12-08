@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { EncodeObject } from '@cosmjs/proto-signing';
 import { Coin } from 'cosmjs-types/cosmos/base/v1beta1/coin';
-import { Buffer } from 'buffer/';
+import globalThis from '../globalThis';
 
 import { formatGasFee } from './gas';
 import ISCNQueryClient from '../queryClient';
@@ -26,7 +26,7 @@ export async function estimateNFTTxFee(
     value,
     memo, // directly append memo to object if exists, since we only need its length
   };
-  const txBytes = Buffer.from(jsonStringify(obj), 'utf-8');
+  const txBytes = globalThis.Buffer.from(jsonStringify(obj), 'utf-8');
   const byteSize = new BigNumber(txBytes.length);
   const feeAmount = new BigNumber(byteSize).multipliedBy(feePerByteAmount);
   return {

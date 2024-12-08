@@ -15,7 +15,7 @@ import { MsgGrant } from 'cosmjs-types/cosmos/authz/v1beta1/tx';
 import { GenericAuthorization, Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz';
 import { SendAuthorization } from 'cosmjs-types/cosmos/bank/v1beta1/authz';
 import { StakeAuthorization } from 'cosmjs-types/cosmos/staking/v1beta1/authz';
-import { Buffer } from 'buffer/';
+import globalThis from '../globalThis';
 import {
   ISCNRecord, ISCNRecordData, LikeNFT, LikeNFTClass, ParsedISCNTx,
 } from '../types';
@@ -30,12 +30,12 @@ export function parseISCNRecordFields(record: IscnRecord): ISCNRecordData {
     ...record,
     stakeholders: stakeholders.map((s: Uint8Array) => {
       if (s) {
-        const sString = Buffer.from(s).toString('utf-8');
+        const sString = globalThis.Buffer.from(s).toString('utf-8');
         if (sString) return JSON.parse(sString);
       }
       return s;
     }),
-    contentMetadata: JSON.parse(Buffer.from(contentMetadata).toString('utf-8')),
+    contentMetadata: JSON.parse(globalThis.Buffer.from(contentMetadata).toString('utf-8')),
   };
 }
 
@@ -44,7 +44,7 @@ export function parseNFTClassDataFields(record: Class): LikeNFTClass {
   if (record.data && record.data.typeUrl === '/likechain.likenft.v1.ClassData') {
     data = ClassData.decode(record.data.value);
     if (data.metadata) {
-      const metadataString = Buffer.from(data.metadata).toString('utf-8');
+      const metadataString = globalThis.Buffer.from(data.metadata).toString('utf-8');
       if (metadataString) {
         data.metadata = JSON.parse(metadataString);
       }
@@ -62,7 +62,7 @@ export function parseNFTDataFields(record: NFT): LikeNFT {
   if (record.data && record.data.typeUrl === '/likechain.likenft.v1.NFTData') {
     data = NFTData.decode(record.data.value);
     if (data.metadata) {
-      const metadataString = Buffer.from(data.metadata).toString('utf-8');
+      const metadataString = globalThis.Buffer.from(data.metadata).toString('utf-8');
       if (metadataString) {
         data.metadata = JSON.parse(metadataString);
       }
@@ -165,7 +165,7 @@ export function parseTxInfoFromIndexedTx(tx: IndexedTx): ParsedISCNTx {
 export function parseISCNTxRecordFromQuery(records: QueryResponseRecord[]): ISCNRecord[] {
   return records.map((r): ISCNRecord => {
     const { data, ipld } = r;
-    const parsedData = JSON.parse(Buffer.from(data).toString('utf-8'));
+    const parsedData = JSON.parse(globalThis.Buffer.from(data).toString('utf-8'));
     return {
       ipld,
       data: parsedData,

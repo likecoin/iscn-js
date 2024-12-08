@@ -1,9 +1,9 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { EncodeObject } from '@cosmjs/proto-signing';
-import { Buffer } from 'buffer/';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Long from 'long';
 import { ISCNSignPayload, Stakeholder } from '../types';
+import globalThis from '../globalThis';
 
 export function formatISCNPayload(payload: ISCNSignPayload, version = 1): {
     recordNotes?: string;
@@ -25,7 +25,7 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1): {
     ...data
   } = payload;
 
-  const stakeholders = inputStakeholders.map((s: Stakeholder) => Buffer.from(
+  const stakeholders = inputStakeholders.map((s: Stakeholder) => globalThis.Buffer.from(
     JSON.stringify(s),
     'utf8',
   ));
@@ -45,7 +45,7 @@ export function formatISCNPayload(payload: ISCNSignPayload, version = 1): {
     recordNotes,
     contentFingerprints,
     stakeholders,
-    contentMetadata: Buffer.from(JSON.stringify(contentMetadata), 'utf8'),
+    contentMetadata: globalThis.Buffer.from(JSON.stringify(contentMetadata), 'utf8'),
   };
 }
 

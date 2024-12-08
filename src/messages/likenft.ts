@@ -4,7 +4,7 @@ import { ClassConfig } from '@likecoin/iscn-message-types/dist/likechain/likenft
 import { RoyaltyConfigInput } from '@likecoin/iscn-message-types/dist/likechain/likenft/v1/royalty_config';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Long from 'long';
-import { Buffer } from 'buffer/';
+import globalThis from '../globalThis';
 import { MintNFTData, NewNFTClassData } from '../types';
 
 export function formatMsgNewClass(
@@ -27,7 +27,7 @@ export function formatMsgNewClass(
         description: nftClassData.description,
         uri: nftClassData.uri,
         uriHash: nftClassData.uriHash,
-        metadata: Buffer.from(JSON.stringify({
+        metadata: globalThis.Buffer.from(JSON.stringify({
           ...(nftClassData.metadata || {}),
         }), 'utf8'),
         config: classConfig || {
@@ -75,7 +75,7 @@ export function formatMsgMintNFT(
       input: {
         uri: nftData.uri,
         uriHash: nftData.uriHash,
-        metadata: Buffer.from(JSON.stringify({
+        metadata: globalThis.Buffer.from(JSON.stringify({
           ...(nftData.metadata || {}),
         }), 'utf8'),
       },

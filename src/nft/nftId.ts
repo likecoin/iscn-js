@@ -6,9 +6,9 @@ function calculateNFTClassId(
   prefix: Uint8Array,
   serial = 0,
 ): string {
-  const bytes = Buffer.concat([
+  const bytes = globalThis.Buffer.concat([
     prefix,
-    Buffer.from(serial.toString(), 'utf8'),
+    globalThis.Buffer.from(serial.toString(), 'utf8'),
   ]);
   const sha256 = createHash('sha256');
   const hash = sha256.update(bytes).digest();
@@ -20,7 +20,7 @@ export function calculateNFTClassIdByISCNId(
   numberOfExistingNFTClass = 0,
 ): string {
   const iscnIdPrefix = getISCNPrefix(iscnId);
-  const prefix = Buffer.from(iscnIdPrefix, 'utf8');
+  const prefix = globalThis.Buffer.from(iscnIdPrefix, 'utf8');
   return calculateNFTClassId(prefix, numberOfExistingNFTClass);
 }
 

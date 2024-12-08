@@ -48,7 +48,6 @@
     "axios": "^1.6.0",
     "bech32": "^2.0.0",
     "bignumber.js": "^9.0.1",
-    "buffer": "^6.0.3",
     "fast-json-stable-stringify": "^2.1.0"
   }
 }

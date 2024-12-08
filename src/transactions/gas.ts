@@ -1,9 +1,9 @@
 import { StdFee } from '@cosmjs/stargate';
 import BigNumber from 'bignumber.js';
-import { Buffer } from 'buffer/';
 import jsonStringify from 'fast-json-stable-stringify';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { EncodeObject } from '@cosmjs/proto-signing';
+import globalThis from '../globalThis';
 import {
   GAS_ESTIMATOR_INTERCEPT,
   GAS_ESTIMATOR_SLOPE,
@@ -57,7 +57,7 @@ export function estimateMsgTxGas(msg: EncodeObject, {
     value,
     memo, // directly append memo to object if exists, since we only need its length
   };
-  const txBytes = Buffer.from(jsonStringify(obj), 'utf-8');
+  const txBytes = globalThis.Buffer.from(jsonStringify(obj), 'utf-8');
   const byteSize = new BigNumber(txBytes.length);
   const gasUsedEstimationBeforeBuffer = byteSize
     .multipliedBy(GAS_ESTIMATOR_SLOPE)
@@ -76,7 +76,7 @@ export function estimateMsgsTxGas(messages: EncodeObject[], option: {
   memo?: string,
   gasMultiplier?: number,
 }): StdFee {
-  const msgSizes = messages.map((m) => (Buffer.from(jsonStringify(m), 'utf-8').length));
+  const msgSizes = messages.map((m) => (globalThis.Buffer.from(jsonStringify(m), 'utf-8').length));
   const maxIndex = msgSizes.reduce((acc, curr, index) => {
     if (curr > msgSizes[acc]) return index;
     return acc;

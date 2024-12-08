@@ -2,7 +2,7 @@ import jsonStringify from 'fast-json-stable-stringify';
 import BigNumber from 'bignumber.js';
 import { StdFee } from '@cosmjs/stargate';
 import { Coin } from 'cosmjs-types/cosmos/base/v1beta1/coin';
-import { Buffer } from 'buffer/';
+import globalThis from '../globalThis';
 
 import {
   ISCN_REGISTRY_NAME,
@@ -61,8 +61,8 @@ export async function estimateISCNTxFee(
       '/': 'bahuaierav3bfvm4ytx7gvn4yqeu4piiocuvtvdpyyb5f6moxniwemae4tjyq',
     };
   }
-  const byteSize = Buffer.from(jsonStringify(obj), 'utf-8').length
-      + Buffer.from(jsonStringify({ stakeholders: [], contentMetadata: {} }), 'utf-8').length
+  const byteSize = globalThis.Buffer.from(jsonStringify(obj), 'utf-8').length
+      + globalThis.Buffer.from(jsonStringify({ stakeholders: [], contentMetadata: {} }), 'utf-8').length
       + stakeholders.reduce((acc, s) => acc + s.length, 0)
       + stakeholders.length
       + contentMetadata.length;

@@ -44,7 +44,7 @@
     "typescript": "^4.4.2"
   },
   "dependencies": {
-    "@likecoin/iscn-message-types": "0.0.7",
+    "@likecoin/iscn-message-types": "0.0.8",
     "axios": "^1.6.0",
     "bech32": "^2.0.0",
     "bignumber.js": "^9.0.1",

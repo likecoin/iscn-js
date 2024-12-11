@@ -1,6 +1,11 @@
 # Changelog
 ## [Unreleased]
 
+## [0.7.0] - 2024-12-11
+### Changed
+- Upgrade @likecoin/iscn-message-types
+- Remove buffer polyfill dependency
+
 ## [0.6.10] - 2024-01-05
 ### Changed
 - Increase default gas price estimator intercept to 200000
